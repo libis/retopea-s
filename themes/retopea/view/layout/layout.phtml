@@ -1,0 +1,187 @@
+<?php
+$escape = $this->plugin('escapeHtml');
+$this->htmlElement('html')->setAttribute('lang', $this->lang());
+$this->headMeta()->setCharset('utf-8');
+$this->headMeta()->appendName('viewport', 'width=device-width, initial-scale=1');
+$this->headTitle($this->setting('installation_title', 'Omeka S'))->setSeparator(' · ');
+$this->headLink()->prependStylesheet($this->assetUrl('css/style.css'));
+$this->headLink()->prependStylesheet($this->assetUrl('css/iconfonts.css', 'Omeka'));
+$this->headLink()->prependStylesheet('//fonts.googleapis.com/css?family=Open+Sans:400,400italic,600,600italic,700italic,700');
+$this->headLink()->prependStylesheet('//fonts.googleapis.com/css?family=Merriweather:400,400i|Roboto:300,300i,400,400i,700,700i');
+$this->headScript()->prependFile($this->assetUrl('js/default.js'));
+$this->headScript()->prependFile($this->assetUrl('js/global.js', 'Omeka'));
+$this->headScript()->prependFile($this->assetUrl('vendor/jquery/jquery.min.js', 'Omeka'));
+$this->trigger('view.layout');
+$title = $this->pageTitle($site->title());
+$logo = $this->themeSettingAssetUrl('logo');
+if ($logo):
+    $title = '<img src="' . $this->escapeHtml($logo) . '">';
+endif;
+$userBar =  $this->userBar();
+
+$libis = $this->plugin('Libis');
+$lang = $libis->getLanguage();
+?>
+<?php echo $this->doctype(); ?>
+<?php echo $this->htmlElement('html'); ?>
+    <head>
+        <?php echo $this->headMeta(); ?>
+        <?php echo $this->headTitle(); ?>
+        <?php echo $this->headLink(); ?>
+        <?php echo $this->headStyle(); ?>
+        <?php echo $this->headScript(); ?>
+
+        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.2/css/all.css" integrity="sha384-oS3vJWv+0UjzBfQzYUhtDYW+Pj2yciDJxpsK1OYPAYjqT085Qq/1cq5FLXAZQ7Ay" crossorigin="anonymous">
+        <!-- MailerLite Universal -->
+        <script>
+        (function(m,a,i,l,e,r){ m['MailerLiteObject']=e;function f(){
+        var c={ a:arguments,q:[]};var r=this.push(c);return "number"!=typeof r?r:f.bind(c.q);}
+        f.q=f.q||[];m[e]=m[e]||f.bind(f.q);m[e].q=m[e].q||f.q;r=a.createElement(i);
+        var _=a.getElementsByTagName(i)[0];r.async=1;r.src=l+'?v'+(~~(new Date().getTime()/1000000));
+        _.parentNode.insertBefore(r,_);})(window, document, 'script', 'https://static.mailerlite.com/js/universal.js', 'ml');
+
+        var ml_account = ml('accounts', '1275314', 't0f1d2f5z3', 'load');
+        </script>
+        <!-- End MailerLite Universal -->
+    </head>
+
+    <?php $sitetitle = strtolower($site->title());?>
+    <?php $sitetitle = str_replace(' ', '-', $sitetitle);?>
+
+    <?php echo $this->htmlElement('body')->setAttribute('class',$sitetitle);?>
+        <?php echo $userBar; ?>
+        <header>
+          <div class="gradient">
+
+
+            <nav>
+              <div class="hero-top">
+                <div class="intro">
+
+                  <div class="title-box">
+                    <?php if ($this->themeSetting('logo')): ?>
+                    <a href="<?php echo $site->url(); ?>" class="site-title"><img src="<?php echo $this->themeSettingAssetUrl('logo'); ?>" title="Logo"></a>
+                    <?php else: ?>
+                    <a href="<?php echo $site->url(); ?>" class="site-title">Retopea</a>
+                    <a href="<?php echo $site->url(); ?>" class="site-sub-title">
+                      <?php if($site->title() == "Start"):?>
+                          Religious Toleration and Peace
+                      <?php else: ?>
+                          <?php echo $site->title(); ?>
+                      <?php endif; ?>
+                    </a>
+                    <?php endif; ?>
+                  </div>
+                  <div class="title-btn">
+                    <a class="menu-btn" href="#">&#9776;</a>
+                  </div>
+                </div>
+                <div class="slogan">
+                  <?php if($site->title() == "Start"):?>
+                      <h1><span>Religious Toleration and Peace</span></h1>
+                  <?php else: ?>
+                      <h1><span><?php echo $site->title(); ?></span></h1>
+                  <?php endif; ?>
+
+                </div>
+              </div>
+              <div class="nav-menu">
+                <?php
+                echo $site->publicNav()->menu()->renderMenu(null, [
+                    'maxDepth' => $this->themeSetting('nav_depth') - 1
+                ]);
+                ?>
+
+                <div id="lang-switcher" class="ui-dropdown-list">
+                    <?php
+                      $languages = array('en'=> 'EN','nl' => 'NL','fr' => 'FR',
+                      'de' => 'DE'
+                      );
+                      $path = $site->url();
+                    ?>
+
+  			            <h2 class="visuallyhidden">Sprache wählen</h2>
+                    <?php foreach ($languages as $locale => $language): ?>
+                      <?php if ($locale == $lang): ?>
+                          <p class="ui-dropdown-list-trigger">
+                          <span class="visuallyhidden">Aktuelle Sprache: </span> <strong><?php echo $language ?></strong></p>
+                      <?php endif; ?>
+                    <?php endforeach; ?>
+              			<ul>
+                    <?php foreach ($languages as $locale => $language): ?>
+                        <?php if ($locale != $lang): ?>
+                             <li><a href="<?php echo str_replace($lang,$locale,$path);
+                             ?>">
+                                 <?php echo $language ?>
+                             </a></li>
+                        <?php endif;?>
+
+                    <?php endforeach; ?>
+                    </ul>
+                </div>
+            </div>
+            <div id="search">
+                <?php echo $this->partial('common/search-form'); ?>
+            </div>
+          </nav>
+        </div>
+        </header>
+
+        <div id="content" role="main">
+            <?php echo $this->content; ?>
+        </div>
+        <footer>
+          <div class="partner-container">
+            <h3 style="text-align:center">Project partners</h3>
+
+            <div class="partners">
+               <a href="http://retopea.eu/s/start/page/ukim"><img alt="Cyril and Methodius University in Skopje" src="/themes/retopea/asset/images/logo/Kiril-metodij.png" /></a>
+               <a href="http://retopea.eu/s/start/page/euro-arab-foundation"><img alt="Euro-Arab Foundation" src="/themes/retopea/asset/images/logo/euro-arab.png" /></a>
+               <a href="http://retopea.eu/s/start/page/le-foyer-vzw"><img alt="Foyer vzw" src="/themes/retopea/asset/images/logo/foyer.png" /></a>
+               <a href="http://retopea.eu/s/start/page/helsingin-yliopisto"><img alt="Helsingin Yliopisto" src="/themes/retopea/asset/images/logo/Helsingin_yliopisto.svg.png" /></a>
+               <a href="http://retopea.eu/s/start/page/ku-leuven"><img alt="KU Leuven" src="/themes/retopea/asset/images/logo/ku-leuven.png" /></a>
+            </div>
+
+            <div class="partners">
+              <a href="http://retopea.eu/s/start/page/leibniz"><img alt="Leibniz-Institut für Europäische Geschichte (IEG Mainz)" src="/themes/retopea/asset/images/logo/leibniz.png" /></a>
+              <a href="http://retopea.eu/s/start/page/mcic"><img alt="Macedonian Centre for Intercultural Cooperation (MCIC)" src="/themes/retopea/asset/images/logo/Mcic_logo_en.png" /></a>
+              <a href="http://retopea.eu/s/start/page/open-university"><img alt="Open University" src="/themes/retopea/asset/images/logo/OU_Master_Logo_Dark_Blue.png" /></a>
+              <a href="http://retopea.eu/s/start/page/universidad-de-granada"><img alt="Universidad de Granada" src="/themes/retopea/asset/images/logo/logo-UGR-pequeño.png" /></a>
+              <a href="http://retopea.eu/s/start/page/university-of-tartu"><img alt="University of Tartu" src="/themes/retopea/asset/images/logo/University_of_Tartu_logo.png" /></a>
+            </div>
+            <div class="partners">
+              <a href="http://retopea.eu/s/start/page/university-of-warsaw"><img alt="University of Warsaw" src="/themes/retopea/asset/images/logo/uw.png" /></a>
+            </div>
+          </div>
+          <div class="footer-content">
+
+
+            <div class="contact">
+              <strong><a href="/s/start/page/contact">CONTACT US</a></strong><br />
+              Project Coordinator<br />
+              Katholieke Universiteit Leuven<br />
+              Oude Markt 13, Leuven 3000, Belgium
+            </div>
+            <div class="logos">
+              <img style="height:50px;" src="<?php echo $this->assetUrl("images/logo.png");?>">
+              <a href="https://kuleuven.be/"><img style="height:50px;" src="<?php echo $this->assetUrl("images/KULEUVEN.png");?>"></a>
+              <a href="http://libis.be/"><img style="height:50px;" src="<?php echo $this->assetUrl("images/libis_gray.png");?>"></a>
+              <div class="horizon">
+                <img style="height:80px;" src="<?php echo $this->assetUrl("images/2020.png");?>">
+              </div>
+            </div>
+          </div>
+
+
+        </footer>
+        <!-- Global site tag (gtag.js) - Google Analytics -->
+        <script async src="https://www.googletagmanager.com/gtag/js?id=UA-143331508-1"></script>
+        <script>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+
+          gtag('config', 'UA-143331508-1');
+        </script>
+    </body>
+</html>

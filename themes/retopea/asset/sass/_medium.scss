@@ -1,0 +1,276 @@
+#content {
+    min-height: 400px;
+}
+
+table {
+    margin: $spacing-l 0;
+    border-collapse: collapse;
+}
+
+th,
+td {
+    text-align: left;
+    padding: $spacing-s $spacing-m;
+    padding-bottom: $spacing-s - 1px;
+    border-bottom: 1px solid $gray;
+}
+
+/* @group ----- Header ----- */
+
+header nav {
+    margin: 0 auto 0 auto;
+    position: static;
+    justify-content: space-between;
+}
+
+/* @end */
+
+
+/* @group ----- Navigation ----- */
+#search {
+    flex: 0 0 340px;
+    padding:0;
+    margin-top:0;
+    border:none;
+}
+
+#search form input[type="text"],
+#search form button[type="submit"] {
+    font-size: .75 * $base-font-size;
+}
+
+#search form button[type="submit"] {
+    width: 35px;
+    height: 1.5*$base-line-height;
+}
+
+.hero{
+  display:block;
+
+  padding:12rem 0 0 0;
+  margin-bottom: 1.2 * $spacing-l;
+
+  .intro{
+    @include container;
+    padding: 0 (2 * gutter());
+
+    .title-box{
+      padding: gutter();
+      background: rgba($primary,0.8);
+      width: span(8 of 12);
+      font-weight: 100;
+
+      .site-title:hover,
+      .site-title:active {
+          border-bottom: 0;
+      }
+
+      .site-title h1{
+        font-weight:100;
+        margin:0;
+        color:white;
+        font-size: 1.9 * $base-font-size;
+        line-height: 1.5 * $base-line-height;
+        text-transform: none;
+        text-transform: uppercase;
+
+        .retopea{
+          font-weight:700;
+          margin-right: 1rem;
+          color:white;
+          font-size: 2.5 * $base-font-size;
+        }
+      }
+    }
+  }
+}
+
+/* @end */
+
+/* @group ----- Resource List ----- */
+
+ul.resource-list .resource img {
+    width: 4 * $spacing-l;
+    height: auto;
+    float: right;
+    margin-left: $spacing-m;
+}
+
+ul.resource-list .resource img ~ * {
+    width: calc(100% - #{4.5 * $spacing-l});
+}
+
+.masonry{
+    column-count: 4;
+    column-gap: 50px;
+
+   .body{
+     padding: 0;
+
+     h4{
+        font-size: $base-font-size;
+        font-weight: bold;
+        padding: 0.1rem 0 0.5rem 0;
+        margin: 0;
+        line-height: 1.4;
+
+        a{
+          margin-bottom: 0.2rem;
+          border-bottom: 2px solid $primary;
+        }
+     }
+   }
+
+   .featured{
+     padding: 0.7rem 1rem 1rem 1rem !important;
+     color: white;
+   }
+}
+
+/* @end */
+
+/* @group ----- Item Set ----- */
+
+body.item-set.item #content {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    justify-content: flex-end;
+
+    & > h2,
+    & > h3 {
+        width: 100%;
+    }
+}
+
+body.item-set .metadata {
+    width: span(4 of 12 alpha);
+    border-left: 5px solid $light;
+    padding-left: gutter();
+    margin-right: gutter();
+}
+
+body.item-set .metadata h4:first-of-type {
+    margin-top: 0;
+}
+
+body.item-set #content .metadata ~ * {
+    width: span(8 of 12 omega);
+    border-left: 1px solid $light;
+    padding-left: gutter();
+}
+
+body.item-set .item-set-items h3 {
+    margin-top: 0;
+}
+
+body.item-set .metadata ~ nav.pagination:first-of-type {
+    margin-bottom: 0;
+}
+
+
+/* @end */
+
+/* @group ----- Item show ----- */
+.item-show{
+  display:flex;
+
+  .media-embeds{
+    flex: 1 1 span(6 of 12);
+    background: rgba($primary,0.05);
+    padding: 1*gutter();
+    margin-right:gutter();
+  }
+
+  .metadata{
+    flex: 1 1 span(6 of 12);
+    padding: 1*gutter();
+  }
+}
+
+/* @end */
+
+/* @group ----- Page and blocks ----- */
+
+.preview-block {
+    clear: both;
+}
+
+ul.preview.resource-list li:first-of-type {
+    border-top: 1px solid $light;
+    padding-top: ($spacing-l - 1px);
+}
+
+.block{
+  //flex: left;
+  flex: 1 1 span(4 of 12);
+}
+
+.page #content{
+  //padding: 0 2*gutter() 30px;
+}
+
+.home-blocks{
+  display: flex;
+  flex-wrap:wrap;
+
+  .language-menu{
+    background:transparent;
+    padding:0;
+    margin-top:2rem;
+
+    ul{
+      padding-left:4rem;
+      list-style: circle;
+      margin:0 2rem;
+      padding-left:gutter();
+
+      li{
+        margin-bottom: 5px;
+      }
+
+      a{
+
+      }
+    }
+  }
+}
+
+.block{
+  flex-basis: span(4 of 12);
+}
+
+.col-2{
+  .block{
+    //flex: left;
+    flex-basis: span(6 of 12);
+    padding: 0 gutter() / 2;
+    margin-bottom: 3rem;
+    padding-bottom: 1rem;
+  }
+}
+
+.item-with-metadata{
+  .resource{
+    display: flex;
+    background: #f1eaeb;
+
+    .media-list{
+      flex: 0 0 span(6 of 12);
+      padding: gutter();
+      background: #f8f4f5;
+
+      img{
+        margin:0 !important;
+      }
+    }
+
+    .metadata{
+      flex: 0 0 span(6 of 12);
+      padding: gutter();
+
+    }
+  }
+}
+
+/* @end */

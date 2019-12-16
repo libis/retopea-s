@@ -1,0 +1,16 @@
+version: '2'
+
+services:
+  
+  omeka-s:    
+    build: ./
+    ports:
+      - "9002:80"
+    volumes:
+      - ./modules/:/var/www/html/retopea/modules/
+      - ./themes/:/var/www/html/retopea/themes/
+      - ./files/:/var/www/html/retopea/files/
+      - ./config/:/var/www/html/retopea/config/
+      - ./htaccess:/var/www/html/retopea/.htaccess
+      - ./imagemagick-policy.xml:/var/www/html/retopea/imagemagick-policy.xml
+    restart: always

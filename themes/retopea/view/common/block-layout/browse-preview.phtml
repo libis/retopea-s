@@ -1,0 +1,73 @@
+<div class="preview-block">
+
+<?php if ($this->heading): ?>
+<h2><?php echo $this->heading; ?></h2>
+<?php endif; ?>
+<p>
+  <?php echo $this->heading; ?>
+</p>
+<?php if ($this->linkText == 'Browse all news'):?>
+  <div class="resource-list preview">
+  <?php
+  $headingTerm = $this->siteSetting('browse_heading_property_term', 'dcterms:title');
+  $bodyTerm = $this->siteSetting('browse_body_property_term', 'dcterms:description');
+  foreach ($this->resources as $resource):
+      $heading = $resource->value($headingTerm, ['default' => $this->translate('[Untitled]')]);
+      $body = $resource->value($bodyTerm);
+  ?>
+      <div class="news-item">
+        <div class="thumbnail">
+          <?php echo $resource->linkRaw($this->thumbnail($resource, 'square')); ?>
+        </div>
+        <div class="body">
+          <h4><?php echo $resource->link($heading); ?></h4>
+          <div class="date">
+            <?php if($resource->value('dcterms:date')):?>
+              <?php echo $resource->value('dcterms:date');?>
+            <?php endif;?>
+          </div>
+          <div class="description">
+            <?php if($resource->value('dcterms:alternative')):?>
+              <?php echo $resource->value('dcterms:alternative');?>
+            <?php endif;?>
+          </div>
+          <div class="subject">
+            <?php if($resource->value('dcterms:subject')):?>
+              <?php echo $resource->value('dcterms:subject');?>
+            <?php endif;?>
+          </div>
+        </div>
+      </div>
+  <?php endforeach; ?>
+  </div>
+<?php else:?>
+    <div class="resource-list masonry preview">
+    <?php
+    $headingTerm = $this->siteSetting('browse_heading_property_term', 'dcterms:title');
+    $bodyTerm = $this->siteSetting('browse_body_property_term', 'dcterms:description');
+    foreach ($this->resources as $resource):
+        $heading = $resource->value($headingTerm, ['default' => $this->translate('[Untitled]')]);
+        $body = $resource->value($bodyTerm);
+    ?>
+        <div class="<?php echo $this->resourceType; ?> resource">
+          <?php echo $resource->linkRaw($this->thumbnail($resource, 'medium')); ?>
+          <div class="body">
+            <h4><?php echo $resource->link($heading); ?></h4>
+            <?php if ($body): ?>
+            <div class="description"><?php echo $body; ?></div>
+            <?php endif; ?>
+          </div>
+        </div>
+    <?php endforeach; ?>
+    </div>
+    <?php
+    if ($this->linkText):
+        echo $this->hyperlink($this->linkText, $this->url(
+            'site/resource', ['controller' => $this->resourceType, 'action' => 'browse'], ['query' => $this->query], true
+        ));
+    endif;
+    ?>
+<?php endif;?>
+
+
+</div>

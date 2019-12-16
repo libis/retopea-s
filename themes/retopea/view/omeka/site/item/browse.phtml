@@ -1,0 +1,61 @@
+<?php
+$escape = $this->plugin('escapeHtml');
+$this->htmlElement('body')->appendAttribute('class', 'item resource browse');
+$query = $this->params()->fromQuery();
+if (isset($itemSet)):
+    $this->htmlElement('body')->appendAttribute('class', 'item-set');
+    $query['item_set_id'] = $itemSet->id();
+endif;
+$headingTerm = $this->siteSetting('browse_heading_property_term', 'dcterms:title');
+$bodyTerm = $this->siteSetting('browse_body_property_term', 'dcterms:description');
+$itemSetShow = isset($itemSet);
+$libis = $this->plugin('Libis');
+$lang = $libis->getLanguage();
+?>
+
+<?php if ($itemSetShow): ?>
+    <h1>
+      <span class="title">
+        <?php if($itemSet->value('dcterms:title',array('all' => 'true','lang' => $lang))):?>
+          <?php echo implode(", ",$itemSet->value('dcterms:title',array('all' => 'true','lang' => $lang)));?>
+        <?php endif;?>
+      </span>
+    </h1>
+    <div class="metadata">
+      <?php if($itemSet->value('dcterms:description',array('all' => 'true','lang' => $lang))):?>
+        <?php echo implode(", ",$itemSet->value('dcterms:description',array('all' => 'true','lang' => $lang)));?>
+      <?php endif;?>
+    </div>
+    <div class="item-set-items">
+    <?php echo '<h3>' . $escape($this->translate('Items')) . '</h3>'; ?>
+    <?php echo $this->hyperlink($this->translate('Advanced search'), $this->url('site/resource', ['controller' => 'item', 'action' => 'search'], ['query' => $query], true), ['class' => 'advanced-search']); ?>
+
+<?php else: ?>
+    <h1><?php echo $this->translate('Items'); ?></h1>
+<?php endif; ?>
+
+<?php echo $this->searchFilters(); ?>
+<?php echo $this->pagination(); ?>
+<?php $this->trigger('view.browse.before'); ?>
+
+<div class="masonry resource-list">
+<?php
+foreach ($items as $item):
+    $heading = $item->value($headingTerm, ['default' => $this->translate('[Untitled]'),'lang' => $lang]);
+    $body = $item->value($bodyTerm,array('lang' => $lang));
+?>
+    <div class="item resource">
+        <?php echo $item->linkRaw($this->thumbnail($item, 'medium')); ?>
+        <div class="body">
+          <h4><?php echo $item->link($heading); ?></h4>
+          <?php if ($body): ?>
+          <div class="description"><?php echo $body; ?></div>
+          <?php endif; ?>
+        </div>
+    </div>
+<?php endforeach; ?>
+</div>
+
+<?php echo ($itemSetShow) ? '</div>' : ''; ?>
+<?php $this->trigger('view.browse.after'); ?>
+<?php echo $this->pagination(); ?>

@@ -1,0 +1,86 @@
+<?php
+$escape = $this->plugin('escapeHtml');
+$this->htmlElement('body')->appendAttribute('class', 'items show');
+if ($owner = $item->owner()) {
+    $ownerText = $escape($item->owner()->name());
+} else {
+    $ownerText = $this->translate('[no owner]');
+}
+
+$sectionNavs = [
+    'item-metadata' => $this->translate('Metadata'),
+    'item-linked' => $this->translate('Linked resources'),
+];
+?>
+<?php echo $this->pageTitle($item->displayTitle(), 1, $this->translate('Items')); ?>
+<div id="page-actions">
+    <?php if ($item->userIsAllowed('update')): ?>
+    <?php echo $item->link($this->translate('Edit item'), 'edit', ['class' => 'button']); ?>
+    <?php endif; ?>
+</div>
+
+<?php echo $this->sectionNav($sectionNavs, 'view.show.section_nav', $item); ?>
+
+<div id="item-metadata" class="active section">
+    <?php if ( $item->resourceClass()): ?>
+        <div class="meta-group">
+            <h4><?php echo $this->translate('Class'); ?></h4>
+            <div class="value"><?php echo $escape($this->translate($item->resourceClass()->label())); ?></div>
+        </div>
+    <?php endif; ?>
+    <?php echo $item->displayValues(); ?>
+</div>
+
+<div id="item-linked" class="section">
+    <?php
+    $page = $this->params()->fromQuery('page', 1);
+    $property = $this->params()->fromQuery('property');
+    $subjectValues = $item->displaySubjectValues($page, 25, $property);
+    ?>
+    <?php if ($subjectValues): ?>
+        <p><?php echo $this->translate('The following resources link to this item:'); ?></p>
+        <?php echo $subjectValues; ?>
+    <?php else: ?>
+        <div class="no-resources">
+            <p><?php echo $this->translate('No resources link to this item.'); ?></p>
+        </div>
+    <?php endif; ?>
+</div>
+
+
+<div class="sidebar active">
+    <?php echo $this->thumbnail($item, 'square'); ?>
+    <div class="meta-group">
+        <h4><?php echo $this->translate('Visibility'); ?></h4>
+        <div class="value"><?php echo ($item->isPublic()) ? $escape($this->translate('Public')) : $escape($this->translate('Private')); ?></div>
+    </div>
+    <?php $itemsets = $item->itemSets(); ?>
+    <?php if (count($itemsets) > 0): ?>
+    <div class="meta-group">
+        <h4><?php echo $this->translate('Item sets'); ?></h4>
+        <?php foreach ($itemsets as $itemset): ?>
+        <div class="value item-sets"><?php echo $itemset->link($itemset->displayTitle()); ?></div>
+        <?php endforeach; ?>
+    </div>
+    <?php endif; ?>
+    <div class="meta-group">
+        <h4><?php echo $this->translate('Created'); ?></h4>
+        <div class="value"><?php echo $escape($this->i18n()->dateFormat($item->created())); ?></div>
+    </div>
+    <div class="meta-group">
+        <h4><?php echo $this->translate('Owner'); ?></h4>
+        <div class="value"><?php echo $ownerText; ?></div>
+    </div>
+    <?php if ($item->media()): ?>
+    <div class="meta-group">
+        <h4><?php echo $this->translate('Media'); ?></h4>
+        <?php foreach ($item->media() as $media): ?>
+        <div class="value">
+            <?php echo $media->linkPretty(); ?>
+        </div>
+        <?php endforeach; ?>
+    </div>
+    <?php endif; ?>
+    <?php $this->trigger('view.show.sidebar'); ?>
+</div>
+<?php $this->trigger('view.show.after'); ?>

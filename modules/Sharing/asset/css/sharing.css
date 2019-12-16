@@ -1,0 +1,71 @@
+ul#sharing-buttons {
+    list-style: none;
+    line-height: 20px;
+    height: 20px;
+    padding-left: 0px;
+    clear: both;
+    display: flex;
+}
+
+ul#sharing-buttons li {
+    margin-right: 3px;
+}
+
+.fb-share-button span,
+li#sharing-pinterest span {
+    vertical-align: top !important;
+}
+
+ul#sharing-buttons li#sharing-tumblr {
+    margin-right: 1px;
+}
+
+li#sharing-email a, 
+li#sharing-embed a {
+    font-size: 11px;
+    vertical-align: top;
+    cursor: pointer;
+    height: 20px;
+    line-height: 20px;
+    padding: 0 5px;
+    display: inline-block;
+    font-family: "Helvetica Neue", "HelveticaNeue" , "Helvetica", "Arial", sans-serif;
+    font-weight: 500;
+    text-decoration: none;
+    color: #666;
+}
+
+li#sharing-email a {
+    background-color: #555;
+    border-radius: 3px;
+    color: #fff;
+}
+
+li#sharing-email a:hover {
+    border: 0;
+    background-color: #3f3f3f;
+}
+
+li#sharing-email a:before {
+    content: "\f0e0";
+    font-family: "Font Awesome 5 Free";
+    font-weight: normal;
+}
+
+li#sharing-embed a {
+    background-color: #fff;
+    border: 1px solid #c2c2c2;
+    border-radius: 3px;
+    line-height: 18px;
+}
+
+li#sharing-embed a:hover {
+    background-color: #eee;
+    color: #666;
+}
+
+li#sharing-embed a:before {
+    content: "\f121";
+    font-family: "Font Awesome 5 Free";
+    font-weight: normal;
+}

@@ -1,0 +1,362 @@
+#content {
+    min-height: 400px;
+}
+
+table {
+    margin: $spacing-l 0;
+    border-collapse: collapse;
+}
+
+th,
+td {
+    text-align: left;
+    padding: $spacing-s $spacing-m;
+    padding-bottom: $spacing-s - 1px;
+    border-bottom: 1px solid $gray;
+}
+
+/* @group ----- Header ----- */
+
+header {
+    position: relative;
+    //margin-bottom: 2 * $spacing-l;
+}
+
+/* @end */
+
+
+/* @group ----- Navigation ----- */
+
+/*header nav {
+    margin: 0 auto 0 auto;
+    position: static;
+    justify-content: space-between;
+    padding: 0 (2 * gutter());
+    flex-wrap: nowrap;
+}
+
+header nav:before {
+    content: "";
+    border: 0;
+    display: none;
+}
+
+.nav-menu, .nav-menu.open{
+  display: flex;
+  flex-wrap: wrap;
+  position: static;
+  padding: 0;
+  max-width: 100%;
+  background: white;
+
+  ul{
+    margin:0;
+  }
+
+  #language-nav{
+      flex: 0 0 100px;
+      display:block;
+      text-align: right;
+      margin-left: auto;
+      border:none;
+      margin-top: 0;
+  }
+}
+
+header nav ul{
+  display:block;
+  padding:0;
+  margin:0;
+  text-align: left;
+}
+
+header .nav-menu ul a {
+    padding: 0;
+}
+
+header .nav-menu ul li {
+    position: static;
+    line-height: 1.5*$base-line-height;
+}
+
+header nav.closed ul,header nav.open ul,
+header nav ul ul li {
+    height: auto;
+    overflow: visible;
+    margin:0;
+}
+
+header .nav-menu ul a:hover {
+    background-color: transparent;
+}
+
+header .nav-menu ul li,
+header .nav-menu > ul li:last-child,
+header .nav-menu > ul ul:hover > li {
+    border: 0;
+}
+
+.nav-menu{
+  margin: 0;
+}
+
+header .navigation {
+    position: static;
+
+    li ul:before {
+        display: none;
+    }
+
+    & > li {
+        display: inline-block;
+        position: relative;
+    }
+
+    & > li:not(:last-child) {
+        margin-right: $spacing-m;
+    }
+
+    & > li > ul {
+        position: absolute;
+        display:none;
+        background-color: #f8f4f5;
+        padding: 0;
+        list-style: none;
+        //width: 100%;
+        border-width: 1px 0;
+        padding: 10px;
+        //display: flex;
+        //flex-direction: row;
+        //flex-flow: row wrap;
+        z-index: 1;
+    }
+
+    & > li:hover > ul {
+        //@include container;
+        display:block;
+        top:45px;
+        width:15rem;
+        word-break: normal;
+        padding: 10px;
+        border-bottom: 0;
+        border-color: $light;
+
+        /*&:after {
+            content: "";
+            left: -9999px;
+            right: -9999px;
+            background-color: #fff;
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            border-bottom: 1px solid $light;
+            z-index: -1;
+        }*/
+  /*  }
+
+    & > li > ul > li {
+        //width: 25%;
+        font-size: .80 * $base-font-size;
+        font-weight: 200;
+        padding-bottom: $spacing-l;
+        line-height: 2;
+    }
+
+    & > li > ul > li ul {
+        font-weight: normal;
+        padding: 0;
+        list-style-type: none;
+        height: auto;
+        display: none;
+    }
+}
+
+.nav-menu > ul > li > a {
+    //margin: $spacing-s;
+    height: 1.2*$base-line-height;
+    border-bottom:2px solid rgba($primary,0.8);
+}
+
+.nav-menu > ul > li > a:hover {
+    border-bottom:2px solid rgba($primary,1);
+}
+
+/* All top-level nav items with siblings are parent items and get an arrow. */
+/*header .nav-menu > ul > li > a:not(:only-child):after {
+    font-family: "Font Awesome 5 Free";
+    content: "\f107";
+    display: inline-block;
+    margin-left: $spacing-s;
+}
+
+header .nav-menu > ul li:hover ul li {
+    height: auto;
+    padding: 0;
+}
+
+/* Second and Third level items */
+/*header .nav-menu > ul > li > ul > li a,
+header .nav-menu > ul > li > ul > li > ul > li a {
+    padding-left: 0;
+    line-height: 2;
+}
+
+.sub-menu ul {
+    border-bottom: 1px solid $light;
+    padding-bottom: ($spacing-m - 1px);
+}
+
+.sub-menu li {
+    display: inline-block;
+    border: 0;
+    padding: 0;
+    margin-right: $spacing-m;
+
+    &:first-of-type {
+        border: 0;
+        padding: 0;
+    }
+}
+
+#search {
+    flex: 0 0 400px;
+    padding:0;
+    padding-left: gutter();
+    margin-top:0;
+    border:none;
+}
+
+#search form input[type="text"],
+#search form button[type="submit"] {
+    font-size: .75 * $base-font-size;
+}
+
+#search form button[type="submit"] {
+    width: 35px;
+    height: 1.5*$base-line-height;
+}
+*/
+
+.hero-top{}
+.hero{
+  .intro{
+      .title-box{
+
+    }
+  }
+}
+
+.home-blocks{
+  .intro{
+    width: span(6 of 12);
+    padding-right:3rem;
+    border-right: 1px solid $primary-light;
+  }
+
+  .right{
+      width: span(6 of 12);
+      padding-left: 3rem;
+  }
+}
+
+.siema{
+  display: block;
+}
+
+.more-news{
+  display: block;
+  text-align: right;
+  padding:0.2rem 0 0.5rem;
+
+
+  a.btn{
+    font-size: 1.8rem;
+  	padding:0.1rem;
+  	color: $primary;
+    border-top: 2px solid $primary;
+  }
+}
+
+.more-news-showcase{
+  display: block;
+  text-align: right;
+  margin: 3rem 0;
+  padding:1rem 0 0.5rem;
+  border-top:1px solid rgba($primary,0.1);
+
+
+  a.btn{
+    font-size: 1.8rem;
+  	padding:0.1rem;
+  	color: $primary;
+
+    &::after {
+        font-family: "Font Awesome 5 Free";
+        content: "\f105";
+        margin-left: 5px;
+        font-weight: 900;
+    }
+  }
+}
+
+
+.news-item{
+  display: flex;
+
+  h3{
+    margin-top: 0;
+    color: $primary;
+  }
+
+  .thumbnail{
+    margin-right: 3rem;
+
+    img{
+      width: 300px;
+      max-width: 300px !important;
+    }
+  }
+
+  .body{
+    h4{
+      margin: 0 0 1rem 0;
+    }
+  }
+}
+
+.item-showcase {
+    margin: 0;
+    margin-bottom: 6rem;
+    //padding: ($spacing-l - 1px) 0 0;
+    overflow: hidden;
+    clear: both;
+    display: flex;
+    flex-wrap: wrap;
+    margin: 0 -1.69492%;
+}
+
+.item-showcase .resource.item {
+      margin-bottom: 0;
+
+    &:not(:only-child) {
+        width: span(4 of 12);
+        width: 33.33%;
+        clear: none;
+        padding: 0 gutter();
+    }
+}
+
+footer {
+    .contact{
+      width: span(3 of 12);
+      padding-right: 3rem;
+
+    }
+
+    .logos{
+      width: span(9 of 12);
+    }
+}
+
+
+/* @end */
