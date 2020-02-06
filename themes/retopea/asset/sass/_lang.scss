@@ -1,3 +1,4 @@
+/* main: style.scss */
 .visuallyhidden { border: 0; clip: rect(0 0 0 0); height: 1px; margin: -1px; overflow: hidden; padding: 0; position: absolute; width: 1px; }
 
 /* LANGUAGE SWITCHER */
@@ -6,6 +7,8 @@
   position: relative;
   flex: 0 0 45px;
   margin-left: auto;
+  margin-top: 10px;
+  z-index: 10000;
 }
 
 p.ui-dropdown-list-trigger {
@@ -23,15 +26,22 @@ p.ui-dropdown-list-trigger {
   font-family: "Font Awesome 5 Free";
   content: "\f107";
   margin-left:5px;
+  font-weight: bold;
+}
+
+.ui-dropdown-list-trigger strong:before {
+  font-family: "Font Awesome 5 Free";
+  content: "\f0ac";
+  margin-right:5px;
+  font-weight: bold;
+  color: rgba(white, 0.6);
 }
 
 .ui-dropdown-list-trigger strong,
 .ui-dropdown-list ul a {
-	display: block;
-	width: 45px;
 	cursor: pointer;
 	padding: 0 5px;
-	color: rgba($primary,0.8);
+	color: white;
 	font-weight: normal;
 }
 
@@ -39,9 +49,9 @@ p.ui-dropdown-list-trigger {
 	display: none;
 	position: absolute;
 	top: 31px;
-	margin-top: 0;
+  left:125px;
+	margin-top: 0 !important;
 	padding: 5px !important;
-  background: #fafafa;
 	z-index: 1000;
 }
 
@@ -56,6 +66,11 @@ p.ui-dropdown-list-trigger {
 .ui-dropdown-list ul a:visited {
 	position: relative;
 	display: block;
+  color: rgba(white,0.6) !important;
+}
+
+.ui-dropdown-list ul a:hover{
+  color:white !important;
 }
 
 /* JS interactivity */

@@ -1,3 +1,4 @@
+/* main: style.scss */
 #content {
     min-height: 400px;
 }
@@ -23,6 +24,53 @@ header nav {
     justify-content: space-between;
 }
 
+.nav-container{
+  position: relative;
+  max-width: 800px;
+  margin: 0 auto;
+
+    margin-top: 8rem;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: flex-end;
+  text-align: left;
+
+  ul{
+      margin: 0;
+  }
+
+  ul li ul{
+    display: none;
+  }
+
+  .start-menu{
+    padding: 0 2rem;
+    text-align: left;
+    border-right: 1px solid white;
+    border-bottom: 0;
+    width: span(5 of 12 alpha);
+
+    ul li{
+      text-align: left;
+    }
+  }
+
+  .collection-menu{
+    padding: 0 2rem;
+    width: span(7 of 12 alpha);
+    text-align: left;
+
+    h4{
+      margin-top:0;
+    }
+
+    ul.navigation li{
+      text-align: left;
+    }
+  }
+}
+
 /* @end */
 
 
@@ -46,7 +94,6 @@ header nav {
 
 .hero{
   display:block;
-
   padding:12rem 0 0 0;
   margin-bottom: 1.2 * $spacing-l;
 
@@ -85,6 +132,18 @@ header nav {
   }
 }
 
+
+
+.slogan{
+
+  h1{
+    font-size: 3rem !important;
+    font-weight: 700 !important;
+    margin-top: 8rem !important;
+    line-height: 45px !important;
+  }
+}
+
 /* @end */
 
 /* @group ----- Resource List ----- */
@@ -101,29 +160,11 @@ ul.resource-list .resource img ~ * {
 }
 
 .masonry{
-    column-count: 4;
-    column-gap: 50px;
+    column-count: 3;
+    column-gap: 30px;
 
    .body{
      padding: 0;
-
-     h4{
-        font-size: $base-font-size;
-        font-weight: bold;
-        padding: 0.1rem 0 0.5rem 0;
-        margin: 0;
-        line-height: 1.4;
-
-        a{
-          margin-bottom: 0.2rem;
-          border-bottom: 2px solid $primary;
-        }
-     }
-   }
-
-   .featured{
-     padding: 0.7rem 1rem 1rem 1rem !important;
-     color: white;
    }
 }
 
@@ -173,18 +214,13 @@ body.item-set .metadata ~ nav.pagination:first-of-type {
 
 /* @group ----- Item show ----- */
 .item-show{
-  display:flex;
+  max-width: 700px;
+  margin: 0 auto;
 
   .media-embeds{
-    flex: 1 1 span(6 of 12);
-    background: rgba($primary,0.05);
-    padding: 1*gutter();
-    margin-right:gutter();
   }
 
   .metadata{
-    flex: 1 1 span(6 of 12);
-    padding: 1*gutter();
   }
 }
 

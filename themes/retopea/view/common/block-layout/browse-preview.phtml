@@ -1,3 +1,9 @@
+<?php
+  $translate = $this->plugin('translate');
+  $escape = $this->plugin('escapeHtml');
+?>
+<?php $this->htmlElement('body')->appendAttribute('class', 'item-set resource browse'); ?>
+
 <div class="preview-block">
 
 <?php if ($this->heading): ?>
@@ -6,7 +12,53 @@
 <p>
   <?php echo $this->heading; ?>
 </p>
-<?php if ($this->linkText == 'Browse all news'):?>
+<?php if($this->resourceType == 'item-set'):?>
+  <div class="top-browse">
+    <div class="discover">Discover our collections</div>
+    <h1>
+      <span class="active"><?php echo $this->translate('Collections'); ?></span>
+      <span><a href="<?php echo $this->url('site/resource', ['controller' => 'page', 'action' => 'docutubes'], ['query' => ''], true);?>">Docutubes</a>
+      </span>
+    </h1>
+    <div id="search">
+        <?php
+        $searchValue = $this->escapeHtml($this->params()->fromQuery('fulltext_search', ''));
+        ?>
+
+        <form action="<?php echo $this->url('site/resource', ['controller' => 'item', 'action' => 'browse'], ['query' => $this->query], true
+    );?>" id="search-form">
+            <input type="text" name="fulltext_search" value="<?php echo $searchValue; ?>"
+                placeholder="<?php echo $translate('Search in all collections'); ?>"
+                aria-label="<?php echo $translate('Search in all collections'); ?>">
+            <button type="submit"><?php echo $translate('Search'); ?></button>
+        </form>
+    </div>
+    <!--<div class="docutube-link">
+      <a href="<?php echo $this->url('site/resource', ['controller' => 'page', 'action' => 'docutubes'], ['query' => ''], true);?>">Docutubes</a>
+    </div>-->
+    <?php echo $this->searchFilters(); ?>
+  </div>
+  <div class="item-showcase item-set-showcase">
+      <?php foreach ($this->resources as $itemSet): ?>
+      <div class="item resource">
+        <?php if($media = $itemSet->thumbnail()):?>
+          <a href="<?php echo $itemSet->url();?>">
+          <div class="media" style="background:url(<?php echo $media->assetUrl('square')?>)"></div>
+          </a>
+        <?php else:?>
+          <div class="media" style="background:#ccc;"></div>
+        <?php endif;?>
+        <div class="text">
+          <h4><?php echo $itemSet->link($itemSet->displayTitle()); ?></h4>
+          <?php if ($description = $itemSet->displayDescription()): ?>
+            <!--<div class="description"><?php echo $description; ?></div>-->
+          <?php endif; ?>
+        </div>
+      </div>
+      <?php endforeach; ?>
+  </div>
+
+<?php elseif ($this->linkText == 'Browse all news'):?>
   <div class="resource-list preview">
   <?php
   $headingTerm = $this->siteSetting('browse_heading_property_term', 'dcterms:title');

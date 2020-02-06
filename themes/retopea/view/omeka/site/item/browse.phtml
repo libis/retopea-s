@@ -1,4 +1,5 @@
 <?php
+$translate = $this->plugin('translate');
 $escape = $this->plugin('escapeHtml');
 $this->htmlElement('body')->appendAttribute('class', 'item resource browse');
 $query = $this->params()->fromQuery();
@@ -9,53 +10,99 @@ endif;
 $headingTerm = $this->siteSetting('browse_heading_property_term', 'dcterms:title');
 $bodyTerm = $this->siteSetting('browse_body_property_term', 'dcterms:description');
 $itemSetShow = isset($itemSet);
-$libis = $this->plugin('Libis');
-$lang = $libis->getLanguage();
 ?>
 
-<?php if ($itemSetShow): ?>
-    <h1>
-      <span class="title">
-        <?php if($itemSet->value('dcterms:title',array('all' => 'true','lang' => $lang))):?>
-          <?php echo implode(", ",$itemSet->value('dcterms:title',array('all' => 'true','lang' => $lang)));?>
-        <?php endif;?>
-      </span>
-    </h1>
-    <div class="metadata">
-      <?php if($itemSet->value('dcterms:description',array('all' => 'true','lang' => $lang))):?>
-        <?php echo implode(", ",$itemSet->value('dcterms:description',array('all' => 'true','lang' => $lang)));?>
-      <?php endif;?>
-    </div>
-    <div class="item-set-items">
-    <?php echo '<h3>' . $escape($this->translate('Items')) . '</h3>'; ?>
-    <?php echo $this->hyperlink($this->translate('Advanced search'), $this->url('site/resource', ['controller' => 'item', 'action' => 'search'], ['query' => $query], true), ['class' => 'advanced-search']); ?>
+<div class="top-browse">
+  <div class="breadcrumbs">
+    <a href="<?php echo $site->url().'/page/collection/';?>">Discover our collections</a>
+  </div>
+  <?php if ($itemSetShow): ?>
+      <h1>
+        <span class="title">
+          <?php echo $this->translate('Collection');?>
+        </span>
+          <?php if($itemSet->value('dcterms:title')):?>
+            <?php echo $itemSet->value('dcterms:title');?>
+          <?php endif;?>
 
-<?php else: ?>
-    <h1><?php echo $this->translate('Items'); ?></h1>
-<?php endif; ?>
+      </h1>
 
-<?php echo $this->searchFilters(); ?>
-<?php echo $this->pagination(); ?>
+  <?php else: ?>
+      <h1><?php echo $this->translate('Items'); ?></h1>
+  <?php endif; ?>
+  <div id="search">
+    <?php
+    $searchValue = $this->escapeHtml($this->params()->fromQuery('fulltext_search', ''));
+    ?>
+    <form action="" id="search-form">
+        <input type="text" name="fulltext_search" value="<?php echo $searchValue; ?>"
+            placeholder="<?php echo $translate('Search in this collection'); ?>"
+            aria-label="<?php echo $translate('Search in this collections'); ?>">
+        <button type="submit"><?php echo $translate('Search'); ?></button>
+    </form>
+  </div>
+  <?php echo $this->searchFilters(); ?>
+</div>
+
+
 <?php $this->trigger('view.browse.before'); ?>
 
 <div class="masonry resource-list">
 <?php
 foreach ($items as $item):
-    $heading = $item->value($headingTerm, ['default' => $this->translate('[Untitled]'),'lang' => $lang]);
-    $body = $item->value($bodyTerm,array('lang' => $lang));
+    $heading = $headingTerm ? $item->value($headingTerm, ['default' => $translate('[Untitled]')]) : $item->displayTitle();
+    $body = $bodyTerm ? $item->value($bodyTerm) : $item->displayDescription();
+    $media = $item->media();
 ?>
     <div class="item resource">
-        <?php echo $item->linkRaw($this->thumbnail($item, 'medium')); ?>
+        <?php if($media[0]->mediaType() == 'image/jpeg' || $media[0]->ingester() == 'youtube' || $media[0]->ingester() == 'upload'):?>
+          <div class="image"><a href="<?php echo $item->url();?>"><img src="<?php echo $media[0]->thumbnailUrl('medium'); ?>"></a></div>
+        <?php else:?>
+          <div class="snippet">
+            <p>
+            <a href="<?php echo $item->url();?>">
+            <?php
+              $text =  $media[0]->render();
+              $start = strpos($text, '<p>');
+              $end = strpos($text, '</p>', $start);
+              $text = substr($text, $start, $end-$start+4);
+              $text = strip_tags($text);
+              $text = myTruncate2($text, 250);
+
+              echo $text;
+            ?>
+            </a>
+            </p>
+          </div>
+
+        <?php endif;?>
         <div class="body">
           <h4><?php echo $item->link($heading); ?></h4>
           <?php if ($body): ?>
-          <div class="description"><?php echo $body; ?></div>
+          <!--<div class="description"><?php echo $body; ?></div>-->
           <?php endif; ?>
         </div>
     </div>
 <?php endforeach; ?>
+
 </div>
+<div class="item-browse-end">
+  <?php echo $this->pagination(); ?>
+</div>
+<?php
+function myTruncate2($string, $limit, $break=" ", $pad="...")
+{
+  // return with no change if string is shorter than $limit
+  if(strlen($string) <= $limit) return $string;
+
+  $string = substr($string, 0, $limit);
+  if(false !== ($breakpoint = strrpos($string, $break))) {
+    $string = substr($string, 0, $breakpoint);
+  }
+
+  return $string .' '. $pad;
+}
+?>
 
 <?php echo ($itemSetShow) ? '</div>' : ''; ?>
 <?php $this->trigger('view.browse.after'); ?>
-<?php echo $this->pagination(); ?>

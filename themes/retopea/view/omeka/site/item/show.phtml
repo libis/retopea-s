@@ -79,11 +79,14 @@ $news = false;
     <div class="property">
         <?php $itemSets = $item->itemSets(); ?>
         <?php if (count($itemSets) > 0): ?>
-        <h4><?php echo $this->translate('Item sets'); ?></h4>
-        <?php foreach ($item->itemSets() as $itemSet): ?>
-        <div class="value"><a href="<?php echo $escape($itemSet->url()); ?>"><?php echo $itemSet->displayTitle(); ?></a></div>
-        <?php endforeach; ?>
+        <h4><?php echo $this->translate('Collections'); ?></h4>
+        <div class="values">
+          <?php foreach ($item->itemSets() as $itemSet): ?>
+          <div class="value"><a href="<?php echo $escape($itemSet->url()); ?>"><?php echo $itemSet->displayTitle(); ?></a></div>
+          <?php endforeach; ?>
+        </div>
         <?php endif; ?>
+
     </div>
   </div>
 

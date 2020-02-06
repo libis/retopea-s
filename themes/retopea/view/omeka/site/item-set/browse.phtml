@@ -1,22 +1,46 @@
-<?php $escape = $this->plugin('escapeHtml');?>
+<?php
+  $translate = $this->plugin('translate');
+  $escape = $this->plugin('escapeHtml');
+?>
 <?php $this->htmlElement('body')->appendAttribute('class', 'item-set resource browse'); ?>
 
-<?php echo $this->pageTitle($this->translate('Item sets'), 2); ?>
+<div class="top-browse">
+  <h1><?php echo $this->translate('Discover the collection'); ?></h1>
+  <div id="search">
+      <?php
+      $searchValue = $this->escapeHtml($this->params()->fromQuery('fulltext_search', ''));
+      ?>
 
-<?php echo $this->searchFilters(); ?>
-<?php echo $this->hyperlink($this->translate('Advanced search'), $this->url(null, ['action' => 'search'], true), ['class' => 'advanced-search']); ?>
-<?php echo $this->pagination(); ?>
+      <form action="" id="search-form">
+          <input type="text" name="fulltext_search" value="<?php echo $searchValue; ?>"
+              placeholder="<?php echo $translate('Search collections'); ?>"
+              aria-label="<?php echo $translate('Search collections'); ?>">
+          <button type="submit"><?php echo $translate('Search'); ?></button>
+      </form>
+  </div>
+  <?php echo $this->searchFilters(); ?>
+</div>
+
+
 <?php $this->trigger('view.browse.before'); ?>
-<ul class="resource-list">
+<div class="item-showcase item-set-showcase">
     <?php foreach ($itemSets as $itemSet): ?>
-    <li class="item-set resource">
-        <?php echo $itemSet->linkRaw($this->thumbnail($itemSet, 'medium')); ?>
+    <div class="item resource">
+      <?php if($media = $itemSet->thumbnail()):?>
+        <a href="<?php echo $itemSet->url();?>">
+        <div class="media" style="background:url(<?php echo $media->assetUrl('square')?>)"></div>
+        </a>
+      <?php else:?>
+        <div class="media" style="background:#ccc;"></div>
+      <?php endif;?>
+      <div class="text">
         <h4><?php echo $itemSet->link($itemSet->displayTitle()); ?></h4>
         <?php if ($description = $itemSet->displayDescription()): ?>
-        <div class="description"><?php echo $description; ?></div>
+          <!--<div class="description"><?php echo $description; ?></div>-->
         <?php endif; ?>
-    </li>
+      </div>
+    </div>
     <?php endforeach; ?>
-</ul>
+    <?php echo $this->pagination(); ?>
+</div>
 <?php $this->trigger('view.browse.after'); ?>
-<?php echo $this->pagination(); ?>

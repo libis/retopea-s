@@ -16,7 +16,8 @@ RUN apt-get -qq update && apt-get -qq -y --no-install-recommends install \
     imagemagick \
     libmagickwand-dev \
     wget \
-    ghostscript
+    ghostscript \
+    ffmpeg
 
 # Install the PHP extensions we need
 RUN docker-php-ext-install -j$(nproc) iconv pdo pdo_mysql mysqli gd
@@ -25,10 +26,12 @@ RUN docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-di
 RUN wget --no-verbose "https://github.com/omeka/omeka-s/releases/download/v2.0.2/omeka-s-2.0.2.zip" -O /var/www/omeka-s.zip
 RUN unzip -q /var/www/omeka-s.zip -d /var/www/ \
 &&  rm /var/www/omeka-s.zip \
-&&  rm -rf /var/www/html/retopea/ \
-&&  mv /var/www/omeka-s /var/www/html/retopea/ \
+&&  rm -rf /var/www/html/ \
+&&  mv /var/www/omeka-s /var/www/html/ \
 &&  chown -R www-data:www-data /var/www/html/
 
-VOLUME /var/www/html/retopea/
+ADD php.ini-development /usr/local/etc/php
+
+VOLUME /var/www/html/
 
 CMD ["apache2-foreground"]

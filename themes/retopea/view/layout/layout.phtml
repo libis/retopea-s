@@ -6,8 +6,8 @@ $this->headMeta()->appendName('viewport', 'width=device-width, initial-scale=1')
 $this->headTitle($this->setting('installation_title', 'Omeka S'))->setSeparator(' · ');
 $this->headLink()->prependStylesheet($this->assetUrl('css/style.css'));
 $this->headLink()->prependStylesheet($this->assetUrl('css/iconfonts.css', 'Omeka'));
-$this->headLink()->prependStylesheet('//fonts.googleapis.com/css?family=Open+Sans:400,400italic,600,600italic,700italic,700');
-$this->headLink()->prependStylesheet('//fonts.googleapis.com/css?family=Merriweather:400,400i|Roboto:300,300i,400,400i,700,700i');
+//$this->headLink()->prependStylesheet('//fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i&display=swap');
+$this->headLink()->prependStylesheet('//fonts.googleapis.com/css?family=Merriweather:400,400i|Roboto:300,300i,400,400i,500,500i,700,700i');
 $this->headScript()->prependFile($this->assetUrl('js/default.js'));
 $this->headScript()->prependFile($this->assetUrl('js/global.js', 'Omeka'));
 $this->headScript()->prependFile($this->assetUrl('vendor/jquery/jquery.min.js', 'Omeka'));
@@ -52,15 +52,12 @@ $lang = $libis->getLanguage();
         <?php echo $userBar; ?>
         <header>
           <div class="gradient">
-
-
             <nav>
               <div class="hero-top">
                 <div class="intro">
-
                   <div class="title-box">
                     <?php if ($this->themeSetting('logo')): ?>
-                    <a href="<?php echo $site->url(); ?>" class="site-title"><img src="<?php echo $this->themeSettingAssetUrl('logo'); ?>" title="Logo"></a>
+                    <a href="https://retopea.eu" class="site-title"><img src="<?php echo $this->themeSettingAssetUrl('logo'); ?>" title="Logo"></a>
                     <?php else: ?>
                     <a href="<?php echo $site->url(); ?>" class="site-title">Retopea</a>
                     <a href="<?php echo $site->url(); ?>" class="site-sub-title">
@@ -82,46 +79,72 @@ $lang = $libis->getLanguage();
                   <?php else: ?>
                       <h1><span><?php echo $site->title(); ?></span></h1>
                   <?php endif; ?>
-
                 </div>
               </div>
               <div class="nav-menu">
-                <?php
-                echo $site->publicNav()->menu()->renderMenu(null, [
-                    'maxDepth' => $this->themeSetting('nav_depth') - 1
-                ]);
-                ?>
+                <div class="nav-container">
+                    <?php if($site->id() != 2):?>
+                      <div class="start-menu">
+                        <?php
+                          $response = $this->api()->search('sites', array());
+                          $sites = $response->getContent();
+                          foreach ($sites as $site_s) {
+                            if($site_s->id() == 2):
+                              echo $site_s->publicNav()->menu()->renderMenu(null, [
+                                  'maxDepth' => $this->themeSetting('nav_depth') - 1
+                              ]);
+                            endif;
+                          }
+                        ?>
+                      </div>
+                    <?php else: ?>
+                      <div class="only-start-menu">
+                        <?php
+                          echo $site->publicNav()->menu()->renderMenu(null, [
+                              'maxDepth' => $this->themeSetting('nav_depth') - 1
+                          ]);
+                        ?>
+                      </div>
+                    <?php endif;?>
 
-                <div id="lang-switcher" class="ui-dropdown-list">
-                    <?php
-                      $languages = array('en'=> 'EN','nl' => 'NL','fr' => 'FR',
-                      'de' => 'DE'
-                      );
-                      $path = $site->url();
-                    ?>
+                    <?php if($site->id() != 2):?>
+                      <div class="collection-menu">
+                        <h4>Discover the collection</h4>
+                        <?php
+                          echo $site->publicNav()->menu()->renderMenu(null, [
+                              'maxDepth' => $this->themeSetting('nav_depth') - 1
+                          ]);
+                        ?>
+                        <div id="lang-switcher" class="ui-dropdown-list">
+                            <?php
+                              $languages = array('en'=> 'EN','nl' => 'NL','fr' => 'FR',
+                              'de' => 'DE'
+                              );
+                              $path = $site->url();
+                            ?>
+          			            <h2 class="visuallyhidden">Sprache wählen</h2>
+                            <?php foreach ($languages as $locale => $language): ?>
+                              <?php if ($locale == $lang): ?>
+                                  <h4 class="ui-dropdown-list-trigger">
+                                    <span class="visuallyhidden">Aktuelle Sprache: </span>
+                                     Language <strong><?php echo $language ?></strong></h4>
+                              <?php endif; ?>
+                            <?php endforeach; ?>
+                      			<ul>
+                            <?php foreach ($languages as $locale => $language): ?>
+                                <?php if ($locale != $lang): ?>
+                                     <li><a href="<?php echo str_replace($lang,$locale,$path);
+                                     ?>">
+                                         <?php echo $language ?>
+                                     </a></li>
+                                <?php endif;?>
 
-  			            <h2 class="visuallyhidden">Sprache wählen</h2>
-                    <?php foreach ($languages as $locale => $language): ?>
-                      <?php if ($locale == $lang): ?>
-                          <p class="ui-dropdown-list-trigger">
-                          <span class="visuallyhidden">Aktuelle Sprache: </span> <strong><?php echo $language ?></strong></p>
-                      <?php endif; ?>
-                    <?php endforeach; ?>
-              			<ul>
-                    <?php foreach ($languages as $locale => $language): ?>
-                        <?php if ($locale != $lang): ?>
-                             <li><a href="<?php echo str_replace($lang,$locale,$path);
-                             ?>">
-                                 <?php echo $language ?>
-                             </a></li>
-                        <?php endif;?>
-
-                    <?php endforeach; ?>
-                    </ul>
+                            <?php endforeach; ?>
+                            </ul>
+                          </div>
+                        </div>
+                      <?php endif;?>
                 </div>
-            </div>
-            <div id="search">
-                <?php echo $this->partial('common/search-form'); ?>
             </div>
           </nav>
         </div>
