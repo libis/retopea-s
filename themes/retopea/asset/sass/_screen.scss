@@ -1355,6 +1355,10 @@ ul.resource-list .resource img ~ * {
      padding: 0.7rem 1rem 1rem 1rem !important;
      color: white;
    }
+
+   .language{
+     font-size: 1.2rem;
+   }
 }
 
 #mapping-section{
@@ -1421,7 +1425,6 @@ body.resource #content > h2:first-of-type + h3 {
 
 .property {
     overflow: hidden;
-    border-bottom: 1px solid #eee;
     padding: 11px 0;
 
     &:last-of-type{
@@ -1437,10 +1440,10 @@ body.resource #content > h2:first-of-type + h3 {
 .property h4 {
     margin: 0;
     font-size: $base-font-size;
-    float: left;
-    width: 160px;
-    padding-right: 10px;
-    font-weight: 600;
+    margin-bottom: 5px;
+    padding-bottom: 5px;
+    border-bottom: 1px solid #eee;
+    font-weight: 500;
 }
 
 .resource-link img {
@@ -1710,8 +1713,6 @@ a.metadata-browse-link {
 
 .top-browse{
   margin-bottom: 3rem;
-  padding-bottom: 3rem;
-  border-bottom: 1px solid #eee;
 
   .breadcrumbs, .discover{
     margin-bottom: 0.1rem;
@@ -1745,6 +1746,7 @@ a.metadata-browse-link {
         color: #aaa;
         border-bottom: 1px solid #eee;
         padding-bottom: 10px;
+        margin-right: 20px;
 
         &:hover{
           color: #888;
@@ -1755,17 +1757,19 @@ a.metadata-browse-link {
     .active{
       border-bottom: 1px solid $primary;
       padding-bottom: 10px;
-      font-weight: 600;      
+      font-weight: 600;
       margin-right: 20px;
     }
 
   }
 
   #search{
-    width: 50%;
-    min-width: 300px;
+    padding-bottom: 3rem;
+    border-bottom: 1px solid #eee;
 
     form{
+      width: 50%;
+      min-width: 300px;
       border: none;
 
       input[type="text"]{
@@ -1812,4 +1816,26 @@ a.metadata-browse-link {
       }
     }
   }
+}
+
+.toggle-trigger {
+    cursor: pointer;
+    font-size: 13px;
+}
+
+.toggle-trigger:after {
+    float:right;
+   font-family: "Font Awesome 5 Free"; font-weight: 900;content: "\f078";
+}
+
+.toggle-trigger-active:after {
+    font-family: "Font Awesome 5 Free"; font-weight: 900;content: "\f077";
+}
+
+.toggle-container {
+    display: none;
+}
+
+.toggle-container-opened{
+  display: block;
 }

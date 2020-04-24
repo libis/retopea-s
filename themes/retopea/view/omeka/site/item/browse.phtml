@@ -14,12 +14,12 @@ $itemSetShow = isset($itemSet);
 
 <div class="top-browse">
   <div class="breadcrumbs">
-    <a href="<?php echo $site->url().'/page/collection/';?>">Discover our collections</a>
+    <a href="<?php echo $site->url().'/page/clippings/';?>">Discover our collection</a>
   </div>
   <?php if ($itemSetShow): ?>
       <h1>
         <span class="title">
-          <?php echo $this->translate('Collection');?>
+          <?php echo $this->translate('Clippings');?>
         </span>
           <?php if($itemSet->value('dcterms:title')):?>
             <?php echo $itemSet->value('dcterms:title');?>
@@ -37,7 +37,7 @@ $itemSetShow = isset($itemSet);
     <form action="" id="search-form">
         <input type="text" name="fulltext_search" value="<?php echo $searchValue; ?>"
             placeholder="<?php echo $translate('Search in this collection'); ?>"
-            aria-label="<?php echo $translate('Search in this collections'); ?>">
+            aria-label="<?php echo $translate('Search in the collection'); ?>">
         <button type="submit"><?php echo $translate('Search'); ?></button>
     </form>
   </div>

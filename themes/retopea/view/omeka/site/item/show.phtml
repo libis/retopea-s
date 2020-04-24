@@ -79,8 +79,8 @@ $news = false;
     <div class="property">
         <?php $itemSets = $item->itemSets(); ?>
         <?php if (count($itemSets) > 0): ?>
-        <h4><?php echo $this->translate('Collections'); ?></h4>
-        <div class="values">
+        <h4 class="toggle-trigger"><?php echo $this->translate('Collections'); ?></h4>
+        <div class="values toggle-container">
           <?php foreach ($item->itemSets() as $itemSet): ?>
           <div class="value"><a href="<?php echo $escape($itemSet->url()); ?>"><?php echo $itemSet->displayTitle(); ?></a></div>
           <?php endforeach; ?>
@@ -102,6 +102,13 @@ $news = false;
   </div>
   <?php endif; ?>
 </div>
-
+<script type="text/javascript">
+$(document).ready(function(){
+  $(".toggle-trigger").click(function(){
+      $(this).toggleClass("toggle-trigger-active").next().toggleClass("toggle-container-opened");
+      return false; //Prevent the browser jump to the link anchor
+  });
+});
+</script>
 <?php $this->trigger('view.show.after'); ?>
 <?php endif;?>
