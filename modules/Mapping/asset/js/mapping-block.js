@@ -20,7 +20,7 @@ mappingMaps.each(function() {
     });
 
     // Initialize the map, add markers, and set the default view.
-    var map = L.map(this, {maxZoom: 18});
+    var map = L.map(this, {maxZoom: 10});
     map.addLayer(markers);
     if (data['bounds']) {
         var bounds = data['bounds'].split(',');
@@ -31,6 +31,7 @@ mappingMaps.each(function() {
         var bounds = markers.getBounds();
         if (bounds.isValid()) {
             map.fitBounds(bounds);
+            map.setZoom(4);
         } else {
             map.setView([20, 0], 2);
         }

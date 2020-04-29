@@ -36,10 +36,12 @@ map.addControl(new L.Control.FitBounds(markers));
 var setView = function() {
     if (defaultBounds) {
         map.fitBounds(defaultBounds);
+        map.setZoom(4);
     } else {
         var bounds = markers.getBounds();
         if (bounds.isValid()) {
             map.fitBounds(bounds);
+            map.setZoom(4);
         } else {
             map.setView([20, 0], 2)
         }
