@@ -28,7 +28,7 @@
     <div class="item resource">
       <?php if($media = $itemSet->thumbnail()):?>
         <a href="<?php echo $itemSet->url();?>">
-        <div class="media" style="background:url(<?php echo $media->assetUrl('square')?>)"></div>
+        <div class="media" style="background:url(<?php echo str_replace('http:','',$media->assetUrl('square'))?>)"></div>
         </a>
       <?php else:?>
         <div class="media" style="background:#ccc;"></div>

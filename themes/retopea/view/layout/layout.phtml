@@ -15,7 +15,7 @@ $this->trigger('view.layout');
 $title = $this->pageTitle($site->title());
 $logo = $this->themeSettingAssetUrl('logo');
 if ($logo):
-    $title = '<img src="' . $this->escapeHtml($logo) . '">';
+    $title = '<img src="' . str_replace('http:','',$this->escapeHtml($logo)) . '">';
 endif;
 $userBar =  $this->userBar();
 
@@ -57,7 +57,7 @@ $lang = $libis->getLanguage();
                 <div class="intro">
                   <div class="title-box">
                     <?php if ($this->themeSetting('logo')): ?>
-                    <a href="https://retopea.eu" class="site-title"><img src="<?php echo $this->themeSettingAssetUrl('logo'); ?>" title="Logo"></a>
+                    <a href="https://retopea.eu" class="site-title"><img src="<?php echo str_replace('http:','',$this->themeSettingAssetUrl('logo')); ?>" title="Logo"></a>
                     <?php else: ?>
                     <a href="<?php echo $site->url(); ?>" class="site-title">Retopea</a>
                     <a href="<?php echo $site->url(); ?>" class="site-sub-title">

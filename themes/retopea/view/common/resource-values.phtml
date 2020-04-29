@@ -70,7 +70,8 @@ $lang = $this->lang();
                 'lemma' => $lemma,
                 'searchLang'  => $searchLang,
                 'targetLang' => $targetLang,
-                'key'   => $key
+                'key'   => $key,
+                'source' => 'WIKT'
               );
 
               $url = $service_url . '?' . http_build_query($params);

@@ -61,7 +61,11 @@ $news = false;
   <?php if ($embedMedia && $itemMedia): ?>
       <div class="media-embeds">
       <?php foreach ($itemMedia as $media):
-          echo $media->render();
+          $render =  $media->render().'';
+          //var_dump($render);
+          $render =  str_replace('http:','',$render);
+          $render = str_replace('http&#x3A;','',$render);
+          echo $render;
       endforeach;
       ?>
       </div>

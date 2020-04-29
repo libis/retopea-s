@@ -1,6 +1,9 @@
 SetEnv APPLICATION_ENV "development"
+# Let apache know we're behind a SSL reverse proxy
+SetEnvIf X-Forwarded-Proto "https" HTTPS=on
 
 RewriteEngine On
+
 # The following rule tells Apache that if the requested filename
 # exists, simply serve it.
 RewriteCond %{REQUEST_FILENAME} -s [OR]
