@@ -21,7 +21,7 @@
           <?php endif; ?>
           <div class="date">
             <?php if($item->value('dcterms:date')):?>
-              <?php echo $item->value('dcterms:date');?>
+              <?php echo date('d-m-Y',strtotime($item->value('dcterms:date')));?>
             <?php endif;?>
           </div>
           <div class="description">

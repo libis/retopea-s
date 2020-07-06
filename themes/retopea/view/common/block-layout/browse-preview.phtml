@@ -80,7 +80,7 @@
           <h4><?php echo $resource->link($heading); ?></h4>
           <div class="date">
             <?php if($resource->value('dcterms:date')):?>
-              <?php echo $resource->value('dcterms:date');?>
+              <?php echo date('d-m-Y',strtotime($resource->value('dcterms:date')));?>
             <?php endif;?>
           </div>
           <div class="description">
@@ -96,6 +96,13 @@
         </div>
       </div>
   <?php endforeach; ?>
+  <?php
+  if ($this->linkText):
+      echo $this->hyperlink($this->linkText, $this->url(
+          'site/resource', ['controller' => $this->resourceType, 'action' => 'browse'], ['query' => $this->query], true
+      ));
+  endif;
+  ?>
   </div>
 <?php else:?>
     <div class="resource-list masonry preview">
