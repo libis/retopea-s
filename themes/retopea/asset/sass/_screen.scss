@@ -1448,11 +1448,12 @@ body.resource #content > h2:first-of-type + h3 {
     padding-bottom: 5px;
     border-bottom: 1px solid #eee;
     font-weight: 500;
+    text-transform: capitalize;
 }
 
 .resource-link img {
-    width: auto;
-    height: 1.5 * $spacing-l;
+    width: 37.5px;
+    height: auto;
     display: inline-block;
     vertical-align: middle;
     margin-right: $spacing-s;

@@ -8,7 +8,7 @@ $lang = $this->lang();
 ?>
 <?php foreach ($values as $term => $propertyData): ?>
     <div class="property">
-        <?php if ($term == "dcterms:title"): ?>
+        <?php if ($term == "dcterms:title" || $term == "dcterms:description" || $term == "dcterms:instructionalMethod"): ?>
           <h4 class="toggle-trigger toggle-trigger-active">
         <?php else: ?>
           <h4 class="toggle-trigger">
@@ -25,7 +25,7 @@ $lang = $this->lang();
         <span class="field-term">(<?php echo $escape($propertyData['property']->vocabulary()->label()); ?>)</span>
         <?php endif; ?>
         </h4>
-        <?php if ($term == "dcterms:title"): ?>
+        <?php if ($term == "dcterms:title" || $term == "dcterms:description" || $term == "dcterms:instructionalMethod"): ?>
           <div class="values toggle-container toggle-container-opened">
         <?php else: ?>
           <div class="values toggle-container">
@@ -42,6 +42,7 @@ $lang = $this->lang();
 
             //add more terms
             $babelterms = array('Spatial Coverage','Subject', 'Contributor', 'Cultural Form Of');
+
             if(in_array($propertyData['property']->label(),$babelterms) && $slug != 'start'):
               $service_url = 'http://babelnet.io/v5/getSenses';
 
@@ -53,7 +54,7 @@ $lang = $this->lang();
               $language = array(
                 'en_US' => 'EN',
                 'fr' => 'FR',
-                'nl-NL' => 'NL',
+                'nl_NL' => 'NL',
                 'de_DE' => 'DE',
                 'es' => 'ES',
                 'pl' => 'PL',
@@ -71,7 +72,7 @@ $lang = $this->lang();
                 'searchLang'  => $searchLang,
                 'targetLang' => $targetLang,
                 'key'   => $key,
-                'source' => 'WordNetSense'
+                'source' => 'WIKT'
               );
 
               if($targetLang != 'EN'):
@@ -87,6 +88,7 @@ $lang = $this->lang();
                 if($response):
                   $result = $response[0]['properties'];
                   $lemma = $result['fullLemma'];
+                  $lemma = str_replace('_',' ',$lemma);
                   $source = $result['source'];
                   $babel = $lemma.' <a target="_blank" href="http://live.babelnet.org/synset?word='.$result['synsetID']['id'].'&details=1&lang='.$targetLang.'"><img alt="link to babelnet" style="height:12px;margin:0 0 0.1rem 2px;" src="'.$this->assetUrl('images/bbnet.png').'" /></a>';
                 endif;

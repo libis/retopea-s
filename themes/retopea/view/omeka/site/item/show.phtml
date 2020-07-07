@@ -94,18 +94,20 @@ $news = false;
     </div>
   </div>
 
-  <?php
-  $page = $this->params()->fromQuery('page', 1);
-  $property = $this->params()->fromQuery('property');
-  $subjectValues = $item->displaySubjectValues($page, 25, $property);
-  ?>
-  <?php if ($subjectValues): ?>
-  <div id="item-linked">
-      <h3><?php echo $this->translate('Linked resources'); ?></h3>
-      <?php echo $subjectValues; ?>
-  </div>
-  <?php endif; ?>
 </div>
+
+<?php
+$page = $this->params()->fromQuery('page', 1);
+$property = $this->params()->fromQuery('property');
+$subjectValues = $item->displaySubjectValues($page, 25, $property);
+?>
+<?php if ($subjectValues): ?>
+<!--<div id="item-linked">
+    <h3><?php echo $this->translate('Linked resources'); ?></h3>
+    <?php echo $subjectValues; ?>
+</div>-->
+<?php endif; ?>
+
 <script type="text/javascript">
 $(document).ready(function(){
   $(".toggle-trigger").click(function(){
