@@ -10,6 +10,8 @@
 <p>
   <?php echo $this->heading; ?>
 </p>
+<?php elseif($this->heading != 'Clippings database'):?>
+  <h3><?php echo $this->heading; ?></h3>
 <?php endif; ?>
 <?php if($this->resourceType == 'item-set' || $this->heading == 'Docutubes'):?>
   <div class="top-browse">
@@ -105,7 +107,7 @@
   ?>
   </div>
 <?php else:?>
-    <div class="resource-list masonry preview">
+    <div class="resource-list masonry preview homepage">
     <?php
     $headingTerm = $this->siteSetting('browse_heading_property_term', 'dcterms:title');
     $bodyTerm = $this->siteSetting('browse_body_property_term', 'dcterms:description');
@@ -120,7 +122,7 @@
         }
     ?>
         <div class="<?php echo $this->resourceType; ?> resource">
-          <?php echo $resource->linkRaw($this->thumbnail($resource, 'medium')); ?>
+          <?php echo $resource->linkRaw($this->thumbnail($resource, 'square')); ?>
           <div class="body">
             <h4><?php echo $resource->link($heading); ?></h4>
             <?php if ($body): ?>
@@ -133,13 +135,15 @@
         </div>
     <?php endforeach; ?>
     </div>
-    <?php
-    if ($this->linkText):
-        echo $this->hyperlink($this->linkText, $this->url(
-            'site/resource', ['controller' => $this->resourceType, 'action' => 'browse'], ['query' => $this->query], true
-        ));
-    endif;
-    ?>
+    <div class="more-news-showcase">
+      <?php
+      if ($this->linkText):
+          echo $this->hyperlink($this->linkText, $this->url(
+              'site/resource', ['controller' => $this->resourceType, 'action' => 'browse'], ['query' => $this->query], true
+          ),array("class" => "btn"));
+      endif;
+      ?>
+    </div>
 <?php endif;?>
 
 

@@ -934,6 +934,7 @@ blockquote{
   }
 }
 
+
 .col-2{
   h2{
     min-height: 4rem;
@@ -1363,6 +1364,18 @@ ul.resource-list .resource img ~ * {
    .language{
      font-size: 1.2rem;
    }
+}
+
+.preview-block{
+  
+}
+.homepage{
+  margin-bottom: 0;
+
+  .resource{
+    border:none !important;
+    margin-bottom: 0 !important;
+  }
 }
 
 #mapping-section{
