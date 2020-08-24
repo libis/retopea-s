@@ -60,13 +60,21 @@ $news = false;
 <div class="item-show">
   <?php if ($embedMedia && $itemMedia): ?>
       <div class="media-embeds">
-      <?php foreach ($itemMedia as $media):
-          $render =  $media->render().'';
-          //var_dump($render);
-          $render =  str_replace('http:','',$render);
-          $render = str_replace('http&#x3A;','',$render);
-          echo $render;
-      endforeach;
+      <?php foreach ($itemMedia as $media):?>
+        <div class="media-block">
+          <?php
+            $render =  $media->render().'';
+            //var_dump($render);
+            $render =  str_replace('http:','',$render);
+            $render = str_replace('http&#x3A;','',$render);
+            echo $render;
+            if($media->value('dcterms:title')):?>
+              <div class="caption">
+                <?php echo $media->value('dcterms:title');?>
+              </div>
+            <?php endif;?>
+        </div>
+      <?php endforeach;
       ?>
       </div>
   <?php endif; ?>

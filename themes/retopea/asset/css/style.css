@@ -1323,14 +1323,20 @@ p.ui-dropdown-list-trigger {
     vertical-align: top;
     margin-bottom: 12.5px;
   }
-  .media-render {
+  .media-block {
     margin-bottom: 25px;
     padding-bottom: 20px;
     border-bottom: 1px solid #eee;
     font-family: "Merriweather", serif;
   }
-  .media-render:last-of-type {
+  .media-block:last-of-type {
     border: none;
+  }
+  .media-block .caption {
+    text-align: center;
+    font-size: 1.1rem;
+    margin: 5px 0;
+    font-style: italic;
   }
   .media-render > * {
     max-width: 100%;
