@@ -1329,14 +1329,38 @@ p.ui-dropdown-list-trigger {
     border-bottom: 1px solid #eee;
     font-family: "Merriweather", serif;
   }
+  .media-block .media-render {
+    background: #f7f7f7;
+  }
+  .media-block .media-render a {
+    line-height: 0;
+  }
   .media-block:last-of-type {
     border: none;
   }
   .media-block .caption {
-    text-align: center;
     font-size: 1.1rem;
     margin: 5px 0;
     font-style: italic;
+    color: #9b2022;
+  }
+  .media-block .caption i {
+    font-size: 1.8rem;
+    margin-right: 5px;
+    vertical-align: sub;
+  }
+  .media-block .caption a {
+    display: block;
+    overflow: hidden;
+  }
+  .media-block .caption-button {
+    line-height: 2.2rem;
+    height: 2.2rem;
+    margin: 2px 0;
+    float: left;
+  }
+  .html .media-render {
+    background: #fff;
   }
   .media-render > * {
     max-width: 100%;

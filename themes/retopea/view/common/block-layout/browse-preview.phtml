@@ -5,12 +5,12 @@
 <?php $this->htmlElement('body')->appendAttribute('class', 'item-set resource browse'); ?>
 
 <div class="preview-block">
-<?php if ($this->heading && $this->heading != 'Docutubes'): ?>
+<?php if ($this->heading && $this->heading != 'Docutubes'  && $this->heading != 'Clippings database'): ?>
 <h2><?php echo $this->heading; ?></h2>
 <p>
   <?php echo $this->heading; ?>
 </p>
-<?php elseif($this->heading != 'Clippings database'):?>
+<?php elseif($this->heading == 'Clippings database'):?>
   <h3><?php echo $this->heading; ?></h3>
 <?php endif; ?>
 <?php if($this->resourceType == 'item-set' || $this->heading == 'Docutubes'):?>
@@ -122,9 +122,9 @@
         }
     ?>
         <div class="<?php echo $this->resourceType; ?> resource">
-          <?php echo $resource->linkRaw($this->thumbnail($resource, 'square')); ?>
+          <a href="https://retopea.eu/s/en/item/<?php echo $resource->id();?>"><?php echo $this->thumbnail($resource, 'square'); ?></a>
           <div class="body">
-            <h4><?php echo $resource->link($heading); ?></h4>
+            <h4><a href="https://retopea.eu/s/en/item/<?php echo $resource->id();?>"><?php echo $heading; ?></a></h4>
             <?php if ($body): ?>
               <!--<div class="description"><?php echo $body; ?></div>-->
             <?php endif; ?>
@@ -136,13 +136,7 @@
     <?php endforeach; ?>
     </div>
     <div class="more-news-showcase">
-      <?php
-      if ($this->linkText):
-          echo $this->hyperlink($this->linkText, $this->url(
-              'site/resource', ['controller' => $this->resourceType, 'action' => 'browse'], ['query' => $this->query], true
-          ),array("class" => "btn"));
-      endif;
-      ?>
+      <a class="btn" href="https://retopea.eu/s/en/item"><?php echo $this->linkText;?></a>
     </div>
 <?php endif;?>
 

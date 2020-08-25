@@ -61,17 +61,29 @@ $news = false;
   <?php if ($embedMedia && $itemMedia): ?>
       <div class="media-embeds">
       <?php foreach ($itemMedia as $media):?>
-        <div class="media-block">
+        <div class="media-block <?php echo $media->renderer();?>">
           <?php
             $render =  $media->render().'';
             //var_dump($render);
             $render =  str_replace('http:','',$render);
             $render = str_replace('http&#x3A;','',$render);
             echo $render;
-            if($media->value('dcterms:title')):?>
-              <div class="caption">
-                <?php echo $media->value('dcterms:title');?>
-              </div>
+            if($media->hasThumbnails()):
+              if($media->value('dcterms:title')):?>
+                <div class="caption">
+                  <div class="caption-button">
+                    <i class="fas fa-info-circle"></i>
+                  </div>
+                  <a href="<?php echo $site->url()."/media/".$media->id();?>"><?php echo $media->value('dcterms:title');?></a>
+                </div>
+              <?php else:?>
+                <div class="caption">
+                  <div class="caption-button">
+                    <i class="fas fa-info-circle"></i>
+                  </div>
+                  <a href="<?php echo $site->url()."/media/".$media->id();?>">More info</a>
+                </div>
+              <?php endif;?>
             <?php endif;?>
         </div>
       <?php endforeach;

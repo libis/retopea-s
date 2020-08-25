@@ -1,8 +1,30 @@
 <?php $this->htmlElement('body')->appendAttribute('class', 'media resource show'); ?>
 
-<?php echo $this->pageTitle($media->displayTitle(), 2); ?>
-<h3><?php echo $this->translate('Media'); ?></h3>
-<?php $this->trigger('view.show.before'); ?>
-<?php echo $media->render(); ?>
-<?php echo $media->displayValues(); ?>
+<h3 style="margin-bottom:0.2rem;font-weight:200;"><?php echo $this->translate('Media'); ?></h3>
+<h1><?php echo $media->displayTitle(); ?></h1>
+
+<div class="item-show">
+  <div class="media-embeds">
+    <div class="media-block">
+      <?php $this->trigger('view.show.before'); ?>
+      <?php echo $media->render(); ?>
+    </div>
+    <div style="text-align:right;">
+      <a style="font-weight:bold;border-bottom:1px solid #9b2022;" class="btn" href="<?php echo $media->item()->url();?>">Return to item</a>
+    </div>
+
+  </div>
+  <div class="metadata">
+    <?php echo $media->displayValues(); ?>
+  </div>
+</div>
+
+<script type="text/javascript">
+$(document).ready(function(){
+  $(".toggle-trigger").click(function(){
+      $(this).toggleClass("toggle-trigger-active").next().toggleClass("toggle-container-opened");
+      return false; //Prevent the browser jump to the link anchor
+  });
+});
+</script>
 <?php $this->trigger('view.show.after'); ?>

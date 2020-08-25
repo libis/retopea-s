@@ -1513,16 +1513,45 @@ body.resource #content > h2:first-of-type + h3 {
   border-bottom: 1px solid #eee;
   font-family: $serif;
 
+  .media-render{
+    background: #f7f7f7;
+    a{
+      line-height:0;
+    }   
+  }
+
   &:last-of-type{
     border: none;
   }
 
+
   .caption{
-    text-align: center;
     font-size: 1.1rem;
     margin:5px 0;
     font-style: italic;
+    color: $primary;
+
+
+    i{
+      font-size: 1.8rem;
+      margin-right: 5px;
+      vertical-align: sub;
+    }
+    a{
+      display: block;
+      overflow: hidden;
+    }
   }
+  .caption-button{
+    line-height: 2.2rem;
+    height: 2.2rem;
+    margin: 2px 0;
+    float: left;
+  }
+}
+
+.html .media-render{
+  background: #fff;
 }
 
 .media-render > * {
