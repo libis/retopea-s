@@ -2063,6 +2063,9 @@ p.ui-dropdown-list-trigger {
   .masonry .body {
     padding: 0;
   }
+  .preview-block .homepage.masonry {
+    display: flex;
+  }
   /* @end */
   footer .contact {
     width: 23.72881%;
