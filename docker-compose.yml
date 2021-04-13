@@ -13,4 +13,4 @@ services:
       - ./config/:/var/www/html/config/
       - ./htaccess:/var/www/html/.htaccess
       - ./imagemagick-policy.xml:/var/www/html/imagemagick-policy.xml
-    restart: always
+    restart: "no"

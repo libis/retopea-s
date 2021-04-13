@@ -6,6 +6,7 @@ $query = $this->params()->fromQuery();
 if (isset($itemSet)):
     $this->htmlElement('body')->appendAttribute('class', 'item-set');
     $query['item_set_id'] = $itemSet->id();
+    $class= $itemSet->displayResourceClassLabel();
 endif;
 $headingTerm = $this->siteSetting('browse_heading_property_term', 'dcterms:title');
 $bodyTerm = $this->siteSetting('browse_body_property_term', 'dcterms:description');
@@ -14,22 +15,33 @@ $itemSetShow = isset($itemSet);
 
 <div class="top-browse">
   <div class="breadcrumbs">
-    <a href="<?php echo $site->url().'/page/clippings/';?>">Discover our collection</a>
+    <?php if($class == 'Collection'):?>
+      Discover our collection: <a href="<?php echo $site->url().'/page/clippings/';?>">Clippings</a>
+    <?php elseif($class == 'Text'):?>
+      Discover our collection: <a href="<?php echo $site->url().'/page/narratives/';?>">Narratives</a>
+    <?php endif;?>
   </div>
   <?php if ($itemSetShow): ?>
       <h1>
         <span class="title">
-          <?php echo $this->translate('Clippings');?>
+          <?php if($class == 'Collection'):?>
+            <?php echo $this->translate('Clippings');?>
+          <?php elseif($class == 'Text'):?>
+            <?php echo $this->translate('Narratives');?>
+          <?php endif;?>
         </span>
           <?php if($itemSet->value('dcterms:title')):?>
             <?php echo $itemSet->value('dcterms:title');?>
           <?php endif;?>
-
       </h1>
-
   <?php else: ?>
       <h1><?php echo $this->translate('Items'); ?></h1>
   <?php endif; ?>
+  <?php if($class == 'Text' || $itemSet->value('dcterms:description')):?>
+    <div style="max-width:800px;margin-bottom:3rem;">
+      <?php echo $itemSet->value('dcterms:description');?>
+    </div>
+  <?php endif;?>
   <div id="search">
     <?php
     $searchValue = $this->escapeHtml($this->params()->fromQuery('fulltext_search', ''));

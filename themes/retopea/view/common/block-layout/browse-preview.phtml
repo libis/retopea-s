@@ -5,7 +5,7 @@
 <?php $this->htmlElement('body')->appendAttribute('class', 'item-set resource browse'); ?>
 
 <div class="preview-block">
-<?php if ($this->heading && $this->heading != 'Docutubes'  && $this->heading != 'Clippings database'): ?>
+<?php if ($this->heading && $this->heading != 'Narratives'  && $this->heading && $this->heading != 'Docutubes'  && $this->heading != 'Clippings database'): ?>
 <h2><?php echo $this->heading; ?></h2>
 <p>
   <?php echo $this->heading; ?>
@@ -17,15 +17,55 @@
   <div class="top-browse">
     <div class="discover">Discover our collection</div>
     <h1>
-      <?php if($this->heading != 'Docutubes'):?>
-      <span class="active"><?php echo $this->translate('Clippings'); ?></span>
-      <span><a href="<?php echo $this->url('site/resource', ['controller' => 'page', 'action' => 'docutubes'], ['query' => ''], true);?>">Docutubes</a>
-      </span>
-      <?php else: ?>
+      <?php if($this->heading != 'Docutubes' && $this->heading != 'Narratives'):?>
+        <span class="active"><?php echo $this->translate('Clippings'); ?></span>
+        <span><a href="<?php echo $this->url('site/resource', ['controller' => 'page', 'action' => 'narratives'], ['query' => ''], true);?>">Naratives</a>
+        <span><a href="<?php echo $this->url('site/resource', ['controller' => 'page', 'action' => 'docutubes'], ['query' => ''], true);?>">Docutubes</a>
+        </span>
+      <?php elseif($this->heading == 'Narratives'):?>
         <span><a href="<?php echo $this->url('site/resource', ['controller' => 'page', 'action' => 'clippings'], ['query' => ''], true);?>"><?php echo $this->translate('Clippings'); ?></a></span>
+        <span class="active">Narratives</span>
+        <span><a href="<?php echo $this->url('site/resource', ['controller' => 'page', 'action' => 'docutubes'], ['query' => ''], true);?>">Docutubes</a>
+        </span>
+      <?php elseif($this->heading == 'Docutubes'): ?>
+        <span><a href="<?php echo $this->url('site/resource', ['controller' => 'page', 'action' => 'clippings'], ['query' => ''], true);?>"><?php echo $this->translate('Clippings'); ?></a></span>
+        <span><a href="<?php echo $this->url('site/resource', ['controller' => 'page', 'action' => 'narratives'], ['query' => ''], true);?>">Naratives</a>
         <span class="active">Docutubes</span>
       <?php endif; ?>
     </h1>
+    <?php if($this->heading != 'Docutubes'):?>
+      <div id="lang-switcher" class="ui-dropdown-list browse-switch">
+          <?php
+            $languages = array('en'=> 'EN','nl' => 'NL','fr' => 'FR',
+            'de' => 'DE'
+            );
+            $libis = $this->plugin('Libis');
+            $lang = $libis->getLanguage();
+            if($this->heading == 'Narratives'):
+              $path = $this->url('site/resource',['controller' => 'page', 'action' => 'narratives'], ['query' => ''], true);
+            else:
+              $path = $this->url('site/resource',['controller' => 'page', 'action' => 'clippings'], ['query' => ''], true);
+            endif;
+          ?>
+          <h2 class="visuallyhidden">Sprache wählen</h2>
+          <?php foreach ($languages as $locale => $language): ?>
+            <?php if ($locale == $lang): ?>
+                <h4 class="ui-dropdown-list-trigger">
+                  <span class="visuallyhidden">Aktuelle Sprache: </span>
+                   Language <strong><?php echo $language ?></strong></h4>
+            <?php endif; ?>
+          <?php endforeach; ?>
+          <ul>
+          <?php foreach ($languages as $locale => $language): ?>
+              <?php if ($locale != $lang): ?>
+                   <li><a href="<?php echo str_replace($lang,$locale,$path);?>">
+                       <?php echo $language ?>
+                   </a></li>
+              <?php endif;?>
+          <?php endforeach; ?>
+          </ul>
+        </div>
+    <?php endif;?>    
     <?php if($this->heading != 'Docutubes'):?>
       <div id="search">
           <?php
@@ -142,3 +182,16 @@
 
 
 </div>
+<script>
+
+        $('#lang-switcher').find('.ui-dropdown-list-trigger').each(function() {
+        	$(this).click(function(){
+      			$(this).parent().toggleClass('active');
+      		});
+        });
+
+        $('.ui-dropdown-list-trigger').click(function(){
+      			$(this).parent().toggleClass('active');
+
+        });
+</script>

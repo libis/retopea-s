@@ -23,6 +23,74 @@ header {
     //margin-bottom: 2 * $spacing-l;
 }
 
+.title-btn{
+  display: none;
+}
+
+.nav-menu-top{
+  display: block;
+  background: $primary;
+
+  a{
+    color:rgba(white,0.9);
+
+    &:hover{
+      border-bottom: 2px solid white;
+    }
+  }
+  ul{
+    margin: 0;
+    padding: 0;
+    display: inline-block;
+    margin-right: 4px;
+    position: relative;
+
+    ul{
+      position: absolute;
+      background: $primary;
+      top:5rem;
+      width: 20rem;
+      margin-left: -4rem;;
+
+      li{
+        background: transparent;
+        display: block;
+        position: relative;
+
+        ul{
+          left:20rem;
+          top:0;
+            margin-left: 0rem;;
+          background: white;
+          width: 20rem;
+          a{color: $primary;}
+        }
+      }
+    }
+
+    .open{
+      position: absolute;
+      display: block;
+
+    }
+  }
+  li{
+    list-style: none;
+    display: inline-block;
+    margin-right: -3px;
+    background: rgba(white,0.3);
+    padding: 1rem 2rem;
+  }
+
+  .active{
+    background: rgba(white,0.1);
+  }
+}
+
+.nav-top-container{
+  @include container;
+}
+
 /* @end */
 
 .home-blocks{
@@ -116,6 +184,8 @@ header {
 
 .item-showcase .resource.item {
       margin-bottom: 0;
+      min-width: 33.33%;
+      padding: 0 gutter();
 
     &:not(:only-child) {
         width: span(4 of 12);

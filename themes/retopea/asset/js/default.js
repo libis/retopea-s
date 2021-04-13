@@ -37,6 +37,7 @@
 
         $('#lang-switcher').find('.ui-dropdown-list-trigger').each(function() {
         	$(this).click(function(){
+            alert('stop');
       			$(this).parent().toggleClass('active');
       		});
 

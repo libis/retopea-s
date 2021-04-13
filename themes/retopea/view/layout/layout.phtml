@@ -51,6 +51,27 @@ $lang = $libis->getLanguage();
     <?php echo $this->htmlElement('body')->setAttribute('class',$sitetitle);?>
         <?php echo $userBar; ?>
         <header>
+          <div class="nav-menu-top">
+            <div class="nav-top-container">
+              <?php
+                $site_c = $site;
+                $response = $this->api()->search('sites', array());
+                $sites = $response->getContent();
+                foreach ($sites as $site_s){
+                  if($site_s->id() == 2):
+                    echo $site_s->publicNav()->menu()->renderMenu(null,['maxDepth' => $this->themeSetting('nav_depth') - 1]);
+                  endif;
+                  if($site_s->title() == 'Religious Toleration and Peace'):
+                    $site_c = $site_s;
+                  endif;
+                }
+                if($site->id() != 2 ):
+                  $site_c = $site;
+                endif;
+                echo '<div class="test">'.$site_c->publicNav()->menu()->renderMenu(null,['maxDepth' => 0]).'</div>';
+              ?>
+            </div>
+          </div>
           <div class="gradient">
             <nav>
               <div class="hero-top">
@@ -108,7 +129,7 @@ $lang = $libis->getLanguage();
                     endif;
                   ?>
                 <div class="collection-menu">
-                    <!--
+
                     <h4>Discover the collection</h4>
                     <?php
                       echo $site_c->publicNav()->menu()->renderMenu(null, [
@@ -139,7 +160,7 @@ $lang = $libis->getLanguage();
                             <?php endif;?>
                         <?php endforeach; ?>
                         </ul>
-                      </div>-->
+                      </div>
                     </div>
                 </div>
             </div>
@@ -174,8 +195,6 @@ $lang = $libis->getLanguage();
             </div>
           </div>
           <div class="footer-content">
-
-
             <div class="contact">
               <strong><a href="/s/start/page/contact">CONTACT US</a></strong><br />
               Project Coordinator<br />
@@ -202,6 +221,15 @@ $lang = $libis->getLanguage();
           gtag('js', new Date());
 
           gtag('config', 'UA-143331508-1');
+        </script>
+        <script>
+          $('.test>ul').appendTo( $('.navigation > li:nth-of-type(2)') );
+          $('.navigation ul').hide();
+          $('.navigation li').mouseenter(function() {
+              $(this).children('ul').stop().fadeIn('fast');
+          }).mouseleave(function() {
+              $(this).children('ul').stop().fadeOut('fast')
+          });
         </script>
     </body>
 </html>

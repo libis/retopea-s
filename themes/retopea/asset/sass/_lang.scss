@@ -37,12 +37,20 @@ p.ui-dropdown-list-trigger {
   color: rgba(white, 0.6);
 }
 
+.browse-switch strong:before {
+  color: rgba(black, 0.6);
+}
+
 .ui-dropdown-list-trigger strong,
 .ui-dropdown-list ul a {
 	cursor: pointer;
 	padding: 0 5px;
 	color: white;
 	font-weight: normal;
+}
+
+.browse-switch strong {
+  color: black;
 }
 
 .ui-dropdown-list ul {
@@ -68,6 +76,10 @@ p.ui-dropdown-list-trigger {
 	display: block;
   color: rgba(white,0.6) !important;
 }
+
+.ui-dropdown-list ul a,
+.ui-dropdown-list ul a:link,
+.ui-dropdown-list ul a:visited {}
 
 .ui-dropdown-list ul a:hover{
   color:white !important;

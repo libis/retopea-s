@@ -1,0 +1,126 @@
+[
+    {
+        "name": "components/flag-icon-css",
+        "version": "3.5.0",
+        "version_normalized": "3.5.0.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/lipis/flag-icon-css.git",
+            "reference": "5141384c57972b0b08fc3bb67bea297321fbd799"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/lipis/flag-icon-css/zipball/5141384c57972b0b08fc3bb67bea297321fbd799",
+            "reference": "5141384c57972b0b08fc3bb67bea297321fbd799",
+            "shasum": ""
+        },
+        "time": "2020-06-10T11:53:19+00:00",
+        "type": "component",
+        "extra": {
+            "component": {
+                "name": "flag-icon-css",
+                "files": [
+                    "less/**",
+                    "css/**",
+                    "flags/**"
+                ]
+            }
+        },
+        "installation-source": "dist",
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "MIT"
+        ],
+        "authors": [
+            {
+                "name": "Panayiotis Lipiridis (Lipis)",
+                "email": "lipiridis@gmail.com"
+            }
+        ],
+        "description": "CSS for vector based country flags"
+    },
+    {
+        "name": "daniel-km/simple-iso-639-3",
+        "version": "0.1.1",
+        "version_normalized": "0.1.1.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/Daniel-KM/Simple-ISO-639-3.git",
+            "reference": "1c41349ff7d0ead41e634dfc2357f58b4eac2458"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/Daniel-KM/Simple-ISO-639-3/zipball/1c41349ff7d0ead41e634dfc2357f58b4eac2458",
+            "reference": "1c41349ff7d0ead41e634dfc2357f58b4eac2458",
+            "shasum": ""
+        },
+        "time": "2019-09-29T22:00:00+00:00",
+        "type": "library",
+        "installation-source": "dist",
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "CECILL-2.1"
+        ],
+        "authors": [
+            {
+                "name": "Daniel Berthereau",
+                "email": "daniel.packagist@berthereau.net"
+            }
+        ],
+        "description": "Convert two and three letters language codes and names from official standard sources.",
+        "keywords": [
+            "iso 639",
+            "language code"
+        ]
+    },
+    {
+        "name": "slowprog/composer-copy-file",
+        "version": "0.3.3",
+        "version_normalized": "0.3.3.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/slowprog/CopyFile.git",
+            "reference": "b02d55f7587577f29d355f0ce7b697f66dffc0af"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/slowprog/CopyFile/zipball/b02d55f7587577f29d355f0ce7b697f66dffc0af",
+            "reference": "b02d55f7587577f29d355f0ce7b697f66dffc0af",
+            "shasum": ""
+        },
+        "require": {
+            "php": ">=5.6"
+        },
+        "require-dev": {
+            "composer/composer": "1.0.*@dev",
+            "mikey179/vfsstream": "~1",
+            "php-mock/php-mock-phpunit": "~1",
+            "phpunit/phpunit": "5.7.27",
+            "symfony/filesystem": "~2.7",
+            "symfony/finder": "~2.7"
+        },
+        "time": "2020-07-02T14:44:41+00:00",
+        "type": "library",
+        "installation-source": "dist",
+        "autoload": {
+            "psr-4": {
+                "SlowProg\\CopyFile\\": ""
+            }
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "MIT"
+        ],
+        "authors": [
+            {
+                "name": "Andrey Tyshev",
+                "email": "slowprog@gmail.com"
+            }
+        ],
+        "description": "Composer script copying your files after install",
+        "homepage": "https://github.com/SlowProg/composer-copy-file",
+        "keywords": [
+            "copy file"
+        ]
+    }
+]
