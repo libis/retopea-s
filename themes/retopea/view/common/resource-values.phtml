@@ -7,6 +7,16 @@ $slug = $libis->getLanguage();
 $lang = $this->lang();
 ?>
 <?php foreach ($values as $term => $propertyData): ?>
+  <?php
+  //get languages and don't continue if slug not found
+  $langs = [];$types = [];
+  $babelterms = array('Spatial Coverage','Subject', 'Contributor', 'Cultural Form Of');
+  foreach ($propertyData['values'] as $value):
+    $langs[$escape($value->lang())] = $escape($value->lang());
+    $types[$value->type()] = $value->type();
+  endforeach;  
+  ?>
+  <?php if(isset($langs[$slug]) || in_array($propertyData['property']->label(),$babelterms) || isset($types["resource"]) || isset($types["uri"])):?>
     <div class="property">
         <?php if ($term == "dcterms:title" || $term == "dcterms:description" || $term == "dcterms:instructionalMethod"): ?>
           <h4 class="toggle-trigger toggle-trigger-active">
@@ -41,7 +51,7 @@ $lang = $this->lang();
             }
 
             //add more terms
-            $babelterms = array('Spatial Coverage','Subject', 'Contributor', 'Cultural Form Of');
+            
 
             if(in_array($propertyData['property']->label(),$babelterms) && $slug != 'start'):
               $service_url = 'http://babelnet.io/v5/getSenses';
@@ -95,14 +105,19 @@ $lang = $this->lang();
               endif;
             endif;
             ?>
-
+            <?php if($slug == $escape($value->lang()) || $babel || $value->type() == "resource" || $value->type() =="uri"):?>
             <div class="<?php echo $class; ?>" lang="<?php echo $escape($value->lang()); ?>">
-                <!--<?php if ($language = $value->lang()): ?>
-                <span class="language"><?php echo $language; ?></span>
-                <?php endif; ?>-->
-                <?php echo ($babel) ? $babel : $value->asHtml();?>
+                <?php if($babel):?>
+                  <?php echo $babel;?>   
+                <?php elseif($obj = $value->valueResource()):?>
+                  <a href="<?php echo $obj->url();?>"><?php echo $obj->value('dcterms:title',['lang' => $slug]);?></a>
+                <?php else:?>
+                  <?php echo $value->asHtml($lang);?>
+                <?php endif;?>  
             </div>
+            <?php endif;?>
         <?php endforeach; ?>
         </div>
     </div>
+    <?php endif;?>
 <?php endforeach; ?>

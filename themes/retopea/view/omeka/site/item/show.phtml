@@ -103,10 +103,10 @@ $news = false;
     <div class="property">
         <?php $itemSets = $item->itemSets(); ?>
         <?php if (count($itemSets) > 0): ?>
-        <h4 class="toggle-trigger"><?php echo $this->translate('Collections'); ?></h4>
+        <h4 class="toggle-trigger"><?php echo $this->translate('Collection'); ?></h4>
         <div class="values toggle-container">
           <?php foreach ($item->itemSets() as $itemSet): ?>
-          <div class="value"><a href="<?php echo $escape($itemSet->url()); ?>"><?php echo $itemSet->displayTitle(); ?></a></div>
+          <div class="value"><a href="<?php echo $escape($itemSet->url()); ?>"><?php echo $itemSet->value('dcterms:title',['lang' => $lang]); ?></a></div>
           <?php endforeach; ?>
         </div>
         <?php endif; ?>

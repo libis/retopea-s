@@ -1,6 +1,8 @@
 <?php
   $translate = $this->plugin('translate');
   $escape = $this->plugin('escapeHtml');
+  $libis = $this->plugin('Libis');
+  $lang = $libis->getLanguage();
 ?>
 <?php $this->htmlElement('body')->appendAttribute('class', 'item-set resource browse'); ?>
 
@@ -34,10 +36,11 @@
         <div class="media" style="background:#ccc;"></div>
       <?php endif;?>
       <div class="text">
-        <h4><?php echo $itemSet->link($itemSet->displayTitle()); ?></h4>
-        <?php if ($description = $itemSet->displayDescription()): ?>
-          <!--<div class="description"><?php echo $description; ?></div>-->
-        <?php endif; ?>
+          <?php if($itemSet->value('dcterms:title',array('lang' => $lang))):?>
+            <h4><?php echo $itemSet->link($itemSet->value('dcterms:title',array('lang' => $lang))); ?></h4>
+          <?php else:?>
+            <h4><?php echo $itemSet->link($itemSet->value('dcterms:title')); ?></h4>  
+          <?php endif;?> 
       </div>
     </div>
     <?php endforeach; ?>

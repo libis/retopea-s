@@ -1997,6 +1997,9 @@ p.ui-dropdown-list-trigger {
     display: block;
     background: #9b2022;
   }
+  .nav-menu-top li {
+    border-right: 1px solid #9b2022;
+  }
   .nav-menu-top a {
     color: rgba(255, 255, 255, 0.9);
   }
@@ -2009,6 +2012,7 @@ p.ui-dropdown-list-trigger {
     display: inline-block;
     margin-right: 4px;
     position: relative;
+    background: rgba(255, 255, 255, 0.3);
   }
   .nav-menu-top ul ul {
     position: absolute;
@@ -2021,6 +2025,7 @@ p.ui-dropdown-list-trigger {
     background: transparent;
     display: block;
     position: relative;
+    border-right: none;
   }
   .nav-menu-top ul ul li ul {
     left: 20rem;
@@ -2040,11 +2045,10 @@ p.ui-dropdown-list-trigger {
     list-style: none;
     display: inline-block;
     margin-right: -3px;
-    background: rgba(255, 255, 255, 0.3);
     padding: 1rem 2rem;
   }
   .nav-menu-top .active {
-    background: rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.2);
   }
   .nav-top-container {
     max-width: 1330px;

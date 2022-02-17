@@ -3,6 +3,7 @@ $translate = $this->plugin('translate');
 $escape = $this->plugin('escapeHtml');
 $this->htmlElement('body')->appendAttribute('class', 'item resource browse');
 $query = $this->params()->fromQuery();
+$class = "";
 if (isset($itemSet)):
     $this->htmlElement('body')->appendAttribute('class', 'item-set');
     $query['item_set_id'] = $itemSet->id();
@@ -11,6 +12,8 @@ endif;
 $headingTerm = $this->siteSetting('browse_heading_property_term', 'dcterms:title');
 $bodyTerm = $this->siteSetting('browse_body_property_term', 'dcterms:description');
 $itemSetShow = isset($itemSet);
+$libis = $this->plugin('Libis');
+  $lang = $libis->getLanguage();
 ?>
 
 <div class="top-browse">
@@ -19,6 +22,8 @@ $itemSetShow = isset($itemSet);
       Discover our collection: <a href="<?php echo $site->url().'/page/clippings/';?>">Clippings</a>
     <?php elseif($class == 'Text'):?>
       Discover our collection: <a href="<?php echo $site->url().'/page/narratives/';?>">Narratives</a>
+    <?php else:?>
+      Discover our collection: <a href="<?php echo $site->url().'/page/clippings/';?>">Clippings</a>
     <?php endif;?>
   </div>
   <?php if ($itemSetShow): ?>
@@ -31,16 +36,18 @@ $itemSetShow = isset($itemSet);
           <?php endif;?>
         </span>
           <?php if($itemSet->value('dcterms:title')):?>
-            <?php echo $itemSet->value('dcterms:title');?>
+            <?php echo $itemSet->value('dcterms:title',['lang' => $lang]);?>
           <?php endif;?>
       </h1>
   <?php else: ?>
-      <h1><?php echo $this->translate('Items'); ?></h1>
+      <h1><span class="title"><?php echo $this->translate('Clippings'); ?></span></h1>
   <?php endif; ?>
-  <?php if($class == 'Text' || $itemSet->value('dcterms:description')):?>
-    <div style="max-width:800px;margin-bottom:3rem;">
-      <?php echo $itemSet->value('dcterms:description');?>
-    </div>
+  <?php if($class == 'Text' && $itemSetShow):?>
+    <?php if($itemSet->value('dcterms:description',['lang' => $lang])):?>
+      <div style="max-width:800px;margin-bottom:3rem;">
+        <?php echo $itemSet->value('dcterms:description',['lang' => $lang]);?>
+      </div>
+    <?php endif;?>
   <?php endif;?>
   <div id="search">
     <?php
@@ -62,6 +69,7 @@ $itemSetShow = isset($itemSet);
 <div class="masonry resource-list">
 <?php
 foreach ($items as $item):
+    
     $heading = $headingTerm ? $item->value($headingTerm, ['default' => $translate('[Untitled]')]) : $item->displayTitle();
     $body = $bodyTerm ? $item->value($bodyTerm) : $item->displayDescription();
     $media = $item->media();
@@ -89,10 +97,11 @@ foreach ($items as $item):
 
         <?php endif;?>
         <div class="body">
-          <h4><?php echo $item->link($heading); ?></h4>
-          <?php if ($body): ?>
-          <!--<div class="description"><?php echo $body; ?></div>-->
-          <?php endif; ?>
+          <?php if($item->value('dcterms:title',array('lang' => $lang))):?>
+            <h4><?php echo $item->link($item->value('dcterms:title',array('lang' => $lang))); ?></h4>
+          <?php else:?>
+            <h4><?php echo $item->link($heading); ?></h4>
+          <?php endif;?> 
         </div>
     </div>
 <?php endforeach; ?>
