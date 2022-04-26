@@ -57,10 +57,25 @@ $news = false;
 </h1>
 
 <?php $this->trigger('view.show.before'); ?>
+<?php 
+$lang_media = array();
+foreach($itemMedia as $media):
+  if($media->hasThumbnails()):
+    $lang_media[] = $media;
+  elseif($media->value('dcterms:language')):
+    if($media->value('dcterms:language') == $lang):
+      $lang_media[] = $media;   
+    endif; 
+  else:
+    $lang_media[] = $media;   
+  endif;  
+endforeach;
+//$lang_media = $itemMedia;
+?>
 <div class="item-show">
-  <?php if ($embedMedia && $itemMedia): ?>
+  <?php if ($embedMedia && $lang_media): ?>
       <div class="media-embeds">
-      <?php foreach ($itemMedia as $media):?>
+      <?php foreach ($lang_media as $media):?>
         <div class="media-block <?php echo $media->renderer();?>">
           <?php
             $render =  $media->render().'';

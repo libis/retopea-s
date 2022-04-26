@@ -10,13 +10,18 @@ $lang = $this->lang();
   <?php
   //get languages and don't continue if slug not found
   $langs = [];$types = [];
-  $babelterms = array('Spatial Coverage','Subject', 'Contributor', 'Cultural Form Of');
+  $babelterms = array('Spatial Coverage','Subject', 'Contributor', 'Cultural Form Of', 'Creator');
   foreach ($propertyData['values'] as $value):
     $langs[$escape($value->lang())] = $escape($value->lang());
     $types[$value->type()] = $value->type();
-  endforeach;  
+
+  endforeach; 
+  $currentlang = $slug;
+  if(!isset($langs[$slug])):
+    $currentlang = 'en';
+  endif;  
   ?>
-  <?php if(isset($langs[$slug]) || in_array($propertyData['property']->label(),$babelterms) || isset($types["resource"]) || isset($types["uri"])):?>
+  <?php if(isset($langs[$currentlang]) || in_array($propertyData['property']->label(),$babelterms) || isset($types["resource"]) || isset($types["uri"])):?>
     <div class="property">
         <?php if ($term == "dcterms:title" || $term == "dcterms:description" || $term == "dcterms:instructionalMethod"): ?>
           <h4 class="toggle-trigger toggle-trigger-active">
@@ -105,14 +110,20 @@ $lang = $this->lang();
               endif;
             endif;
             ?>
-            <?php if($slug == $escape($value->lang()) || $babel || $value->type() == "resource" || $value->type() =="uri"):?>
+            <?php if($currentlang == $escape($value->lang()) || $babel || $value->type() == "resource" || $value->type() =="uri"):?>
             <div class="<?php echo $class; ?>" lang="<?php echo $escape($value->lang()); ?>">
                 <?php if($babel):?>
                   <?php echo $babel;?>   
+                <?php elseif($propertyData['property']->term() == "dcterms:subject"):?>  
+                  <a href="https://retopea.eu/s/<?php echo $slug;?>/item?property%5B0%5D%5Bjoiner%5D=and&property%5B0%5D%5Bproperty%5D=3&property%5B0%5D%5Btype%5D=eq&property%5B0%5D%5Btext%5D=<?php echo $value->asHtml()?>"><?php echo $value->asHtml();?></a>
                 <?php elseif($obj = $value->valueResource()):?>
-                  <a href="<?php echo $obj->url();?>"><?php echo $obj->value('dcterms:title',['lang' => $slug]);?></a>
+                  <?php if($obj->value('dcterms:title',['lang' => $slug])):?>
+                    <a href="<?php echo $obj->url();?>"><?php echo $obj->value('dcterms:title',['lang' => $slug]);?></a>
+                  <?php else:?>
+                    <a href="<?php echo $obj->url();?>"><?php echo $obj->value('dcterms:title');?></a>
+                  <?php endif;?>  
                 <?php else:?>
-                  <?php echo $value->asHtml($lang);?>
+                  <?php echo $value->asHtml();?>
                 <?php endif;?>  
             </div>
             <?php endif;?>
