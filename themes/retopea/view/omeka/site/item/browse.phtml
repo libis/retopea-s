@@ -75,6 +75,7 @@ foreach ($items as $item):
     $media = $item->media();
 ?>
     <div class="item resource">
+        <?php if($media):?>
         <?php if($media[0]->mediaType() == 'image/jpeg' || $media[0]->ingester() == 'youtube' || $media[0]->ingester() == 'upload'):?>
           <div class="image"><a href="<?php echo $item->url();?>"><img src="<?php echo str_replace('http:','',$media[0]->thumbnailUrl('medium')); ?>"></a></div>
         <?php else:?>
@@ -95,6 +96,7 @@ foreach ($items as $item):
             </p>
           </div>
 
+        <?php endif;?>
         <?php endif;?>
         <div class="body">
           <?php if($item->value('dcterms:title',array('lang' => $lang))):?>

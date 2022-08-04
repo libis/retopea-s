@@ -1,4 +1,4 @@
-FROM php:7.1-apache
+FROM php:7.4-apache
 
 RUN a2enmod rewrite
 
@@ -20,11 +20,14 @@ RUN apt-get -qq update && apt-get -qq -y --no-install-recommends install \
     ffmpeg
 
 # Install the PHP extensions we need
-RUN docker-php-ext-install -j$(nproc) iconv pdo pdo_mysql mysqli gd
-RUN docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/
+RUN docker-php-ext-install -j$(nproc) iconv pdo pdo_mysql mysqli
+
+# GD
+RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
+  && docker-php-ext-install -j "$(nproc)" gd
 
 RUN usermod -u 10000 www-data
-RUN wget --no-verbose "https://github.com/omeka/omeka-s/releases/download/v2.0.2/omeka-s-2.0.2.zip" -O /var/www/omeka-s.zip
+RUN wget --no-verbose "https://github.com/omeka/omeka-s/releases/download/v2.1.2/omeka-s-2.1.2.zip" -O /var/www/omeka-s.zip
 RUN unzip -q /var/www/omeka-s.zip -d /var/www/ \
 &&  rm /var/www/omeka-s.zip \
 &&  rm -rf /var/www/html/ \

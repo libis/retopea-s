@@ -7,6 +7,14 @@ $itemMedia = $item->media();
 $libis = $this->plugin('Libis');
 $lang = $libis->getLanguage();
 $news = false;
+
+$template = $item->resourceTemplate();
+
+if($template):
+  $type = $template->label();
+else:
+  $type = "";
+endif;
 ?>
 
 <?php $itemSets = $item->itemSets(); ?>
@@ -45,6 +53,94 @@ $news = false;
       </div>
     </div>
   </div>
+<?php elseif($type == "Docutube"):?>
+  <?php 
+  $lang_media = $itemMedia;
+  ?>
+  <div class="item-show">
+    <?php if ($lang_media): ?>
+      <div class="media-embeds">
+      <?php foreach ($lang_media as $media):?>
+        <div class="media-block <?php echo $media->renderer();?>">
+          <?php
+            $render =  $media->render().'';
+            //var_dump($render);
+            $render =  str_replace('http:','',$render);
+            $render = str_replace('http&#x3A;','',$render);
+            echo $render;?>
+        </div>
+      <?php endforeach;?>
+      </div>
+    <?php endif; ?>
+    <div class="metadata">
+      <h3><?php echo $item->value('dcterms:title'); ?></h3>
+     
+      <div class="description">
+        <?php if($item->value('dcterms:description')):?>
+          <?php echo $item->value('dcterms:description');?>
+        <?php endif;?>
+      </div>
+
+      <?php if($item->value("dcterms:alternative")):?>
+      <div class="property">
+        <h4 class="toggle-trigger">Alternative title</h4>
+        <div class="values toggle-container toggle-container-opened">
+        <?php foreach($item->value("dcterms:alternative", ['all' => true]) as $val):?>
+          <div class="value" lang="en">
+            <?php echo $val->asHtml();?>                
+          </div>  
+        <?php endforeach;?>   
+        </div>
+      </div>
+      <?php endif;?> 
+      
+      <?php if($item->value("dcterms:creator")):?>
+      <div class="property">
+        <h4 class="toggle-trigger">Creators</h4>
+        <div class="values toggle-container toggle-container-opened">
+        <?php foreach($item->value("dcterms:creator", ['all' => true]) as $val):?>
+          <div class="value" lang="en">
+            <?php echo $val->asHtml();?>                
+          </div>  
+        <?php endforeach;?>   
+        </div>
+      </div>
+      <?php endif;?>   
+      
+      <?php if($item->value("dcterms:created")):?>
+      <div class="property">
+        <h4 class="toggle-trigger">Date Created</h4>
+        <div class="values toggle-container toggle-container-opened">
+        <?php foreach($item->value("dcterms:created", ['all' => true]) as $val):?>
+          <div class="value" lang="en">
+            <?php echo $val->asHtml();?>                
+          </div>  
+        <?php endforeach;?>   
+        </div>
+      </div>
+      <?php endif;?>
+
+      <?php if($item->value("dcterms:language")):?>
+      <div class="property">
+        <h4 class="toggle-trigger">Language</h4>
+        <div class="values toggle-container toggle-container-opened">
+        <?php foreach($item->value("dcterms:created", ['all' => true]) as $val):?>
+          <div class="value" lang="en">
+            <?php echo $val->asHtml();?>                
+          </div>  
+        <?php endforeach;?>   
+        </div>
+      </div>
+      <?php endif;?>
+
+      <?php if($item->value("dcterms:source")):?>
+        <div class="property" style="margin:1.5rem 0">
+          <a style="border:2px solid #9b2022;padding:0.7rem;" target="_blank" href="<?php echo $item->value("dcterms:source")->uri();?> "><?php echo $item->value("dcterms:source");?></a></>
+        </div>
+      <?php endif;?>
+
+      
+    </div>
 <?php else: ?>
 
 <h1>
@@ -143,6 +239,9 @@ $subjectValues = $item->displaySubjectValues($page, 25, $property);
 </div>-->
 <?php endif; ?>
 
+
+<?php $this->trigger('view.show.after'); ?>
+<?php endif;?>
 <script type="text/javascript">
 $(document).ready(function(){
   $(".toggle-trigger").click(function(){
@@ -151,5 +250,3 @@ $(document).ready(function(){
   });
 });
 </script>
-<?php $this->trigger('view.show.after'); ?>
-<?php endif;?>

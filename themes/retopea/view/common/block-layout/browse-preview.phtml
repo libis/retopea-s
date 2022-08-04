@@ -67,6 +67,11 @@
           </ul>
         </div>
     <?php endif;?>
+    <?php if($this->heading == 'Docutubes'):?>
+      <p>The ‘docutubes’ displayed in this section of the website are short films, ranging from 2 to 7 minutes in length, made by groups of young people in workshops in eight locations across Europe, one in each of the RETOPEA partner countries: Brussels and Leuven (Belgium), Granada (Spain), London (England), Mainz (Germany), Skopje (North Macedonia), Tampere (Finland), Tartu (Estonia) and Warsaw (Poland). The first workshop in Leuven was held in February 2020. After a delay due to the pandemic, the remainder took place over a period of eighteen months between December 2020 and May 2022.</p> 
+      <p>The participants, predominantly aged between 13 and 18 and working in groups of three or four, were asked to make short films to express their own ideas about religious diversity and tolerance, drawing on the RETOPEA clippings collection for ideas and inspiration. Some of the films refer directly to RETOPEA clippings; others are influenced by them in more implicit ways. The young people used a variety of different approaches, including interviews with passers-by or people in their workplaces, drawings and captions, exploration of their local cityscapes and filming of museum displays. They were provided with Go-Pro cameras and used a variety of editing software packages. </p>
+      <p>In viewing and evaluating the docutubes, it is important to be aware that the workshops allowed limited time for filming and editing. Participants were encouraged to see the object of the film-making exercise not as technical perfection, but rather as a means to develop and articulate their own ideas on religious toleration and peace. In viewing them for yourself you should approach them in the same spirit, as offering insights into the ideas and experience of a sample of today’s young Europeans, and inspiring others to rise to the challenge of also making docutubes. (For further information and guidance on this process please see the free online course produced by The Open University: <a target="_blank" href="https://www.open.edu/openlearn/mod/oucontent/view.php?id=126746">Young People and Religion: Creative Learning with History</a>)</p>
+    <?php endif;?>  
     <?php if($this->heading != 'Docutubes'):?>
       <div id="search">
           <?php
@@ -129,7 +134,8 @@
         <?php endif;?>
       
           
-      <?php endif;?>    
+      <?php endif;?>  
+
     <?php endif;?>
     
     <?php echo $this->searchFilters(); ?>
@@ -198,6 +204,36 @@
   endif;
   ?>
   </div>
+
+<?php elseif($this->heading == "Docutubes"):?>
+  <div class="resource-list masonry">
+    <?php
+    $headingTerm = $this->siteSetting('browse_heading_property_term', 'dcterms:title');
+    $bodyTerm = $this->siteSetting('browse_body_property_term', 'dcterms:description');
+    foreach ($this->resources as $resource):
+        $heading = $resource->value($headingTerm, ['default' => $this->translate('[Untitled]')]);
+        $body = $resource->value($bodyTerm);
+        $type = $resource->resourceTemplate();
+        if($type){
+          $type = $resource->resourceTemplate()->label();
+        }else{
+          $type = false;
+        }
+    ?>
+        <div class="<?php echo $this->resourceType; ?> resource">
+          <a href="https://retopea.eu/s/en/item/<?php echo $resource->id();?>"><?php echo $this->thumbnail($resource, 'square'); ?></a>
+          <div class="body">
+            <h4 style="height: 5rem;"><a href="https://retopea.eu/s/en/item/<?php echo $resource->id();?>"><?php echo $heading; ?></a></h4>
+            <?php if ($body): ?>
+              <!--<div class="description"><?php echo $body; ?></div>-->
+            <?php endif; ?>
+            <?php if ($type == 'Docutube'): ?>
+              <div class="language"><?php echo $resource->value('dcterms:language');?></div>
+            <?php endif;?>
+          </div>
+        </div>
+    <?php endforeach; ?>
+    </div>
 <?php else:?>
     <div class="resource-list masonry preview homepage">
     <?php
@@ -227,23 +263,23 @@
         </div>
     <?php endforeach; ?>
     </div>
-    <div class="more-news-showcase">
-      <a class="btn" href="https://retopea.eu/s/en/page/clippings"><?php echo $this->linkText;?></a>
-    </div>
+   
+      <div class="more-news-showcase">
+        <a class="btn" href="https://retopea.eu/s/en/page/clippings"><?php echo $this->linkText;?></a>
+      </div>
+   
 <?php endif;?>
 
 
 </div>
 <script>
+  $('#lang-switcher').find('.ui-dropdown-list-trigger').each(function() {
+    $(this).click(function(){
+      $(this).parent().toggleClass('active');
+    });
+  });
 
-        $('#lang-switcher').find('.ui-dropdown-list-trigger').each(function() {
-        	$(this).click(function(){
-      			$(this).parent().toggleClass('active');
-      		});
-        });
-
-        $('.ui-dropdown-list-trigger').click(function(){
-      			$(this).parent().toggleClass('active');
-
-        });
+  $('.ui-dropdown-list-trigger').click(function(){
+      $(this).parent().toggleClass('active');
+  });
 </script>
