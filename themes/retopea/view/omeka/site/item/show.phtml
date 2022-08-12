@@ -28,11 +28,11 @@ endif;
 ?>
 <?php endif; ?>
 
-<?php if($news):?>
+<?php if($type == "News"):?>
   <nav class="breadcrumbs"><a href="/s/start/page/news">News</a> &gt; <?php echo $item->value('dcterms:title'); ?></nav>
   <div class="news-item">
-    <div class="thumbnail">
-      <?php echo $this->thumbnail($item, 'medium'); ?>
+    <div class="thumbnail" style="min-width:350px;">
+      <?php echo $item->primaryMedia()->render(); ?>
     </div>
     <div class="body">
       <h3><?php echo $item->value('dcterms:title'); ?></h3>
