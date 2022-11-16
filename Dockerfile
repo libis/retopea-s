@@ -1,4 +1,4 @@
-FROM php:7.4-apache
+FROM php:7.4.3-apache
 
 RUN a2enmod rewrite
 
@@ -26,18 +26,20 @@ RUN docker-php-ext-install -j$(nproc) iconv pdo pdo_mysql mysqli
 RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
   && docker-php-ext-install -j "$(nproc)" gd
 
-RUN usermod -u 10000 www-data
+ARG root_path=/var/www/html/  
+
+RUN usermod -u 1000 www-data
 RUN wget --no-verbose "https://github.com/omeka/omeka-s/releases/download/v2.1.2/omeka-s-2.1.2.zip" -O /var/www/omeka-s.zip
 RUN unzip -q /var/www/omeka-s.zip -d /var/www/ \
 &&  rm /var/www/omeka-s.zip \
-&&  rm -rf /var/www/html/ \
-&&  mv /var/www/omeka-s /var/www/html/ \
+&&  rm -rf $root_path \
+&&  mv /var/www/omeka-s $root_path \
 &&  chown -R www-data:www-data /var/www/html/
 
 ADD php.ini-development /usr/local/etc/php
 
 COPY extra.ini /usr/local/etc/php/conf.d/
 
-VOLUME /var/www/html/
+#VOLUME /var/www/html/
 
 CMD ["apache2-foreground"]

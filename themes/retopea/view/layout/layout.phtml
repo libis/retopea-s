@@ -4,7 +4,7 @@ $this->htmlElement('html')->setAttribute('lang', $this->lang());
 $this->headMeta()->setCharset('utf-8');
 $this->headMeta()->appendName('viewport', 'width=device-width, initial-scale=1');
 $this->headTitle($this->setting('installation_title', 'Omeka S'))->setSeparator(' · ');
-$this->headLink()->prependStylesheet($this->assetUrl('css/style.css'));
+$this->headLink()->prependStylesheet($this->assetUrl('css/style.min.css'));
 $this->headLink()->prependStylesheet($this->assetUrl('css/iconfonts.css', 'Omeka'));
 //$this->headLink()->prependStylesheet('//fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i&display=swap');
 $this->headLink()->prependStylesheet('//fonts.googleapis.com/css?family=Merriweather:400,400i|Roboto:300,300i,400,400i,500,500i,700,700i');
@@ -21,6 +21,15 @@ $userBar =  $this->userBar();
 
 $libis = $this->plugin('Libis');
 $lang = $libis->getLanguage();
+
+
+$url = $this->serverUrl(true);
+//echo 'url:'.$url;
+if (strpos($url, 'page/home') !== false) {
+    $home = true;
+}else{
+  $home = false;
+}
 ?>
 <?php echo $this->doctype(); ?>
 <?php echo $this->htmlElement('html'); ?>
@@ -53,6 +62,7 @@ $lang = $libis->getLanguage();
         <header>
           <div class="nav-menu-top">
             <div class="nav-top-container">
+            <a href="https://retopea.eu" class="site-title"><img class="logo-top" src="https://retopea.eu/files/asset/f946753c479c912ab861b841bf573c4d1fb84202.png" title="Logo"></a>
               <?php
                 $site_c = $site;
                 $response = $this->api()->search('sites', array());
@@ -68,39 +78,22 @@ $lang = $libis->getLanguage();
                 if($site->id() != 2 ):
                   $site_c = $site;
                 endif;
-                echo '<div class="test">'.$site_c->publicNav()->menu()->renderMenu(null,['maxDepth' => 0]).'</div>';
+                //echo '<div class="test">'.$site_c->publicNav()->menu()->renderMenu(null,['maxDepth' => 0]).'</div>';
               ?>
             </div>
           </div>
           <div class="gradient">
             <nav>
               <div class="hero-top">
+                
                 <div class="intro">
-                  <div class="title-box">
-                    <?php if ($this->themeSetting('logo')): ?>
-                    <a href="https://retopea.eu" class="site-title"><img src="<?php echo str_replace('http:','',$this->themeSettingAssetUrl('logo')); ?>" title="Logo"></a>
-                    <?php else: ?>
-                    <a href="<?php echo $site->url(); ?>" class="site-title">Retopea</a>
-                    <a href="<?php echo $site->url(); ?>" class="site-sub-title">
-                      <?php if($site->title() == "Start"):?>
-                          Religious Toleration and Peace
-                      <?php else: ?>
-                          <?php echo $site->title(); ?>
-                      <?php endif; ?>
-                    </a>
-                    <?php endif; ?>
-                  </div>
+                  <a href="https://retopea.eu" class="site-title"><img class="logo-top" src="https://retopea.eu/files/asset/f946753c479c912ab861b841bf573c4d1fb84202.png" title="Logo"></a>
+            
                   <div class="title-btn">
                     <a class="menu-btn" href="#">&#9776;</a>
                   </div>
                 </div>
-                <div class="slogan">
-                  <?php if($site->title() == "Start"):?>
-                      <h1><span>Religious Toleration and Peace</span></h1>
-                  <?php else: ?>
-                      <h1><span><?php echo $site->title(); ?></span></h1>
-                  <?php endif; ?>
-                </div>
+               
               </div>
               <div class="nav-menu">
                 <div class="nav-container">
@@ -166,6 +159,61 @@ $lang = $libis->getLanguage();
             </div>
           </nav>
         </div>
+        <?php if($site->title() == "Start" && $home):?>                      
+          <div class="hero-top-2">
+            <div class="hero-left">
+            <div class="language-wrapper">
+              <div class="language-box">
+              <div class="clipping-button">
+              <h3><a href="/s/en">Discover it here</a></h3>
+              </div>
+
+              <div class="clipping-button">
+              <h3><a href="/s/nl">Ontdek het hier</a></h3>
+              </div>
+
+              <div class="clipping-button">
+              <h3><a href="/s/fr">D&eacute;couvrez ici</a></h3>
+              </div>
+
+              <div class="clipping-button">
+              <h3><a href="/s/mk">Откријте го овде</a></h3>
+              </div>
+
+              <div class="clipping-button">
+              <h3><a href="/s/de">Hier geht&rsquo;s los</a></h3>
+              </div>
+
+              <div class="clipping-button">
+              <h3><a href="/s/es">Desc&uacute;brelo aqu&iacute;</a></h3>
+              </div>
+
+              <div class="clipping-button">
+              <h3><a href="/s/et">Avasta siin</a></h3>
+              </div>
+              </div>
+              </div>
+
+              
+            </div>
+            <div class="hero-right">
+              
+              <div class="slogan" style="height:0;">
+                
+                    <h1 class="slide-slogan" style="margin:0 !important;height:0;border:none;">Online resources for learning with history on religious toleration and peace</h1>
+                    <h1 class="slide-slogan" style="margin:0 !important;height:0;border:none;">Online bronnen voor leren met geschiedenis over religieuze tolerantie en vrede</h1>
+                    <h1 class="slide-slogan" style="margin:0 !important;height:0;border:none;">Ressources en ligne pour apprendre avec l'histoire la tolérance religieuse et la paix</h1>
+                    <h1 class="slide-slogan" style="margin:0 !important;height:0;border:none;">Онлајн ресурси за учење со историја за религиозна толеранција и мир</h1>
+                    <h1 class="slide-slogan" style="margin:0 !important;height:0;border:none;">Materiały online do nauki z historii na temat tolerancji religijnej i pokoju</h1>
+                    <h1 class="slide-slogan" style="margin:0 !important;height:0;border:none;">Online-Ressourcen für das Lernen mit der Geschichte über religiöse Toleranz und Frieden</h1>
+                    <h1 class="slide-slogan" style="margin:0 !important;height:0;border:none;">Recursos en línea para aprender con la historia sobre la tolerancia religiosa y la paz</h1>
+                    <h1 class="slide-slogan" style="margin:0 !important;height:0;border:none;">Veebiressursid religioosse sallivuse ja rahu õppimiseks koos ajalooga</h1>
+                              
+              </div>
+            
+            </div>
+          </div>                    
+          <?php endif; ?>  
         </header>
 
         <div id="content" role="main">
@@ -173,25 +221,25 @@ $lang = $libis->getLanguage();
         </div>
         <footer>
           <div class="partner-container">
-            <h3 style="text-align:center">Project partners</h3>
+            <h3 style="text-align:center">Partners</h3>
 
             <div class="partners">
-               <a href="http://retopea.eu/s/start/page/ukim"><img alt="Cyril and Methodius University in Skopje" src="/themes/retopea/asset/images/logo/Kiril-metodij.png" /></a>
-               <a href="http://retopea.eu/s/start/page/euro-arab-foundation"><img alt="Euro-Arab Foundation" src="/themes/retopea/asset/images/logo/euro-arab.png" /></a>
-               <a href="http://retopea.eu/s/start/page/le-foyer-vzw"><img alt="Foyer vzw" src="/themes/retopea/asset/images/logo/foyer.png" /></a>
-               <a href="http://retopea.eu/s/start/page/helsingin-yliopisto"><img alt="Helsingin Yliopisto" src="/themes/retopea/asset/images/logo/Helsingin_yliopisto.svg.png" /></a>
-               <a href="http://retopea.eu/s/start/page/ku-leuven"><img alt="KU Leuven" src="/themes/retopea/asset/images/logo/ku-leuven.png" /></a>
+               <a href="https://retopea.eu/s/start/page/ukim"><img alt="Cyril and Methodius University in Skopje" src="/themes/retopea/asset/images/logo/Kiril-metodij.png" /></a>
+               <a href="https://retopea.eu/s/start/page/euro-arab-foundation"><img alt="Euro-Arab Foundation" src="/themes/retopea/asset/images/logo/euro-arab.png" /></a>
+               <a href="https://retopea.eu/s/start/page/le-foyer-vzw"><img alt="Foyer vzw" src="/themes/retopea/asset/images/logo/foyer.png" /></a>
+               <a href="https://retopea.eu/s/start/page/helsingin-yliopisto"><img alt="Helsingin Yliopisto" src="/themes/retopea/asset/images/logo/Helsingin_yliopisto.svg.png" /></a>
+               <a href="https://retopea.eu/s/start/page/ku-leuven"><img alt="KU Leuven" src="/themes/retopea/asset/images/logo/ku-leuven.png" /></a>
             </div>
 
             <div class="partners">
-              <a href="http://retopea.eu/s/start/page/leibniz"><img alt="Leibniz-Institut für Europäische Geschichte (IEG Mainz)" src="/themes/retopea/asset/images/logo/leibniz.png" /></a>
-              <a href="http://retopea.eu/s/start/page/mcic"><img alt="Macedonian Centre for Intercultural Cooperation (MCIC)" src="/themes/retopea/asset/images/logo/Mcic_logo_en.png" /></a>
-              <a href="http://retopea.eu/s/start/page/open-university"><img alt="Open University" src="/themes/retopea/asset/images/logo/OU_Master_Logo_Dark_Blue.png" /></a>
-              <a href="http://retopea.eu/s/start/page/universidad-de-granada"><img alt="Universidad de Granada" src="/themes/retopea/asset/images/logo/logo-UGR-pequeño.png" /></a>
-              <a href="http://retopea.eu/s/start/page/university-of-tartu"><img alt="University of Tartu" src="/themes/retopea/asset/images/logo/University_of_Tartu_logo.png" /></a>
+              <a href="https://retopea.eu/s/start/page/leibniz"><img alt="Leibniz-Institut für Europäische Geschichte (IEG Mainz)" src="/themes/retopea/asset/images/logo/leibniz.png" /></a>
+              <a href="https://retopea.eu/s/start/page/mcic"><img alt="Macedonian Centre for Intercultural Cooperation (MCIC)" src="/themes/retopea/asset/images/logo/Mcic_logo_en.png" /></a>
+              <a href="https://retopea.eu/s/start/page/open-university"><img alt="Open University" src="/themes/retopea/asset/images/logo/OU_Master_Logo_Dark_Blue.png" /></a>
+              <a href="https://retopea.eu/s/start/page/universidad-de-granada"><img alt="Universidad de Granada" src="/themes/retopea/asset/images/logo/logo-UGR-pequeño.png" /></a>
+              <a href="https://retopea.eu/s/start/page/university-of-tartu"><img alt="University of Tartu" src="/themes/retopea/asset/images/logo/University_of_Tartu_logo.png" /></a>
             </div>
             <div class="partners">
-              <a href="http://retopea.eu/s/start/page/university-of-warsaw"><img alt="University of Warsaw" src="/themes/retopea/asset/images/logo/uw.png" /></a>
+              <a href="https://retopea.eu/s/start/page/university-of-warsaw"><img alt="University of Warsaw" src="/themes/retopea/asset/images/logo/uw.png" /></a>
             </div>
           </div>
           <div class="footer-content">
@@ -204,7 +252,7 @@ $lang = $libis->getLanguage();
             <div class="logos">
               <img style="height:50px;" src="<?php echo $this->assetUrl("images/logo.png");?>">
               <a href="https://kuleuven.be/"><img style="height:50px;" src="<?php echo $this->assetUrl("images/KULEUVEN.png");?>"></a>
-              <a href="http://libis.be/"><img style="height:50px;" src="<?php echo $this->assetUrl("images/libis_gray.png");?>"></a>
+              <a href="https://libis.be/"><img style="height:50px;" src="<?php echo $this->assetUrl("images/libis_gray.png");?>"></a>
               <div class="horizon">
                 <img style="height:80px;" src="<?php echo $this->assetUrl("images/2020.png");?>">
               </div>
@@ -223,9 +271,29 @@ $lang = $libis->getLanguage();
           gtag('config', 'UA-143331508-1');
         </script>
         <script>
-          $('.test>ul').appendTo( $('.navigation > li:nth-of-type(2)') );
-          $('.navigation ul').hide();
-          $('.navigation li').mouseenter(function() {
+          $(document).ready(function(){  
+            $(function(){              
+              $('.slogan .slide-slogan:gt(0)').hide();
+              setInterval(function(){
+                $('.slogan :first-child').fadeOut(1000, "swing").next('.slide-slogan').fadeIn(1000, "swing")
+                .end().appendTo('.slogan');
+              }, 7000);              
+            });            
+          });
+
+          $(document).ready(function(){  
+            $(function(){              
+              $('.quotes .quote-slogan:gt(0)').hide();
+              setInterval(function(){
+                $('.quotes :first-child').fadeOut(1000, "swing").next('.quote-slogan').fadeIn(1000, "swing")
+                .end().appendTo('.quotes');
+              }, 7000);              
+            });            
+          });
+
+          //$('.test>ul').appendTo( $('.nav-menu .navigation > li:nth-of-type(2)') );
+          $('.nav-menu-top .navigation ul').hide();
+          $('.nav-menu-top .navigation li').mouseenter(function() {
               $(this).children('ul').stop().fadeIn('fast');
           }).mouseleave(function() {
               $(this).children('ul').stop().fadeOut('fast')

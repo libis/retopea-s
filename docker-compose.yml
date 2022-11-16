@@ -1,9 +1,12 @@
-version: '2'
+version: '3'
 
 services:
-
   omeka-s:
-    build: ./
+    build:  
+      context: .
+      dockerfile: Dockerfile
+      args:
+        root_path: /var/www/html/
     ports:
       - "9002:80"
     volumes:

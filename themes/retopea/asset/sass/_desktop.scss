@@ -29,14 +29,21 @@ header {
 
 .nav-menu-top{
   display: block;
-  background: $primary;
+  background: white;
+
+  .logo-top{
+    width: 90px; 
+    margin-right: 1rem;
+  }
 
   li{
-    border-right: 1px solid $primary;
+    
   }
 
   a{
-    color:rgba(white,0.9);
+    color: $primary;
+    font-weight: bold;
+    font-size: 1.8rem;
 
     &:hover{
       border-bottom: 2px solid white;
@@ -47,15 +54,17 @@ header {
     padding: 0;
     display: inline-block;
     margin-right: 4px;
-    position: relative;
-    background: rgba(white,0.3);
+    position: relative;    
 
     ul{
       position: absolute;
       background: $primary;
-      top:5rem;
+      top:3.5rem;
       width: 20rem;
       margin-left: -4rem;;
+      a{
+        color: white;
+      }
 
       li{
         background: transparent;
@@ -97,20 +106,264 @@ header {
 
 .nav-top-container{
   @include container;
+  align-items: center;
+  display: flex;
 }
 
 /* @end */
+.language-box{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap:wrap;
+  padding:4rem;
+
+  .clipping-button{    
+    width: 33%;
+  }
+
+  h3{
+    margin:2rem;
+  }
+}
+
+.hero-top{
+  padding:0;
+  display: none;
+
+  .logo-top{
+    display:none;
+    padding: 0;
+  }
+}
+
+.hero-top-2{
+  display: flex;
+  flex-wrap: wrap;
+  
+
+  .hero-left{
+    width: span(7 of 12);
+    //width:50%;
+    padding-right: 1rem;
+  }
+
+  .hero-right{
+    width: span(5 of 12);
+    //width:50%;
+    padding-left: 3rem;
+    padding-right:3rem;
+  }
+}
 
 .home-blocks{
+  overflow: hidden;
+  clear: both;
+  display: flex;
+  flex-wrap: wrap;
+
   .intro{
     width: span(6 of 12);
-    padding-right:3rem;
-    border-right: 1px solid $primary-light;
+    width:50%;
+    padding-right: 1rem;
   }
 
   .right{
       width: span(6 of 12);
-      padding-left: 3rem;
+      width:50%;
+      padding-left: 1rem;
+  }
+}
+
+.language-box{  
+  background: rgba(#c94444,0.4); 
+  min-height: 400px;
+
+  .clipping-button{    
+    padding:1rem;
+  }
+
+  h3{    
+    border-radius: 5px;
+    background: #9a2022;
+    //margin-top: 270px;
+    border:none;
+    padding:1.5rem;
+    margin:0;
+    font-size:2.1rem;
+    color:white;    
+    text-transform: uppercase;
+    font-weight: bold;
+    line-height: 1.5;
+  
+    a{color: white;}
+
+      &::after{
+        font-family: "Font Awesome 5 Free";
+        content: "\f105";
+        margin-left: 5px;
+        font-weight: 900;
+        margin-left: 1rem;
+      }
+  }
+  
+  .clipping-button:nth-of-type(2) {
+    h3{
+      background: #5c0a10;
+    }    
+  }
+  .clipping-button:nth-of-type(3) {
+    h3{
+      background: #c96c6c;
+    }    
+  }
+  .clipping-button:nth-of-type(4) {
+    h3{
+      background: #c94444;
+    }    
+  }
+  .clipping-button:nth-of-type(5) {
+    h3{      
+      background: #c99796;
+    }    
+  }
+  .clipping-button:nth-of-type(6) {
+    h3{
+      background: #be2d2e;
+    }    
+  }
+}
+
+.home-blocks{
+  flex-wrap:wrap;
+  padding-top:4rem;
+
+  h3{
+    margin-top: 270px;
+    margin-bottom: 0;
+    border:none;
+    padding:2rem;
+    font-size:3.5rem;
+    color:white;    
+    text-transform: uppercase;
+    font-weight: bold;
+
+    a{color: white;}
+
+      &::after{
+        font-family: "Font Awesome 5 Free";
+        content: "\f105";
+        margin-left: 5px;
+        font-weight: 900;
+        margin-left: 1rem;
+      }
+  }
+
+  .overlay-text{    
+    background-position-x: 0%;
+    background-position-y: 0%;
+    background-size: auto;
+    background-size: cover;
+    background-position: center center;
+    overflow: auto;
+  }
+
+  .teachers{
+    background: url("../images/youth2.jpg");
+    background-size: cover;
+  }
+
+  .intro{
+    margin-bottom: 0;
+    h3{
+      background: #c96c6c;
+    }    
+    .overlay-text{      
+      background: rgba(#5c0a10,0.5);
+    } 
+  }
+
+  .researcher{    
+    background: url("../images/youth3.jpg");
+    background-size: cover;
+  }
+
+  .right{
+    margin-bottom: 0;
+    h3{
+      background: #5c0a10;
+    } 
+    .overlay-text{
+      background: rgba(#5c0a10,0.5);
+    }    
+  }
+
+  .start-button{
+    margin-top:3rem;
+    margin-bottom: 0.8rem;
+    text-align: right;
+
+    a {
+      background: $primary;
+      color: white;
+      border-radius: 5px;
+      padding: 10px;
+    }
+
+    a::after{
+      font-family: "Font Awesome 5 Free";
+      content: "\f105";
+      margin-left: 5px;
+      font-weight: 900;
+    }
+  }
+
+  .language-menu{
+    margin-top: 10px;
+
+    ul{
+      padding-left:4rem;
+      list-style: circle;
+      margin:0 2rem;
+      margin-left:0;
+      padding-left:gutter();
+
+      li{
+        margin-bottom: 5px;
+      }
+
+      a{
+        border-bottom: 1px solid rgba($primary,0.1);
+      }
+    }
+  }
+
+  .quote-wrapper{
+    background: #c99796;
+    height: 100%;
+  }
+}
+
+.slogan{
+  padding-top: 150px;
+  padding-bottom: 150px;
+  height: 0;
+}
+
+.quotes{
+  padding: 4rem 1.5rem;
+  text-align:center;
+
+  h4{
+    font-size: 2.6rem;
+    line-height: 35px;
+    font-weight: 700;
+    margin-top: 0;
+    margin-bottom: 0;
+    
+    span{
+      padding: 0.5rem 0.5rem;
+    }
   }
 }
 

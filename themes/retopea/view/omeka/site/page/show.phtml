@@ -2,6 +2,8 @@
 $this->htmlElement('body')->appendAttribute('class', 'page');
 $this->pageTitle($page->title(), 2);
 $showPagePagination = $this->siteSetting('show_page_pagination', true);
+$libis = $this->plugin('Libis');
+  $lang = $libis->getLanguage();
 ?>
 
 <?php
@@ -21,6 +23,38 @@ if ($activePage):?>
 <?php endif; ?>
 
 <?php $this->trigger('view.show.before'); ?>
+<?php if($page->slug() == "teachers-researchers"):?>
+<div id="lang-switcher" class="ui-dropdown-list browse-switch" style="text-align:right;">
+        <?php
+          $languages = array('de' => 'DE','en'=> 'EN','es' => 'ES','et' => 'ET','fr' => 'FR',
+          'mk' => 'MK','nl' => 'NL'
+          );
+        
+          if($this->heading == 'Narratives'):
+            $path = $this->url('site/resource',['controller' => 'page', 'action' => 'teachers-researchers'], ['query' => ''], true);
+          else:
+            $path = $this->url('site/resource',['controller' => 'page', 'action' => 'teachers-researchers'], ['query' => ''], true);
+          endif;
+        ?>
+        <h2 class="visuallyhidden">Sprache wählen</h2>
+        <?php foreach ($languages as $locale => $language): ?>
+          <?php if ($locale == $lang): ?>
+              <h4 class="ui-dropdown-list-trigger">
+                <span class="visuallyhidden">Aktuelle Sprache: </span>
+                  Language <strong><?php echo $language ?></strong></h4>
+          <?php endif; ?>
+        <?php endforeach; ?>
+        <ul style="right:0;left:auto;">
+        <?php foreach ($languages as $locale => $language): ?>
+            <?php if ($locale != $lang): ?>
+                  <li style="line-height:1.2 !important;"><a href="<?php echo str_replace($lang,$locale,$path);?>">
+                      <?php echo $language ?>
+                  </a></li>
+            <?php endif;?>
+        <?php endforeach; ?>
+        </ul>
+      </div>
+<?php endif;?>
 <div class="page-blocks">
     <?php echo $this->content; ?>
 </div>
@@ -28,3 +62,14 @@ if ($activePage):?>
 <?php if ($showPagePagination): ?>
 <?php echo $this->sitePagePagination(); ?>
 <?php endif; ?>
+<script>
+  $('#lang-switcher').find('.ui-dropdown-list-trigger').each(function() {
+    $(this).click(function(){
+      $(this).parent().toggleClass('active');
+    });
+  });
+
+  $('.ui-dropdown-list-trigger').click(function(){
+      $(this).parent().toggleClass('active');
+  });
+</script>

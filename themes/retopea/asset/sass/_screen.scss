@@ -261,7 +261,7 @@ header nav ul {
   left:0;
   z-index: 1000;
   margin: 0 auto;
-  background: rgba($primary,0.7);
+  background: rgba($primary,0.4);
   transition:all 400ms;
 
   #language-nav{
@@ -367,7 +367,7 @@ header .nav-menu > ul > li > ul > li > ul > li a {
   margin: 0 auto;
   text-align: left;
   background: $primary;
-  padding: 3rem 0 2rem 0;
+  padding: 4rem 0 2rem 0;
 
   ul{
       margin: 0;
@@ -514,6 +514,16 @@ nav.pagination {
 /* @end */
 
 /* @group ----- Header ----- */
+.site-title{
+  height: auto;
+  line-height: 0;
+  padding: 1rem 0;
+
+  &:hover{
+    text-decoration: none;
+    border: none !important;
+  }
+}
 
 .site-title h1 {
     font-size: 1.1 * $base-font-size;
@@ -521,14 +531,13 @@ nav.pagination {
 }
 
 header{
-  background: url('../images/banner_kadoc.jpg');
-  background-size: cover;
+  background: #c96c6c;
   background-position: center center;
   margin-bottom: 3rem;
 }
 
 .gradient{
-  background-image: linear-gradient(to top left, rgba($primary,0.2), rgba($primary,0));
+  background: white;
 
   & > * {
       @include container;
@@ -539,9 +548,12 @@ header{
 
 .hero-top{
   width:100%;
-  padding-top: 2rem;
-  padding-bottom: 2rem;
   line-height: 1.2;
+  padding: 1rem 0;
+
+  .logo-top{
+    width: 90px;
+  }
 
   a{
     color: white;
@@ -550,7 +562,8 @@ header{
   .intro{
     display:flex;
     width: 100%;
-    justify-content: space-between;
+    justify-content: space-between;    
+    align-items: center;
 
     .title-btn {
       z-index:100000;
@@ -562,6 +575,7 @@ header{
         cursor: pointer;
         line-height: 3.9rem;
         z-index: 10000;
+        color: $primary;
     }
 
     .title-box{
@@ -595,15 +609,17 @@ header{
         color: rgba(white,0.8);
       }
     }
-  }
+  }  
+}
 
+.hero-top-2{
   .slogan{
     color: white;
-    text-align: right;
+    text-align: center;
     text-transform: uppercase;
 
     h1{
-      font-size: 2.5rem;
+      font-size: 3.5rem;
       line-height: 35px;
       font-weight: 700;
       margin-top: 3rem;
@@ -614,7 +630,23 @@ header{
 
       }
     }
+  }
+}
 
+.quotes{
+  padding: 8rem 1.5rem 20rem;
+  text-align:center;
+
+  h4{
+    font-size: 2.6rem;
+    line-height: 35px;
+    font-weight: 700;
+    margin-top: 0;
+    margin-bottom: 0;
+    
+    span{
+      padding: 0.5rem 0.5rem;
+    }
   }
 }
 
@@ -768,8 +800,6 @@ footer {
       font-weight: 900;
     }
   }
-
-
 }
 
 .page-blocks{
@@ -785,22 +815,139 @@ footer {
     }
   }
 }
+.language-wrapper{
+  background: url("../images/youth.jpg");
+  background-size: cover;
+}
+
+.slogan{
+  padding-top: 100px;
+  padding-bottom: 200px;
+  height: 0;
+}
+
+.language-box{  
+  background: rgba(#c94444,0.4); 
+
+  .clipping-button{    
+    padding:0rem;
+    margin: 0;
+  }
+
+  h3{    
+    border-radius: 0;
+    background: #9a2022;
+    //margin-top: 270px;
+    border:none;
+    padding:1.5rem;
+    margin:0;
+    font-size:1.9rem;
+    color:white;    
+    text-transform: uppercase;
+    font-weight: bold;
+    line-height: 1.5;
+  
+    a{color: white;}
+
+      &::after{
+        font-family: "Font Awesome 5 Free";
+        content: "\f105";
+        margin-left: 5px;
+        font-weight: 900;
+        margin-left: 1rem;
+      }
+  }
+  
+  .clipping-button:nth-of-type(2) {
+    h3{
+      background: #5c0a10;
+    }    
+  }
+  .clipping-button:nth-of-type(3) {
+    h3{
+      background: #c96c6c;
+    }    
+  }
+  .clipping-button:nth-of-type(4) {
+    h3{
+      background: #c94444;
+    }    
+  }
+  .clipping-button:nth-of-type(5) {
+    h3{      
+      background: #c99796;
+    }    
+  }
+  .clipping-button:nth-of-type(6) {
+    h3{
+      background: #be2d2e;
+    }    
+  }
+}
 
 .home-blocks{
   display: block;
-  flex-wrap:wrap;
   padding-top:4rem;
-  margin-bottom: 7rem;
+
+  h3{
+    margin-top: 270px;
+    margin-bottom: 0;
+    border:none;
+    padding:2rem;
+    font-size:3.5rem;
+    color:white;    
+    text-transform: uppercase;
+    font-weight: bold;
+
+    a{color: white;}
+
+      &::after{
+        font-family: "Font Awesome 5 Free";
+        content: "\f105";
+        margin-left: 5px;
+        font-weight: 900;
+        margin-left: 1rem;
+      }
+  }
+
+  .overlay-text{    
+    background-position-x: 0%;
+    background-position-y: 0%;
+    background-size: auto;
+    background-size: cover;
+    background-position: center center;
+    overflow: auto;
+  }
+
+  .teachers{
+    background: url("../images/youth2.jpg");
+    background-size: cover;
+  }
 
   .intro{
-
+    margin-bottom: 2rem;
     h3{
-      margin-top: 0;
-      text-align: right;
-      border:none;
-      padding:0;
+      background: #c96c6c;
+    }    
+    .overlay-text{      
+      background: rgba(#5c0a10,0.5);
+    } 
+  }
 
-    }
+  .researcher{    
+    background: url("../images/youth3.jpg");
+    background-size: cover;
+    
+  }
+
+  .right{
+    margin-bottom: 2rem;
+    h3{
+      background: #5c0a10;
+    } 
+    .overlay-text{
+      background: rgba(#5c0a10,0.5);
+    }    
   }
 
   .start-button{
@@ -843,35 +990,9 @@ footer {
     }
   }
 
-  .right{
-    h3{
-      margin-top: 1.6rem;
-      border:none;
-      text-transform: uppercase;
-
-      span{
-        border: 1px solid $primary;
-        padding:1.5rem;
-
-        &::after{
-              font-family: "Font Awesome 5 Free";
-              content: "\f105";
-              margin-left: 5px;
-              font-weight: 300;
-
-        }
-      }
-    }
-    .box{
-      height:350px;
-      margin-bottom:1.5rem;
-      position: relative;
-      background-size: cover !important;
-      background-position: 50% 50% !important;
-
-
-    }
-
+  .quote-wrapper{
+    background: #c99796;
+    height: 100%;
   }
 }
 
