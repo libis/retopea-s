@@ -153,8 +153,9 @@ $lang_media = array();
 foreach($itemMedia as $media):
   if($media->hasThumbnails()):
     $lang_media[] = $media;
-  elseif($media->value('dcterms:language')):
-    if($media->value('dcterms:language') == $lang):
+  
+  elseif($media->value('dcterms:language')):    
+    if($media->value('dcterms:language') == $lang):      
       $lang_media[] = $media;   
     endif; 
   else:
@@ -180,7 +181,11 @@ endforeach;
                   <div class="caption-button">
                     <i class="fas fa-info-circle"></i>
                   </div>
-                  <a href="<?php echo $site->url()."/media/".$media->id();?>"><?php echo $media->value('dcterms:title');?></a>
+                  <?php if($media->value('dcterms:title',array("lang" => $lang))):?>
+                    <a href="<?php echo $site->url()."/media/".$media->id();?>"><?php echo $media->value('dcterms:title',array("lang" => $lang));?></a>
+                  <?php else:?>
+                    <a href="<?php echo $site->url()."/media/".$media->id();?>"><?php echo $media->value('dcterms:title');?></a>
+                  <?php endif;?>  
                 </div>
               <?php else:?>
                 <div class="caption">

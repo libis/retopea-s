@@ -23,18 +23,15 @@ if ($activePage):?>
 <?php endif; ?>
 
 <?php $this->trigger('view.show.before'); ?>
-<?php if($page->slug() == "teachers-researchers"):?>
+<?php if($page->slug() == "teachers" || $page->slug() == "researchers"):?>
 <div id="lang-switcher" class="ui-dropdown-list browse-switch" style="text-align:right;">
         <?php
           $languages = array('de' => 'DE','en'=> 'EN','es' => 'ES','et' => 'ET','fr' => 'FR',
           'mk' => 'MK','nl' => 'NL'
           );
+
+          $path = $this->url('site/resource',['controller' => 'page', 'action' => $page->slug()], ['query' => ''], true);
         
-          if($this->heading == 'Narratives'):
-            $path = $this->url('site/resource',['controller' => 'page', 'action' => 'teachers-researchers'], ['query' => ''], true);
-          else:
-            $path = $this->url('site/resource',['controller' => 'page', 'action' => 'teachers-researchers'], ['query' => ''], true);
-          endif;
         ?>
         <h2 class="visuallyhidden">Sprache wählen</h2>
         <?php foreach ($languages as $locale => $language): ?>
@@ -47,7 +44,7 @@ if ($activePage):?>
         <ul style="right:0;left:auto;">
         <?php foreach ($languages as $locale => $language): ?>
             <?php if ($locale != $lang): ?>
-                  <li style="line-height:1.2 !important;"><a href="<?php echo str_replace($lang,$locale,$path);?>">
+                  <li style="line-height:1.2 !important;"><a href="<?php echo str_replace("/".$lang,"/".$locale,$path);?>">
                       <?php echo $language ?>
                   </a></li>
             <?php endif;?>

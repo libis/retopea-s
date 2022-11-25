@@ -53,10 +53,26 @@ $libis = $this->plugin('Libis');
     <?php
     $searchValue = $this->escapeHtml($this->params()->fromQuery('fulltext_search', ''));
     ?>
+    <?php 
+      $placeholder_array = array(
+        "en" => "search the clippings",
+        "nl" => "zoek de knipsels",
+        "mk" => "пребарајте ги исечоците",
+        "fr" => "rechercher les coupures",
+        "de" => "durchsuchen sie die ausschnitte",
+        "es" => "buscar los recortes",
+        "et" => "otsi väljalõikeid",
+      );
+      if(isset($placeholder_array[$lang])):
+        $placeholder = $placeholder_array[$lang];
+      else:
+        $placeholder = "search the clippings";
+      endif;    
+    ?>   
     <form action="" id="search-form">
         <input type="text" name="fulltext_search" value="<?php echo $searchValue; ?>"
-            placeholder="<?php echo $translate('Search in this collection'); ?>"
-            aria-label="<?php echo $translate('Search in the collection'); ?>">
+            placeholder="<?php echo $placeholder; ?>"
+            aria-label="<?php echo $placeholder; ?>">
         <button type="submit"><?php echo $translate('Search'); ?></button>
     </form>
   </div>
@@ -78,24 +94,28 @@ foreach ($items as $item):
         <?php if($media):?>
         <?php if($media[0]->mediaType() == 'image/jpeg' || $media[0]->ingester() == 'youtube' || $media[0]->ingester() == 'upload'):?>
           <div class="image"><a href="<?php echo $item->url();?>"><img src="<?php echo str_replace('http:','',$media[0]->thumbnailUrl('medium')); ?>"></a></div>
-        <?php else:?>
-          <div class="snippet">
-            <p>
-            <a href="<?php echo $item->url();?>">
-            <?php
-              $text =  $media[0]->render();
-              $start = strpos($text, '<p>');
-              $end = strpos($text, '</p>', $start);
-              $text = substr($text, $start, $end-$start+4);
-              $text = strip_tags($text);
-              $text = myTruncate2($text, 250);
-
-              echo $text;
-            ?>
-            </a>
-            </p>
-          </div>
-
+        <?php else:?>            
+          <?php foreach($media as $media_ln):?>             
+            <?php if($media_ln->value("dcterms:language") == $lang):?>
+              <div class="snippet">
+                <p>
+                <a href="<?php echo $item->url();?>">
+                <?php 
+                  //echo $media_ln->value("dcterms:language")." = ".$lang."<br>";                 
+                  $text = $media_ln->render();
+                  /*$start = strpos($text, '<p>');
+                  $end = strpos($text, '</p>', $start);
+                  $text = substr($text, $start, $end-$start+4);*/
+                  $text = strip_tags($text);
+                  $text = myTruncate2($text, 250);
+                  echo $text;                  
+                ?>
+                </a>
+                </p>
+              </div>
+              <?php break;?>
+            <?php endif;?>              
+          <?php endforeach;?>
         <?php endif;?>
         <?php endif;?>
         <div class="body">
