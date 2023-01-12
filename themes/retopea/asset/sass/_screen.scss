@@ -546,6 +546,8 @@ header{
   }
 }
 
+
+
 .hero-top{
   width:100%;
   line-height: 1.2;
@@ -613,6 +615,7 @@ header{
 }
 
 .hero-top-2{
+  
   .slogan{
     color: white;
     text-align: center;
@@ -631,6 +634,10 @@ header{
       }
     }
   }
+}
+
+.hero-left{
+  
 }
 
 .quotes{
@@ -816,8 +823,7 @@ footer {
   }
 }
 .language-wrapper{
-  background: url("../images/youth.jpg");
-  background-size: cover;
+  
 }
 
 .slogan{
@@ -827,7 +833,6 @@ footer {
 }
 
 .language-box{  
-  background: rgba(#c94444,0.4); 
 
   .clipping-button{    
     padding:0rem;

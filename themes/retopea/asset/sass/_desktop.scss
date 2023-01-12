@@ -116,10 +116,10 @@ header {
   justify-content: center;
   align-items: center;
   flex-wrap:wrap;
-  padding:4rem;
+  padding:2rem;
 
   .clipping-button{    
-    width: 33%;
+    width: 50%;
   }
 
   h3{
@@ -140,19 +140,41 @@ header {
 .hero-top-2{
   display: flex;
   flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
   
-
   .hero-left{
-    width: span(7 of 12);
+    //width: span(4 of 12);
     //width:50%;
-    padding-right: 1rem;
+    padding:0;
+    flex: 1;
+  }
+
+  .hero-right-wrapper{
+    background: url("../images/youth.jpg");
+    background-size: cover;
+    flex: 1;
+       
+  }
+
+  .hero-right-overlay{
+    background: rgba(#c94444,0.4); 
+    display: flex;
+    padding:3rem; 
+    align-items: center;
+  justify-content: center;
+  }
+
+  .hero-middle{
+    flex: 1;
   }
 
   .hero-right{
-    width: span(5 of 12);
+    width: span(4 of 12);
     //width:50%;
     padding-left: 3rem;
     padding-right:3rem;
+    //flex: 1;
   }
 }
 
@@ -175,12 +197,9 @@ header {
   }
 }
 
-.language-box{  
-  background: rgba(#c94444,0.4); 
-  min-height: 400px;
-
+.language-box{
   .clipping-button{    
-    padding:1rem;
+    padding:0.5rem;
   }
 
   h3{    
@@ -188,9 +207,9 @@ header {
     background: #9a2022;
     //margin-top: 270px;
     border:none;
-    padding:1.5rem;
+    padding:1rem;
     margin:0;
-    font-size:2.1rem;
+    font-size:1.3rem;
     color:white;    
     text-transform: uppercase;
     font-weight: bold;
@@ -341,9 +360,19 @@ header {
 }
 
 .slogan{
-  padding-top: 150px;
+  
   padding-bottom: 150px;
   height: 0;
+}
+
+.slogan{
+
+  h1{
+    font-size: 1.8rem !important;
+    font-weight: 700 !important;
+    margin-top: 8rem !important;
+    line-height: 25px !important;
+  }
 }
 
 .quotes{

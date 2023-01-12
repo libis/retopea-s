@@ -161,41 +161,7 @@ if (strpos($url, 'page/home') !== false) {
         </div>
         <?php if($site->title() == "Start" && $home):?>                      
           <div class="hero-top-2">
-            <div class="hero-left">
-            <div class="language-wrapper">
-              <div class="language-box">
-              <div class="clipping-button">
-              <h3><a href="/s/en">Discover it here</a></h3>
-              </div>
-
-              <div class="clipping-button">
-              <h3><a href="/s/nl">Ontdek het hier</a></h3>
-              </div>
-
-              <div class="clipping-button">
-              <h3><a href="/s/fr">D&eacute;couvrez ici</a></h3>
-              </div>
-
-              <div class="clipping-button">
-              <h3><a href="/s/mk">Откријте го овде</a></h3>
-              </div>
-
-              <div class="clipping-button">
-              <h3><a href="/s/de">Hier geht&rsquo;s los</a></h3>
-              </div>
-
-              <div class="clipping-button">
-              <h3><a href="/s/es">Desc&uacute;brelo aqu&iacute;</a></h3>
-              </div>
-
-              <div class="clipping-button">
-              <h3><a href="/s/et">Avasta siin</a></h3>
-              </div>
-              </div>
-              </div>
-
-              
-            </div>
+            
             <div class="hero-right">
               
               <div class="slogan" style="height:0;">
@@ -212,6 +178,50 @@ if (strpos($url, 'page/home') !== false) {
               </div>
             
             </div>
+            <div class="hero-right-wrapper">
+              <div class="hero-right-overlay">
+              <div class="hero-middle">
+                <video controls="true" playsinline="" src="https://retopea.eu/files/original/d0ab1b87f7556696aaf71cc3047aafbe1b82e2a8.mp4#t=1" width="100%">&nbsp;</video>            
+              </div>
+
+              <div class="hero-left">
+              <div class="language-wrapper">
+                <div class="language-box">
+                <div class="clipping-button">
+                <h3><a href="/s/en">Discover it here</a></h3>
+                </div>
+
+                <div class="clipping-button">
+                <h3><a href="/s/nl">Ontdek het hier</a></h3>
+                </div>
+
+                <div class="clipping-button">
+                <h3><a href="/s/fr">D&eacute;couvrez ici</a></h3>
+                </div>
+
+                <div class="clipping-button">
+                <h3><a href="/s/mk">Откријте го овде</a></h3>
+                </div>
+
+                <div class="clipping-button">
+                <h3><a href="/s/de">Hier geht&rsquo;s los</a></h3>
+                </div>
+
+                <div class="clipping-button">
+                <h3><a href="/s/es">Desc&uacute;brelo aqu&iacute;</a></h3>
+                </div>
+
+                <div class="clipping-button">
+                <h3><a href="/s/et">Avasta siin</a></h3>
+                </div>
+                </div>
+                </div>
+
+                
+              </div>
+              </div>
+            </div>
+            
           </div>                    
           <?php endif; ?>  
         </header>
@@ -277,7 +287,7 @@ if (strpos($url, 'page/home') !== false) {
               setInterval(function(){
                 $('.slogan :first-child').fadeOut(1000, "swing").next('.slide-slogan').fadeIn(1000, "swing")
                 .end().appendTo('.slogan');
-              }, 7000);              
+              }, 5500);              
             });            
           });
 
@@ -287,7 +297,7 @@ if (strpos($url, 'page/home') !== false) {
               setInterval(function(){
                 $('.quotes :first-child').fadeOut(1000, "swing").next('.quote-slogan').fadeIn(1000, "swing")
                 .end().appendTo('.quotes');
-              }, 7000);              
+              }, 5500);              
             });            
           });
 
