@@ -1,4 +1,4 @@
-FROM php:7.4.3-apache
+FROM php:7.4.28-apache
 
 RUN a2enmod rewrite
 
@@ -26,7 +26,7 @@ RUN docker-php-ext-install -j$(nproc) iconv pdo pdo_mysql mysqli
 RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
   && docker-php-ext-install -j "$(nproc)" gd
 
-ARG root_path=/var/www/html/  
+ENV root_path=/var/www/html/  
 
 RUN usermod -u 1000 www-data
 RUN wget --no-verbose "https://github.com/omeka/omeka-s/releases/download/v2.1.2/omeka-s-2.1.2.zip" -O /var/www/omeka-s.zip

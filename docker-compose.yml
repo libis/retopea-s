@@ -2,11 +2,7 @@ version: '3'
 
 services:
   omeka-s:
-    build:  
-      context: .
-      dockerfile: Dockerfile
-      args:
-        root_path: /var/www/html/
+    image: registry.docker.libis.be/omeka_s_v2:latest
     ports:
       - "9002:80"
     volumes:
