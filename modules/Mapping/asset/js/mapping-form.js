@@ -53,14 +53,16 @@ var addMarker = function(marker, markerId, markerLabel, markerMediaId) {
             .attr('name', 'o-module-mapping:marker[' + marker._leaflet_id + '][o:id]')
             .val(markerId));
     }
+    // Account for markers placed outside the CRS's bounds.
+    var latLng = marker.getLatLng().wrap();
     mappingForm.append($('<input>')
         .attr('type', 'hidden')
         .attr('name', 'o-module-mapping:marker[' + marker._leaflet_id + '][o-module-mapping:lat]')
-        .val(marker.getLatLng().lat));
+        .val(latLng.lat));
     mappingForm.append($('<input>')
         .attr('type', 'hidden')
         .attr('name', 'o-module-mapping:marker[' + marker._leaflet_id + '][o-module-mapping:lng]')
-        .val(marker.getLatLng().lng));
+        .val(latLng.lng));
     mappingForm.append($('<input>')
         .attr('type', 'hidden')
         .attr('name', 'o-module-mapping:marker[' + marker._leaflet_id + '][o-module-mapping:label]')
@@ -140,7 +142,7 @@ if (mappingData && mappingData['o-module-mapping:bounds'] !== null) {
 // Add layers and controls to the map.
 var baseMaps = {
     'Streets': L.tileLayer.provider('OpenStreetMap.Mapnik'),
-    'Grayscale': L.tileLayer.provider('OpenStreetMap.BlackAndWhite'),
+    'Grayscale': L.tileLayer.provider('CartoDB.Positron'),
     'Satellite': L.tileLayer.provider('Esri.WorldImagery'),
     'Terrain': L.tileLayer.provider('Esri.WorldShadedRelief')
 };
@@ -236,8 +238,8 @@ map.on('draw:deleted', function(e) {
 });
 
 // Handle adding a geocoded marker.
-map.on('geosearch_showlocation', function(e) {
-    addMarker(new L.Marker([e.Location.Y, e.Location.X]), null, e.Location.Label);
+map.on('geosearch/showlocation', function(e) {
+    addMarker(new L.Marker([e.location.y, e.location.x]), null, e.location.label);
 });
 
 // Switching sections changes map dimensions, so make the necessary adjustments.

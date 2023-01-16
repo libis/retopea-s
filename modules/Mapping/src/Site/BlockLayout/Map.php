@@ -5,15 +5,14 @@ use Omeka\Api\Representation\SiteRepresentation;
 use Omeka\Api\Representation\SitePageRepresentation;
 use Omeka\Api\Representation\SitePageBlockRepresentation;
 use Omeka\Entity\SitePageBlock;
-use Omeka\Site\BlockLayout\AbstractBlockLayout;
 use Omeka\Stdlib\ErrorStore;
 use Zend\View\Renderer\PhpRenderer;
 
-class Map extends AbstractBlockLayout
+class Map extends AbstractMap
 {
     public function getLabel()
     {
-        return 'Map'; // @translate
+        return 'Map by attachments'; // @translate
     }
 
     public function onHydrate(SitePageBlock $block, ErrorStore $errorStore)
@@ -42,100 +41,47 @@ class Map extends AbstractBlockLayout
         }
     }
 
-    public function prepareForm(PhpRenderer $view)
-    {
-        $view->headScript()->appendFile($view->assetUrl('js/mapping-block-form.js', 'Mapping'));
-        $view->headLink()->appendStylesheet($view->assetUrl('vendor/leaflet/leaflet.css', 'Mapping'));
-        $view->headScript()->appendFile($view->assetUrl('vendor/leaflet/leaflet.js', 'Mapping'));
-        $view->headScript()->appendFile($view->assetUrl('js/control.default-view.js', 'Mapping'));
-    }
-
     public function form(PhpRenderer $view, SiteRepresentation $site,
         SitePageRepresentation $page = null, SitePageBlockRepresentation $block = null
     ) {
-        $data = $block ? $block->data() : [];
-        return $view->partial('common/block-layout/mapping-block-form', [
-            'data' => $this->filterBlockData($data),
-        ]) . $view->blockAttachmentsForm($block, true, ['has_markers' => true]);
+        $form = parent::form($view, $site, $page, $block);
+        $form .= $view->blockAttachmentsForm($block, true, ['has_markers' => true]);
+        return $form;
     }
 
     public function render(PhpRenderer $view, SitePageBlockRepresentation $block)
     {
-        // Get all markers from the attachment items.
-        $allMarkers = [];
+        $data = $this->filterBlockData($block->data());
+        $isTimeline = (bool) $data['timeline']['data_type_properties'];
+        $timelineIsAvailable = $this->timelineIsAvailable();
+
+        // Get markers (and events, if applicable) from the attached items.
+        $events = [];
+        $markers = [];
         foreach ($block->attachments() as $attachment) {
-            // When an item was removed from the base, it should be skipped.
             $item = $attachment->item();
             if (!$item) {
+                // This attachment has no item. Do not add markers.
                 continue;
             }
-            $markers = $view->api()->search(
-                'mapping_markers',
-                ['item_id' => $item->id()]
-            )->getContent();
-            $allMarkers = array_merge($allMarkers, $markers);
+            if ($isTimeline && $timelineIsAvailable) {
+                // Set the timeline event for this item.
+                $event = $this->getTimelineEvent($item, $data['timeline']['data_type_properties'], $view);
+                if ($event) {
+                    $events[] = $event;
+                }
+            }
+            // Set the map markers for this item.
+            $itemMarkers = $view->api()->search('mapping_markers', ['item_id' => $item->id()])->getContent();
+            $markers = array_merge($markers, $itemMarkers);
         }
 
         return $view->partial('common/block-layout/mapping-block', [
-            'data' => $this->filterBlockData($block->data()),
-            'markers' => $allMarkers,
+            'data' => $data,
+            'markers' => $markers,
+            'isTimeline' => $isTimeline,
+            'timelineData' => $this->getTimelineData($events, $data, $view),
+            'timelineOptions' => $this->getTimelineOptions($data),
         ]);
-    }
-
-    /**
-     * Filter Map block data.
-     *
-     * We filter data on input and output to ensure a valid format, regardless
-     * of version.
-     *
-     * @param array $data
-     * @return array
-     */
-    protected function filterBlockData($data)
-    {
-        // Filter the defualt view data.
-        $bounds = null;
-        if (isset($data['bounds'])
-            && 4 === count(array_filter(explode(',', $data['bounds']), 'is_numeric'))
-        ) {
-            $bounds = $data['bounds'];
-        }
-
-        // Filter the WMS overlay data.
-        $wmsOverlays = [];
-        if (isset($data['wms']) && is_array($data['wms'])) {
-            foreach ($data['wms'] as $wmsOverlay) {
-                // WMS data must have label and base URL.
-                if (is_array($wmsOverlay)
-                    && isset($wmsOverlay['label'])
-                    && isset($wmsOverlay['base_url'])
-                ) {
-                    $layers = '';
-                    if (isset($wmsOverlay['layers']) && '' !== trim($wmsOverlay['layers'])) {
-                        $layers = $wmsOverlay['layers'];
-                    }
-                    $wmsOverlay['layers'] = $layers;
-
-                    $styles = '';
-                    if (isset($wmsOverlay['styles']) && '' !== trim($wmsOverlay['styles'])) {
-                        $styles = $wmsOverlay['styles'];
-                    }
-                    $wmsOverlay['styles'] = $styles;
-
-                    $open = null;
-                    if (isset($wmsOverlay['open']) && $wmsOverlay['open']) {
-                        $open = true;
-                    }
-                    $wmsOverlay['open'] = $open;
-
-                    $wmsOverlays[] = $wmsOverlay;
-                }
-            }
-        }
-
-        return [
-            'bounds' => $bounds,
-            'wms' => $wmsOverlays,
-        ];
     }
 }

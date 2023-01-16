@@ -7,6 +7,8 @@ $(document).ready( function() {
  */
 var setMap = function(block) {
     var mapDiv = block.find('.mapping-map');
+    var basemapProviderSelect = block.find('select.basemap-provider');
+    var currentZoomLevelSpan = block.find('span.current-zoom');
 
     var map = L.map(mapDiv[0]);
     var defaultBounds = null;
@@ -18,9 +20,13 @@ var setMap = function(block) {
         defaultBounds = [southWest, northEast];
     }
 
-    L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a>'
-    }).addTo(map);
+    var layer;
+    try {
+        layer = L.tileLayer.provider(basemapProviderSelect.val());
+    } catch (error) {
+        layer = L.tileLayer.provider('OpenStreetMap.Mapnik');
+    }
+    map.addLayer(layer);
 
     map.addControl(new L.Control.DefaultView(
         function(e) {
@@ -44,6 +50,20 @@ var setMap = function(block) {
         map.invalidateSize();
         defaultBounds ? map.fitBounds(defaultBounds) : map.setView([20, 0], 2);
     })
+
+    basemapProviderSelect.on('change', function(e) {
+        map.removeLayer(layer);
+        try {
+            layer = L.tileLayer.provider(basemapProviderSelect.val());
+        } catch (error) {
+            layer = L.tileLayer.provider('OpenStreetMap.Mapnik');
+        }
+        map.addLayer(layer);
+    });
+
+    map.on('zoom', function(e) {
+        currentZoomLevelSpan.text(this.getZoom());
+    });
 };
 
 /**
@@ -75,12 +95,12 @@ var setWmsData = function(block, wmsOverlay) {
 }
 
 // Handle setting the map for added blocks.
-$('#blocks').on('o:block-added', '.block[data-block-layout="mappingMap"]', function(e) {
+$('#blocks').on('o:block-added', '.block[data-block-layout^="mappingMap"]', function(e) {
     setMap($(this));
 });
 
 // Handle setting the map for existing blocks.
-$('.block[data-block-layout="mappingMap"]').each(function() {
+$('.block[data-block-layout^="mappingMap"]').each(function() {
     setMap($(this));
 });
 
@@ -99,7 +119,7 @@ $('form').submit(function(e) {
     // Unfortunately the only way to get the blockIndex at this stage is to
     // extract it from the layout input's name (ideally the index would be set
     // to a data attribute, but that doesn't exist at the time of this fix).
-    $('.block[data-block-layout="mappingMap"]').each(function() {
+    $('.block[data-block-layout^="mappingMap"]').each(function() {
         var thisBlock = $(this);
         var layoutInput = thisBlock.find('input[type="hidden"][name$="[o:layout]"]');
         var index = /\[(\d)\]/.exec(layoutInput.attr('name'))[1];
@@ -118,7 +138,7 @@ $('#blocks').on('click', '.mapping-wms-add', function(e) {
     var block = $(this).closest('.block');
     block.find('.mapping-wms-add').show();
     block.find('.mapping-wms-edit').hide();
-    var wmsOverlays = block.find('ul.mapping-wms-overlays');
+    var wmsOverlays = block.find('.mapping-wms-overlays');
     var wmsOverlay = $($.parseHTML(wmsOverlays.data('wmsOverlayTemplate')));
 
     if (setWmsData(block, wmsOverlay)) {
@@ -135,7 +155,7 @@ $('#blocks').on('click', '.mapping-wms-edit', function(e) {
     var block = $(this).closest('.block');
     block.find('.mapping-wms-add').show();
     block.find('.mapping-wms-edit').hide();
-    var wmsOverlay = block.find('li.mapping-wms-overlay-editing');
+    var wmsOverlay = block.find('.mapping-wms-overlay-editing');
     wmsOverlay.removeClass('mapping-wms-overlay-editing');
 
     if (!setWmsData(block, wmsOverlay)) {

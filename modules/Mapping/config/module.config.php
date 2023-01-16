@@ -35,8 +35,9 @@ return [
         Omeka2Importer\GeolocationImporter::class,
     ],
     'block_layouts' => [
-        'invokables' => [
-            'mappingMap' => Site\BlockLayout\Map::class,
+        'factories' => [
+            'mappingMap' => Service\BlockLayout\MapFactory::class,
+            'mappingMapQuery' => Service\BlockLayout\MapFactory::class,
         ],
     ],
     'navigation_links' => [

@@ -170,7 +170,7 @@ header {
   }
 
   .hero-right{
-    width: span(4 of 12);
+    width: span(3 of 12);
     //width:50%;
     padding-left: 3rem;
     padding-right:3rem;
@@ -356,6 +356,9 @@ header {
   .quote-wrapper{
     background: #c99796;
     height: 100%;
+    display: flex;
+align-items: center;
+justify-content: center;
   }
 }
 
@@ -378,6 +381,8 @@ header {
 .quotes{
   padding: 4rem 1.5rem;
   text-align:center;
+  display: flex;
+  align-items: center;
 
   h4{
     font-size: 2.6rem;
@@ -385,6 +390,7 @@ header {
     font-weight: 700;
     margin-top: 0;
     margin-bottom: 0;
+    flex: 0 0 100%;
     
     span{
       padding: 0.5rem 0.5rem;

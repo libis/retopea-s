@@ -7,7 +7,7 @@ var map = L.map('mapping-map');
 var markers = new L.FeatureGroup();
 var baseMaps = {
     'Streets': L.tileLayer.provider('OpenStreetMap.Mapnik'),
-    'Grayscale': L.tileLayer.provider('OpenStreetMap.BlackAndWhite'),
+    'Grayscale': L.tileLayer.provider('CartoDB.Positron'),
     'Satellite': L.tileLayer.provider('Esri.WorldImagery'),
     'Terrain': L.tileLayer.provider('Esri.WorldShadedRelief')
 };
@@ -36,12 +36,10 @@ map.addControl(new L.Control.FitBounds(markers));
 var setView = function() {
     if (defaultBounds) {
         map.fitBounds(defaultBounds);
-        map.setZoom(4);
     } else {
         var bounds = markers.getBounds();
         if (bounds.isValid()) {
             map.fitBounds(bounds);
-            map.setZoom(4);
         } else {
             map.setView([20, 0], 2)
         }

@@ -8,7 +8,7 @@ $(document).ready(function() {
         var map = L.map(this);
         var marker;
 
-        L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
+        L.tileLayer('https://{s}.tile.osm.org/{z}/{x}/{y}.png', {
             attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a>'
         }).addTo(map);
         map.setView([20, 0], 2);
@@ -18,17 +18,16 @@ $(document).ready(function() {
             showMarker: false,
         }));
 
-        // As a UX consideration, open the GeoSearch address bar by default.
-        mapDiv.find('div.leaflet-control-geosearch > a')[0].click();
-
         // Add the marker to the map.
         map.on('click', function(e) {
             if (marker) {
                 map.removeLayer(marker);
             }
             marker = new L.marker(e.latlng).addTo(map);
-            inputLat.val(e.latlng.lat);
-            inputLng.val(e.latlng.lng);
+            // Account for markers placed outside the CRS's bounds.
+            var latLng = marker.getLatLng().wrap();
+            inputLat.val(latLng.lat);
+            inputLng.val(latLng.lng);
         });
 
         // Remove the marker if it's clicked.
@@ -40,6 +39,11 @@ $(document).ready(function() {
                     inputLng.val('');
                 });
             }
+        });
+
+        // Prevent click-throughs (otherwise clicks will add markers).
+        $('.geosearch').on('click', function(e) {
+            e.stopPropagation();
         });
 
         // Add an existing marker to the map.

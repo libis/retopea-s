@@ -8,6 +8,7 @@ $this->headScript()->appendFile($this->assetUrl('vendor/leaflet.providers/leafle
 $this->headScript()->appendFile($this->assetUrl('js/control.fit-bounds.js', 'Mapping'));
 $this->headScript()->appendFile($this->assetUrl('js/mapping-browse.js', 'Mapping'));
 $this->headScript()->appendFile($this->assetUrl('js/advanced-search.js', 'Omeka'));
+$query['mapping_basemap_provider'] = $query['mapping_basemap_provider'] ?? '';
 ?>
 
 <div id="mapping-map" style="height:500px; width: 80%; margin:0 auto;"></div>
@@ -15,6 +16,7 @@ $this->headScript()->appendFile($this->assetUrl('js/advanced-search.js', 'Omeka'
 <form id="advanced-search">
     <?php echo $this->partial('common/advanced-search', ['query' => $query, 'resourceType' => 'item']); ?>
     <button><?php echo $this->translate('Search Map'); ?></button>
+    <input type="hidden" name="mapping_basemap_provider" value="<?php echo $this->escapeHtml($query['mapping_basemap_provider']); ?>">
 </form>
 
 <?php foreach ($markers as $marker): ?>
