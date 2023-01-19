@@ -30,8 +30,10 @@
              //console.log($('.menu-btn').text());
              if($('.menu-btn').text() == '\u2630'){
                $('.menu-btn').text('\u2715');
+               $('.menu-btn').css("color","white");
              }else{
                $('.menu-btn').text('\u2630');
+               $('.menu-btn').css("color","#9b2022");
              }
         });
 

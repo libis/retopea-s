@@ -374,7 +374,9 @@ header .nav-menu > ul > li > ul > li > ul > li a {
   }
 
   ul li ul{
-    display: none;
+    //display: none;
+    margin-left: 1rem;
+    font-weight: normal;
   }
 
   .start-menu{
