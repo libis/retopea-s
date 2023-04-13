@@ -197,6 +197,73 @@ header {
   }
 }
 
+.text-image{
+  display: flex;
+
+  div.text{
+    flex: 60%;
+    padding:1rem;
+  }
+
+  div.media{
+    flex: 40%;
+    padding:1rem;  
+  }
+}
+
+.home-text-box{
+  background: rgba(#c99796,0.2);
+  padding: 2rem;
+  margin: 4rem 0 0 0;
+}
+
+.youth-box{
+  background: rgba(#c99796,0.2);
+  padding: 2rem;
+}
+
+.home-blocks2{
+  overflow: hidden;
+  clear: both;
+  display: flex;
+  flex-wrap: wrap;
+
+  .intro{
+    width:33.3%;
+    padding-right: 1rem;
+  }
+
+  .middle{
+    width:33.3%;
+    padding:0 1rem;
+    background: #be2d2e;
+    display: flex;
+    align-items: center;
+    margin-bottom: 0rem;
+
+    .middle-box{
+      width: 100%;
+    }
+
+    h4{
+      text-align: center;
+      font-size: 2.6rem;
+      text-transform: uppercase;
+      
+      a{
+        color: white;
+        border-bottom: 3px solid white; 
+      }
+    }
+     
+  }
+
+  .right{
+    width:33.3%;
+      padding-left: 1rem;
+  }
+}
+
 .language-box{
   .clipping-button{    
     padding:0.5rem;
