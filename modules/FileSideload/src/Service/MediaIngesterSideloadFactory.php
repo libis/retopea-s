@@ -2,8 +2,8 @@
 namespace FileSideload\Service;
 
 use FileSideload\Media\Ingester\Sideload;
-use Zend\ServiceManager\Factory\FactoryInterface;
 use Interop\Container\ContainerInterface;
+use Laminas\ServiceManager\Factory\FactoryInterface;
 
 class MediaIngesterSideloadFactory implements FactoryInterface
 {
@@ -12,9 +12,10 @@ class MediaIngesterSideloadFactory implements FactoryInterface
         $settings = $services->get('Omeka\Settings');
         return new Sideload(
             $settings->get('file_sideload_directory'),
-            $settings->get('file_sideload_delete_file'),
+            $settings->get('file_sideload_delete_file') === 'yes',
             $services->get('Omeka\File\TempFileFactory'),
-            $services->get('Omeka\File\Validator')
+            $services->get('Omeka\File\Validator'),
+            (int) $settings->get('file_sideload_max_files')
         );
     }
 }

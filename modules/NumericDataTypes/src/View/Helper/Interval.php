@@ -1,8 +1,8 @@
 <?php
 namespace NumericDataTypes\View\Helper;
 
-use Zend\Form\View\Helper\AbstractHelper;
-use Zend\Form\ElementInterface;
+use Laminas\Form\View\Helper\AbstractHelper;
+use Laminas\Form\ElementInterface;
 
 class Interval extends AbstractHelper
 {
@@ -16,4 +16,3 @@ class Interval extends AbstractHelper
         return $this->getView()->partial('common/numeric-interval', ['element' => $element]);
     }
 }
-

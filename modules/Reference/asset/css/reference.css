@@ -39,6 +39,9 @@
     color: #000;
     text-decoration: none;
 }
+.reference-pagination li.pagination-range.active a {
+    background-color: #DDDDDD;
+}
 
 ul.references {
     list-style: inside none disc;
@@ -61,35 +64,26 @@ ul.references li {
     margin-bottom: 12px;
 }
 
-/* Advanced search */
-/* These rules should be adapted to the theme, in particular the sizes. */
-#property-queries .chosen-container-single {
-    min-width: 40%;
-    max-width: 80%;
+/* Recursive list */
+.list-unstyled {
+    padding-left: 0;
+    list-style: none;
 }
-#property-queries .chosen-container-single .chosen-single {
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    appearance: none;
-    background: inherit;
-    border: inherit;
-    border-radius: inherit;
-    color: inherit;
-    height: inherit;
-    font-family: inherit;
-    vertical-align: inherit;
-    height: inherit;
-    font-size: 16px;
-    line-height: 32px;
-    margin: 0 0 0 5px;
-    padding: 6px;
+.recursive-list .resource-link {
+    display: inline-flex;
+    align-items: center;
+    max-width: 100%;
+    min-width: 0;
 }
-/* Adaptation for official theme Cozy */
-/*
-#property-queries .chosen-container-single .chosen-single {
-    border: 1px solid #000;
+.recursive-list .resource-link img {
     height: 36px;
-    line-height: inherit;
-    padding: 5px;
+    margin-right: 6px;
 }
-*/
+.recursive-list .resource-link .resource-name {
+    flex: 1;
+    min-width: 0;
+}
+.recursive-list .see-all {
+    font-style: italic;
+    list-style: none;
+}

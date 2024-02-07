@@ -9,10 +9,10 @@ use Omeka\Entity\Value;
 use Omeka\Api\Adapter\AbstractEntityAdapter;
 use Omeka\Api\Adapter\AdapterInterface;
 use Omeka\Api\Representation\ValueRepresentation;
-use Zend\Form\Element;
-use Zend\View\Renderer\PhpRenderer;
+use Omeka\DataType\ValueAnnotatingInterface;
+use Laminas\View\Renderer\PhpRenderer;
 
-class Duration extends AbstractDataType
+class Duration extends AbstractDataType implements ValueAnnotatingInterface
 {
     /**
      * Seconds in a timespan
@@ -64,7 +64,7 @@ class Duration extends AbstractDataType
         $value->setValueResource(null);
     }
 
-    public function render(PhpRenderer $view, ValueRepresentation $value)
+    public function render(PhpRenderer $view, ValueRepresentation $value, $options = [])
     {
         if (!$this->isValid(['@value' => $value->value()])) {
             return $value->value();
@@ -229,5 +229,14 @@ class Duration extends AbstractDataType
             );
             $qb->addOrderBy('numeric_value', $query['sort_order']);
         }
+    }
+
+    public function valueAnnotationPrepareForm(PhpRenderer $view)
+    {
+    }
+
+    public function valueAnnotationForm(PhpRenderer $view)
+    {
+        return $this->form($view);
     }
 }

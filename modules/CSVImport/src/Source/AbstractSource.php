@@ -133,6 +133,14 @@ abstract class AbstractSource implements SourceInterface
         }
         $headers = array_reverse($headers, true);
 
+        // Strip UTF-8 encoded BOM, if present, in first header
+        foreach ($headers as $key => $header) {
+            if (substr($header, 0, 3) === "\xef\xbb\xbf") {
+                $headers[$key] = substr($header, 3);
+            }
+            break;
+        }
+
         return $headers;
     }
 
@@ -164,7 +172,9 @@ abstract class AbstractSource implements SourceInterface
 
     protected function cleanRow(array $row)
     {
-        return array_map(function ($v) { return trim($v); }, $row);
+        return array_map(function ($v) {
+            return trim($v);
+        }, $row);
     }
 
     public function clean()

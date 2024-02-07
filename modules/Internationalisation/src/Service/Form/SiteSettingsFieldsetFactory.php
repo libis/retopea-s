@@ -1,9 +1,10 @@
-<?php
+<?php declare(strict_types=1);
+
 namespace Internationalisation\Service\Form;
 
 use Internationalisation\Form\SiteSettingsFieldset;
 use Interop\Container\ContainerInterface;
-use Zend\ServiceManager\Factory\FactoryInterface;
+use Laminas\ServiceManager\Factory\FactoryInterface;
 
 /**
  * Service factory to get the SiteSettingFieldset.
@@ -17,8 +18,8 @@ class SiteSettingsFieldsetFactory implements FactoryInterface
      */
     public function __invoke(ContainerInterface $services, $requestedName, array $options = null)
     {
-        $fieldset = new SiteSettingsFieldset(null, $options);
-        $fieldset->setSiteSetting($services->get('ViewHelperManager')->get('siteSetting'));
-        return $fieldset;
+        $fieldset = new SiteSettingsFieldset(null, $options ?? []);
+        return $fieldset
+            ->setSiteSetting($services->get('ViewHelperManager')->get('siteSetting'));
     }
 }

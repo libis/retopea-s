@@ -1,7 +1,7 @@
 <?php
 namespace CSVImport\Mapping;
 
-use Zend\View\Renderer\PhpRenderer;
+use Laminas\View\Renderer\PhpRenderer;
 
 class PropertyMapping extends AbstractMapping
 {
@@ -24,7 +24,7 @@ class PropertyMapping extends AbstractMapping
         // Set columns.
         if (isset($this->args['column-property'])) {
             $propertyMap = $this->args['column-property'];
-            foreach ($propertyMap as $column => $property) {
+            foreach ($propertyMap as $property) {
                 $data[key($property)] = [];
             }
         }
@@ -53,6 +53,16 @@ class PropertyMapping extends AbstractMapping
         $multivalueMap = isset($this->args['column-multivalue']) ? $this->args['column-multivalue'] : [];
         $multivalueSeparator = $this->args['multivalue_separator'];
         foreach ($row as $index => $values) {
+            if (empty($multivalueMap[$index])) {
+                $values = [trim($values)];
+            } else {
+                $values = explode($multivalueSeparator, $values);
+                $values = array_map(function ($v) {
+                    return trim($v);
+                }, $values);
+            }
+            $values = array_filter($values, 'strlen');
+
             if (isset($propertyMap[$index])) {
                 // Consider 'literal' as the default type.
                 $type = 'literal';
@@ -67,14 +77,6 @@ class PropertyMapping extends AbstractMapping
                 $privateValues = !empty($privateValuesMap[$index]);
 
                 foreach ($propertyMap[$index] as $propertyTerm => $propertyId) {
-                    if (empty($multivalueMap[$index])) {
-                        $values = [trim($values)];
-                    } else {
-
-                        $values = explode($multivalueSeparator, $values);
-                        $values = array_map(function ($v) { return trim($v); }, $values);
-                    }
-                    $values = array_filter($values, 'strlen');
                     foreach ($values as $value) {
                         $valueData = [];
                         switch ($typeAdapter) {
@@ -140,8 +142,8 @@ class PropertyMapping extends AbstractMapping
     {
         $dataTypeAdapters = [];
 
-        $config = $this->getServiceLocator()->get('Config');
-        $dataTypeConfig = $config['csv_import']['data_types'];
+        $config = $this->getServiceLocator()->get('CSVImport\Config');
+        $dataTypeConfig = $config['data_types'];
         foreach ($dataTypeConfig as $id => $configEntry) {
             $dataTypeAdapters[$id] = $configEntry['adapter'];
         }

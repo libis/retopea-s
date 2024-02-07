@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-01-06 00:00+0100\n"
+"POT-Creation-Date: 2021-03-29 00:00+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -26,29 +26,33 @@ msgstr ""
 msgid "See module’s installation documentation."
 msgstr ""
 
-#: src/Generic/AbstractModule.php:518
+#: src/Generic/AbstractModule.php:66
 #, php-format
 msgid "This module requires the module \"%s\"."
 msgstr ""
 
-#: src/Generic/AbstractModule.php:538
+#: src/Generic/AbstractModule.php:73
 #, php-format
 msgid "This module requires modules \"%s\"."
 msgstr ""
 
-#: src/Generic/AbstractModule.php:606
+#: src/Generic/AbstractModule.php:80
+msgid "This module has resources that cannot be installed."
+msgstr ""
+
+#: src/Generic/AbstractModule.php:707
 #, php-format
 msgid ""
 "The module \"%s\" was automatically deactivated because the dependencies are "
 "unavailable."
 msgstr ""
 
-#: view/common/pdf-viewer-inline.phtml:421
+#: view/common/pdf-viewer-inline.phtml:427
 #: view/common/pdf-viewer-object.phtml:16
 msgid "This browser does not support PDF."
 msgstr ""
 
-#: view/common/pdf-viewer-inline.phtml:422
+#: view/common/pdf-viewer-inline.phtml:428
 #: view/common/pdf-viewer-object.phtml:17
 #, php-format
 msgid "You may %sdownload it%s to view it offline."
@@ -65,7 +69,7 @@ msgstr ""
 #: src/Form/SiteSettingsFieldset.php:19
 msgid ""
 "According to the needed compatibility level, the pdf viewer can be embedded "
-"in multiple ways. These options are used in the admin board."
+"in multiple ways."
 msgstr ""
 
 #: src/Form/SiteSettingsFieldset.php:21

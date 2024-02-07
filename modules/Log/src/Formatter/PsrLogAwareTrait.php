@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Log\Formatter;
 
@@ -35,7 +35,7 @@ trait PsrLogAwareTrait
         if ($context) {
             // Check if there are non-mappable extra data.
             $missingPlaceholders = array_filter($context, function ($key) use ($message) {
-                return strpos($message, '{' . $key .'}') === false;
+                return strpos($message, '{' . $key . '}') === false;
             }, ARRAY_FILTER_USE_KEY);
             if ($missingPlaceholders) {
                 if (strpos($message, '{extra}') === false) {

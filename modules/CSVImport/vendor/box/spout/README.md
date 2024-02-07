@@ -1,7 +1,7 @@
 # Spout
 
 [![Latest Stable Version](https://poser.pugx.org/box/spout/v/stable)](https://packagist.org/packages/box/spout)
-[![Project Status](http://opensource.box.com/badges/active.svg)](http://opensource.box.com/badges)
+[![Project Status](https://opensource.box.com/badges/active.svg)](https://opensource.box.com/badges)
 [![Build Status](https://travis-ci.org/box/spout.svg?branch=master)](https://travis-ci.org/box/spout)
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/box/spout/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/box/spout/?branch=master)
 [![Code Coverage](https://scrutinizer-ci.com/g/box/spout/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/box/spout/?branch=master)
@@ -15,28 +15,28 @@ Join the community and come discuss about Spout: [![Gitter](https://badges.gitte
 
 ## Documentation
 
-Full documentation can be found at [http://opensource.box.com/spout/](http://opensource.box.com/spout/).
+Full documentation can be found at [https://opensource.box.com/spout/](https://opensource.box.com/spout/).
 
 
 ## Requirements
 
-* PHP version 5.4.0 or higher
+* PHP version 7.1 or higher
 * PHP extension `php_zip` enabled
 * PHP extension `php_xmlreader` enabled
 
+## Upgrade guide
+
+Version 3 introduced new functionality but also some breaking changes. If you want to upgrade your Spout codebase from version 2 please consult the [Upgrade guide](UPGRADE-3.0.md). 
 
 ## Running tests
 
-On the `master` branch, only unit and functional tests are included. The performance tests require very large files and have been excluded.
-If you just want to check that everything is working as expected, executing the tests of the `master` branch is enough.
+The `master` branch includes unit, functional and performance tests.
+If you just want to check that everything is working as expected, executing the unit and functional tests is enough.
 
-If you want to run performance tests, you will need to checkout the `perf-tests` branch. Multiple test suites can then be run, depending on the expected output:
-
-* `phpunit` - runs the whole test suite (unit + functional + performance tests)
-* `phpunit --exclude-group perf-tests` - only runs the unit and functional tests
+* `phpunit` - runs unit and functional tests
 * `phpunit --group perf-tests` - only runs the performance tests
 
-For information, the performance tests take about 30 minutes to run (processing 1 million rows files is not a quick thing).
+For information, the performance tests take about 10 minutes to run (processing 1 million rows files is not a quick thing).
 
 > Performance tests status: [![Build Status](https://travis-ci.org/box/spout.svg?branch=perf-tests)](https://travis-ci.org/box/spout)
 

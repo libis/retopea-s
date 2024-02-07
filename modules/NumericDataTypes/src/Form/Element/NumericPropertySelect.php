@@ -2,7 +2,7 @@
 namespace NumericDataTypes\Form\Element;
 
 use Doctrine\ORM\EntityManager;
-use Zend\Form\Element\Select;
+use Laminas\Form\Element\Select;
 
 class NumericPropertySelect extends Select
 {
@@ -44,44 +44,55 @@ class NumericPropertySelect extends Select
             return [];
         }
 
-        $qb = $this->entityManager->createQueryBuilder();
-        $qb->select('p')->from('Omeka\Entity\ResourceTemplateProperty', 'p');
-        foreach (array_values($dataTypes) as $index => $dataType) {
-            $qb->orWhere("p.dataType = ?$index");
-            $qb->setParameter($index, sprintf('numeric:%s', $dataType));
+        // Users don't pass the full numeric data type names using the
+        // numeric_data_type option, so set them here.
+        $numericDataTypes = [];
+        foreach ($dataTypes as $dataType) {
+            $numericDataTypes[sprintf('numeric:%s', $dataType)] = true;
         }
+
+        $qb = $this->entityManager->createQueryBuilder();
+        $qb->select('rtp')
+            ->from('Omeka\Entity\ResourceTemplateProperty', 'rtp')
+            ->andWhere($qb->expr()->isNotNull('rtp.dataType'));
         $query = $qb->getQuery();
         $valueOptions = [];
         foreach ($query->getResult() as $templateProperty) {
             $property = $templateProperty->getProperty();
             $template = $templateProperty->getResourceTemplate();
-            $value = $disambiguate
-                ? sprintf('%s:%s', $templateProperty->getDataType(), $property->getId())
-                : $property->getId();
-            $label = $disambiguate
-                ? sprintf('%s (%s)', $property->getLabel(), $templateProperty->getDataType())
-                : $property->getLabel();
-            if (!isset($valueOptions[$value])) {
-                $valueOptions[$value] = [
-                    'label' => $label,
-                    'value' => $value,
-                    'template_labels' => [],
-                ];
+            foreach ($templateProperty->getDataType() ?? [] as $dataType) {
+                if (!isset($numericDataTypes[$dataType])) {
+                    // This is not a requested numeric data type.
+                    continue;
+                }
+                $value = $disambiguate
+                    ? sprintf('%s:%s', $dataType, $property->getId())
+                    : $property->getId();
+                $label = $disambiguate
+                    ? sprintf('%s (%s)', $property->getLabel(), $dataType)
+                    : $property->getLabel();
+                if (!isset($valueOptions[$value])) {
+                    $valueOptions[$value] = [
+                        'label' => $label,
+                        'value' => $value,
+                        'template_labels' => [],
+                    ];
+                }
+                $templateLabel = $disambiguate
+                    ? sprintf(
+                        '• %s: %s',
+                        $template->getLabel(),
+                        $templateProperty->getAlternateLabel() ?: $property->getLabel()
+                    )
+                    : sprintf(
+                        '• %s: %s (%s)',
+                        $template->getLabel(),
+                        $templateProperty->getAlternateLabel() ?: $property->getLabel(),
+                        $dataType
+                    );
+                // More than one template could use the same property.
+                $valueOptions[$value]['template_labels'][] = $templateLabel;
             }
-            $templateLabel = $disambiguate
-                ? sprintf(
-                    '• %s: %s',
-                    $template->getLabel(),
-                    $templateProperty->getAlternateLabel() ?: $property->getLabel()
-                )
-                : sprintf(
-                    '• %s: %s (%s)',
-                    $template->getLabel(),
-                    $templateProperty->getAlternateLabel() ?: $property->getLabel(),
-                    $templateProperty->getDataType()
-                );
-            // More than one template could use the same property.
-            $valueOptions[$value]['template_labels'][] = $templateLabel;
         }
 
         // Include template/property labels in the option title attribute.

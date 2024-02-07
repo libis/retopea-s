@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Internationalisation;
 
@@ -9,12 +9,11 @@ if (!class_exists(\Generic\AbstractModule::class)) {
 }
 
 use Generic\AbstractModule;
+use Laminas\EventManager\Event;
+use Laminas\EventManager\SharedEventManagerInterface;
+use Laminas\Mvc\MvcEvent;
 use Omeka\Api\Representation\AbstractResourceEntityRepresentation;
-use Omeka\Settings\SiteSettings;
 use Omeka\Stdlib\Message;
-use Zend\EventManager\Event;
-use Zend\EventManager\SharedEventManagerInterface;
-use Zend\Mvc\MvcEvent;
 
 class Module extends AbstractModule
 {
@@ -32,7 +31,7 @@ class Module extends AbstractModule
      */
     protected $lastQuerySort = [];
 
-    public function onBootstrap(MvcEvent $event)
+    public function onBootstrap(MvcEvent $event): void
     {
         parent::onBootstrap($event);
         $this->addAclRules();
@@ -41,7 +40,7 @@ class Module extends AbstractModule
     /**
      * Add ACL rules for this module.
      */
-    protected function addAclRules()
+    protected function addAclRules(): void
     {
         /** @var \Omeka\Permissions\Acl $acl */
         $acl = $this->getServiceLocator()->get('Omeka\Acl');
@@ -53,7 +52,7 @@ class Module extends AbstractModule
             );
     }
 
-    protected function preInstall()
+    protected function preInstall(): void
     {
         $vendor = __DIR__ . '/vendor/daniel-km/simple-iso-639-3/src/Iso639p3.php';
         if (!file_exists($vendor)) {
@@ -66,7 +65,7 @@ class Module extends AbstractModule
         }
     }
 
-    public function attachListeners(SharedEventManagerInterface $sharedEventManager)
+    public function attachListeners(SharedEventManagerInterface $sharedEventManager): void
     {
         $sharedEventManager->attach(
             '*',
@@ -202,11 +201,6 @@ class Module extends AbstractModule
             'form.add_elements',
             [$this, 'handleSiteSettings']
         );
-        $sharedEventManager->attach(
-            \Omeka\Form\SiteSettingsForm::class,
-            'form.add_input_filters',
-            [$this, 'handleSiteSettingsFilters']
-        );
 
         // Duplicate site.
         $sharedEventManager->attach(
@@ -241,7 +235,7 @@ class Module extends AbstractModule
         );
     }
 
-    public function handleViewLayoutPublic(Event $event)
+    public function handleViewLayoutPublic(Event $event): void
     {
         $view = $event->getTarget();
         if (!$view->status()->isSiteRequest()) {
@@ -259,7 +253,7 @@ class Module extends AbstractModule
      *
      * @param Event $event
      */
-    public function handleResourceTitle(Event $event)
+    public function handleResourceTitle(Event $event): void
     {
         $locales = $this->getLocales();
         if (!$locales) {
@@ -279,7 +273,7 @@ class Module extends AbstractModule
         } else {
             $title = $resource->value('dcterms:title');
         }
-        $event->setParam('title', $title);
+        $event->setParam('title', (string) $title);
     }
 
     /**
@@ -293,7 +287,7 @@ class Module extends AbstractModule
      *
      * @param Event $event
      */
-    public function handleResourceValues(Event $event)
+    public function handleResourceValues(Event $event): void
     {
         $locales = $this->getLocales();
         if (!$locales) {
@@ -353,10 +347,9 @@ class Module extends AbstractModule
      *
      * @param Event $event
      */
-    public function handleResourceDisplayValues(Event $event)
+    public function handleResourceDisplayValues(Event $event): void
     {
         $locales = $this->getLocales();
-        //var_dump($locales);
         if (!$locales) {
             return;
         }
@@ -433,10 +426,10 @@ class Module extends AbstractModule
      *
      * @param Event $event
      */
-    public function filterJsonLdResource(Event $event)
+    public function filterJsonLdResource(Event $event): void
     {
         // TODO Use the Zend cache.
-        /** @var \Zend\Mvc\I18n\Translator $translator */
+        /** @var \Laminas\Mvc\I18n\Translator $translator */
         static $translator;
         static $propertyLabels;
         static $templatePropertyLabels = [[]];
@@ -446,7 +439,7 @@ class Module extends AbstractModule
         $services = $this->getServiceLocator();
 
         // Process only external api requests.
-        /** @var \Zend\Mvc\MvcEvent $mvcEvent */
+        /** @var \Laminas\Mvc\MvcEvent $mvcEvent */
         $mvcEvent = $services->get('Application')->getMvcEvent();
         // A check is required on route match to allow background processes.
         $routeMatch = $mvcEvent->getRouteMatch();
@@ -455,7 +448,7 @@ class Module extends AbstractModule
             return;
         }
 
-        /** @var \Zend\Http\Request $request */
+        /** @var \Laminas\Http\Request $request */
         $request = $mvcEvent->getRequest();
 
         // Use "use_locale" instead of "locale" to avoid conflicts with some
@@ -583,7 +576,7 @@ class Module extends AbstractModule
         return $templatePropertyLabels;
     }
 
-    public function filterJsonLdSitePage(Event $event)
+    public function filterJsonLdSitePage(Event $event): void
     {
         $page = $event->getTarget();
         $jsonLd = $event->getParam('jsonLd');
@@ -605,7 +598,7 @@ class Module extends AbstractModule
         $event->setParam('jsonLd', $jsonLd);
     }
 
-    public function handleApiUpdatePostPage(Event $event)
+    public function handleApiUpdatePostPage(Event $event): void
     {
         $services = $this->getServiceLocator();
         /**
@@ -678,19 +671,19 @@ SQL;
             }
         }
         $sql = rtrim($sql, ',');
-        $connection->exec($sql);
+        $connection->executeStatement($sql);
     }
 
-    public function filterVocabularyMemberSelectQuery(Event $event)
+    public function filterVocabularyMemberSelectQuery(Event $event): void
     {
         $query = $event->getParam('query', []);
         $this->lastQuerySort = [
             'sort_by' => $query['sort_by'],
-            'sort_order' => isset($query['sort_order']) && strtolower($query['sort_order']) === 'desc' ? 'desc' : 'asc',
+            'sort_order' => isset($query['sort_order']) && strtolower((string) $query['sort_order']) === 'desc' ? 'desc' : 'asc',
         ];
     }
 
-    public function filterVocabularyMemberSelectValues(Event $event)
+    public function filterVocabularyMemberSelectValues(Event $event): void
     {
         if ($this->lastQuerySort['sort_by'] !== 'label') {
             $this->lastQuerySort = [];
@@ -749,7 +742,7 @@ SQL;
         }
         $reverted = $this->lastQuerySort['sort_order'] === 'desc';
         $translateOptionsLabels = function ($v) use ($translator, $reverted) {
-            if (is_scalar($v)) {
+            if (is_scalar($v) || empty($v['options'])) {
                 return $v;
             }
             $optionLabelsTranslated = array_map(function ($vv) use ($translator) {
@@ -770,13 +763,11 @@ SQL;
         $event->setParam('valueOptions', $valueOptions);
     }
 
-    public function handleMainSettings(Event $event)
+    public function handleMainSettings(Event $event): void
     {
         parent::handleMainSettings($event);
 
         $services = $this->getServiceLocator();
-
-        $space = strtolower(__NAMESPACE__);
 
         $api = $services->get('Omeka\ApiManager');
         $sites = $api
@@ -799,7 +790,9 @@ SQL;
          * @var \Internationalisation\Form\SettingsFieldset $fieldset
          */
         $form = $event->getTarget();
-        $fieldset = $form->get($space);
+        $fieldset = version_compare(\Omeka\Module::VERSION, '4', '<')
+            ? $form->get('internationalisation')
+            : $form;
         $siteGroupsElement = $fieldset
             ->get('internationalisation_site_groups');
         $siteGroupsElement
@@ -808,16 +801,18 @@ SQL;
             ->setRestoreValue(implode("\n", $sites));
     }
 
-    public function handleMainSettingsFilters(Event $event)
+    public function handleMainSettingsFilters(Event $event): void
     {
-        $event->getParam('inputFilter')
-            ->get('internationalisation')
+        $inputFilter = version_compare(\Omeka\Module::VERSION, '4', '<')
+            ? $event->getParam('inputFilter')->get('internationalisation')
+            : $event->getParam('inputFilter');
+        $inputFilter
             ->add([
                 'name' => 'internationalisation_site_groups',
                 'required' => false,
                 'filters' => [
                     [
-                        'name' => \Zend\Filter\Callback::class,
+                        'name' => \Laminas\Filter\Callback::class,
                         'options' => [
                             'callback' => [$this, 'filterSiteGroups'],
                         ],
@@ -826,38 +821,16 @@ SQL;
             ]);
     }
 
-    public function handleSiteSettings(Event $event)
+    public function handleSiteSettings(Event $event): void
     {
         parent::handleSiteSettings($event);
-
-        $services = $this->getServiceLocator();
-
-        $space = strtolower(__NAMESPACE__);
-
-        $settings = $services->get('Omeka\Settings\Site');
-
-        /**
-         * @var \Omeka\Form\Element\RestoreTextarea $siteGroupsElement
-         * @var \Internationalisation\Form\SettingsFieldset $fieldset
-         */
-        $fieldset = $event->getTarget()
-            ->get($space);
-        $list = $settings->get('internationalisation_fallbacks') ?: [];
-        $fieldset
-            ->get('internationalisation_fallbacks')
-            ->setValue(implode("\n", $list));
-        $list = $settings->get('internationalisation_required_languages') ?: [];
-        $fieldset
-            ->get('internationalisation_required_languages')
-            ->setValue(implode("\n", $list));
-
-        $this->prepareSiteLocales($settings);
+        $this->prepareSiteLocales();
     }
 
-    public function handleSiteFormElements(Event $event)
+    public function handleSiteFormElements(Event $event): void
     {
         /**
-         * @var \Zend\Router\Http\RouteMatch $routeMatch
+         * @var \Laminas\Router\Http\RouteMatch $routeMatch
          * @var \Internationalisation\Form\DuplicateSiteFieldset $fieldset
          */
         $services = $this->getServiceLocator();
@@ -874,13 +847,13 @@ SQL;
         $event->getTarget()->add($fieldset);
     }
 
-    public function handleSiteFormFilters(Event $event)
+    public function handleSiteFormFilters(Event $event): void
     {
         /**
          * @var \Internationalisation\Form\DuplicateSiteFieldset $fieldset
          */
         $inputFilter = $event->getParam('inputFilter')
-            ->get('internationalisation');
+            ->get('duplicate');
         $fieldset = $this->getServiceLocator()->get('FormElementManager')->get(
             \Internationalisation\Form\DuplicateSiteFieldset::class,
             [
@@ -892,29 +865,29 @@ SQL;
             ->updateInputFilter($inputFilter);
     }
 
-    public function handleSiteAdminViewAfter(Event $event)
+    public function handleSiteAdminViewAfter(Event $event): void
     {
         $view = $event->getTarget();
         $expand = json_encode($view->translate('Expand'), 320);
         $legend = json_encode($view->translate('Remove and copy data'), 320);
         echo <<<INLINE
 <style>
-.collapse + #internationalisation.collapsible {
+.collapse + #duplicate.collapsible {
     overflow: initial;
 }
 </style>
 <script type="text/javascript">
 $(document).ready(function() {
-    $('[name^="internationalisation"]').closest('.field')
-        .wrapAll('<fieldset id="internationalisation" class="field-container collapsible">')
-        .closest('#internationalisation')
+    $('[name^="duplicate"]').closest('.field')
+        .wrapAll('<fieldset id="duplicate" class="field-container collapsible">')
+        .closest('#duplicate')
         .before('<a href="#" class="expand" aria-label=$expand>' + $legend + ' </a> ');
 });
 </script>
 INLINE;
     }
 
-    public function handleSitePost(Event $event)
+    public function handleSitePost(Event $event): void
     {
         $site = $event->getParam('response')->getContent();
         if (empty($site)) {
@@ -923,7 +896,7 @@ INLINE;
 
         /** @var \Omeka\Api\Request $request */
         $request = $event->getParam('request');
-        $params = $request->getValue('internationalisation',[]);
+        $params = $request->getValue('duplicate', []);
         if (!count($params)) {
             return;
         }
@@ -938,6 +911,12 @@ INLINE;
             'is_new' => false,
         ];
         // TODO A source should be set even for remove currently.
+        if (empty($params['remove'])) {
+            $params['remove'] = [];
+        }
+        if (empty($params['copy'])) {
+            $params['copy'] = [];
+        }
         if ((!count($params['remove']) && !count($params['copy']))
             || (count($params['copy']) && !$params['source'])
         ) {
@@ -945,7 +924,7 @@ INLINE;
         }
 
         $services = $this->getServiceLocator();
-        $messenger = new \Omeka\Mvc\Controller\Plugin\Messenger();
+        $messenger = $services->get('ControllerPluginManager')->get('messenger');
 
         try {
             $source = $params['source']
@@ -1006,11 +985,11 @@ INLINE;
      *
      * It's not possible to save it simply after validation, so add it here,
      * since the form is always reloaded after submission.
-     *
-     * @param SiteSettings $settings
      */
-    protected function prepareSiteLocales(SiteSettings $settings)
+    protected function prepareSiteLocales(): void
     {
+        $settings = $this->getServiceLocator()->get('Omeka\Settings\Site');
+
         $settings->set('internationalisation_iso_codes', []);
 
         $locale = $settings->get('locale');
@@ -1063,37 +1042,6 @@ INLINE;
 
         $settings->set('internationalisation_locales', $locales);
     }
-
-    public function handleSiteSettingsFilters(Event $event)
-    {
-        $inputFilter = $event->getParam('inputFilter');
-        $inputFilter->get('internationalisation')
-            ->add([
-                'name' => 'internationalisation_fallbacks',
-                'required' => false,
-                'filters' => [
-                    [
-                        'name' => \Zend\Filter\Callback::class,
-                        'options' => [
-                            'callback' => [$this, 'stringToList'],
-                        ],
-                    ],
-                ],
-            ])
-            ->add([
-                'name' => 'internationalisation_required_languages',
-                'required' => false,
-                'filters' => [
-                    [
-                        'name' => \Zend\Filter\Callback::class,
-                        'options' => [
-                            'callback' => [$this, 'stringToList'],
-                        ],
-                    ],
-                ],
-            ]);
-    }
-
 
     public function filterSiteGroups($groups)
     {
@@ -1156,5 +1104,23 @@ INLINE;
         }
 
         return $locales;
+    }
+
+    /**
+     * Get each line of a string separately.
+     */
+    public function stringToList($string): array
+    {
+        return array_filter(array_map('trim', explode("\n", $this->fixEndOfLine($string))), 'strlen');
+    }
+
+    /**
+     * Clean the text area from end of lines.
+     *
+     * This method fixes Windows and Apple copy/paste from a textarea input.
+     */
+    public function fixEndOfLine($string): string
+    {
+        return str_replace(["\r\n", "\n\r", "\r"], ["\n", "\n", "\n"], (string) $string);
     }
 }

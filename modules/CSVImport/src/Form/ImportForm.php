@@ -2,7 +2,7 @@
 namespace CSVImport\Form;
 
 use Omeka\Settings\UserSettings;
-use Zend\Form\Form;
+use Laminas\Form\Form;
 
 class ImportForm extends Form
 {
@@ -118,7 +118,6 @@ class ImportForm extends Form
                 ],
         ]);
 
-        
         $this->add([
             'name' => 'automap_check_names_alone',
             'type' => 'checkbox',

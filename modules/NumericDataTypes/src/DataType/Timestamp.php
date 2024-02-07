@@ -7,10 +7,11 @@ use NumericDataTypes\Form\Element\Timestamp as TimestampElement;
 use Omeka\Api\Adapter\AbstractEntityAdapter;
 use Omeka\Api\Adapter\AdapterInterface;
 use Omeka\Api\Representation\ValueRepresentation;
+use Omeka\DataType\ValueAnnotatingInterface;
 use Omeka\Entity\Value;
-use Zend\View\Renderer\PhpRenderer;
+use Laminas\View\Renderer\PhpRenderer;
 
-class Timestamp extends AbstractDateTimeDataType
+class Timestamp extends AbstractDateTimeDataType implements ValueAnnotatingInterface
 {
     public function getName()
     {
@@ -19,7 +20,7 @@ class Timestamp extends AbstractDateTimeDataType
 
     public function getLabel()
     {
-        return 'Timestamp';
+        return 'Timestamp'; // @translate
     }
 
     public function getJsonLd(ValueRepresentation $value)
@@ -82,14 +83,13 @@ class Timestamp extends AbstractDateTimeDataType
         $value->setValueResource(null);
     }
 
-    public function render(PhpRenderer $view, ValueRepresentation $value)
+    public function render(PhpRenderer $view, ValueRepresentation $value, $options = [])
     {
         if (!$this->isValid(['@value' => $value->value()])) {
             return $value->value();
         }
-        // Render the datetime, allowing for reduced accuracy.
-        $date = $this->getDateTimeFromValue($value->value());
-        return $date['date']->format($date['format_render']);
+        $options['lang'] = $options['lang'] ?? $view->lang();
+        return $this->getFormattedDateTimeFromValue($value->value(), $options);
     }
 
     public function getFulltextText(PhpRenderer $view, ValueRepresentation $value)
@@ -111,8 +111,8 @@ class Timestamp extends AbstractDateTimeDataType
     /**
      * numeric => [
      *   ts => [
-     *     lt => [val => <date>, pid => <propertyID>],
-     *     gt => [val => <date>, pid => <propertyID>],
+     *     lt/lte => [val => <date>, pid => <propertyID>],
+     *     gt/gte => [val => <date>, pid => <propertyID>],
      *   ],
      * ]
      */
@@ -142,6 +142,30 @@ class Timestamp extends AbstractDateTimeDataType
                 $this->addGreaterThanQuery($adapter, $qb, $propertyId, $number);
             }
         }
+        if (isset($query['numeric']['ts']['lte']['val'])
+            && isset($query['numeric']['ts']['lte']['pid'])
+            && is_numeric($query['numeric']['ts']['lte']['pid'])
+        ) {
+            $value = $query['numeric']['ts']['lte']['val'];
+            $propertyId = $query['numeric']['ts']['lte']['pid'];
+            if ($this->isValid(['@value' => $value])) {
+                $date = $this->getDateTimeFromValue($value);
+                $number = $date['date']->getTimestamp();
+                $this->addLessThanOrEqualToQuery($adapter, $qb, $propertyId, $number);
+            }
+        }
+        if (isset($query['numeric']['ts']['gte']['val'])
+            && isset($query['numeric']['ts']['gte']['pid'])
+            && is_numeric($query['numeric']['ts']['gte']['pid'])
+        ) {
+            $value = $query['numeric']['ts']['gte']['val'];
+            $propertyId = $query['numeric']['ts']['gte']['pid'];
+            if ($this->isValid(['@value' => $value])) {
+                $date = $this->getDateTimeFromValue($value);
+                $number = $date['date']->getTimestamp();
+                $this->addGreaterThanOrEqualToQuery($adapter, $qb, $propertyId, $number);
+            }
+        }
     }
 
     public function sortQuery(AdapterInterface $adapter, QueryBuilder $qb, array $query, $type, $propertyId)
@@ -158,5 +182,14 @@ class Timestamp extends AbstractDateTimeDataType
             );
             $qb->addOrderBy('numeric_value', $query['sort_order']);
         }
+    }
+
+    public function valueAnnotationPrepareForm(PhpRenderer $view)
+    {
+    }
+
+    public function valueAnnotationForm(PhpRenderer $view)
+    {
+        return $this->form($view);
     }
 }

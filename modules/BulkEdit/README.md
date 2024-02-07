@@ -1,21 +1,32 @@
 Bulk Edit (module for Omeka S)
 ==============================
 
+> __New versions of this module and support for Omeka S version 3.0 and above
+> are available on [GitLab], which seems to respect users and privacy better
+> than the previous repository.__
+
 [Bulk Edit] is a module for [Omeka S] that adds tools to bulk edit resources in
 order to modify or to clean them.
 
 Current processes are:
 
+- Modify language codes
+- Remove duplicate values
+- Remove all trailing white spaces
 - Replace value of a property (directly or via regex)
 - Remove the literal value of a property
 - Prepend or append a string to a value of a property
 - Set or remove language of a property
 - Order values by language (in particular for the title)
-- Displace values from a property to another one
 - Set visibility of a property public or private
-- Update the media html of an item
-- Remove all trailing white spaces
-- Remove duplicate values
+- Displace values from a property to another one
+- Explode a value into multiple ones
+- Merge two values into one
+- Convert a value to another data type
+- Update or remove the owner
+- Update value suggest labels
+- Update the media html via item or media
+- Update the media type (mime-type) of a media
 
 Furthermore, values are automatically trimmed and deduplicated when a resource
 is saved.
@@ -25,6 +36,9 @@ Installation
 ------------
 
 Uncompress files and rename plugin folder `BulkEdit`.
+
+**Important**: If you use the module [Numeric Data Types], you should apply this
+[patch] or use this [version].
 
 See general end user documentation for [Installing a module] and follow the
 config instructions.
@@ -37,13 +51,51 @@ The tool is available via the standard bulk process in Admin > Items, Admin > It
 and Admin > Media. Simply select specific resources or all, then click Go, then
 select and config the process to do.
 
-To improve search of resources, you can use module [Advanced Search Plus], that
+To improve search of resources, you can use module [Advanced Search], that
 allows to search by creation date, modification date, or by visibility.
 
 The job is launched directly when specific resources are selected, and in the
 background when all resources are selected.
 
-### Replace value of a property directly or via regex
+### Cleaning metadata
+
+#### Trim property values
+
+Remove leading and trailing whitespaces preventively on any resource creation or
+update, or curatively via the batch edit, so values will be easier to find and
+to compare exactly (see [omeka/omeka-s#1258]). Note that the curative trimming
+uses a regex when possible (with mysql ≥ 8.0.4 or mariadb ≥ 10.0.5). There is no
+difference in most of the cases, except when there are multiple whitespace mixed
+(space, tabulation, new line, end of line, etc.).
+
+#### Specify data type of linked resources
+
+In some cases, in particular when using resource templates with data type "resource",
+linked resources are saved in the database with the generic data type "resource",
+not with the specific "resourc:item", "resource:media, etc.
+This process is needed to clarify output of the facets with module [Advanced Search],
+lists from the module [Reference], and in some other places.
+
+#### Clean languages
+
+Sometime, an empty language for a value is an empty string. This option makes it
+null.
+
+#### Modify language codes
+
+This options allows to replace all "fr" or "fre" by "fra", or any other language
+code, or into an empty code. It can be limited to specific properties.
+
+#### Deduplicate property values
+
+Remove exact duplicated values on any new or updated resource preventively.
+Note: preventive deduplication is case sensitive, but curative deduplication is
+case insensitive (it uses a direct query and the Omeka database is case
+insensitive by default).
+
+### Replace values
+
+#### Replace value of a property directly or via regex
 
 Fill fields "Replace" and "By", specify the type of replacement (simple, html or
 regex), then select the properties to update.
@@ -54,23 +106,25 @@ as html encoded string too. For example, string `café` will be checked with
 entities, it may be difficult to replace all strings. The replacement string is
 used unchanged, so it is recommended to use entities for it too.
 
-### Remove the literal value of a property
+#### Remove the literal value of a property
 
 Simply check the box "Remove string", then select the properties to update.
 The string will be removed, but it can be prepended or appended with another
 string. In that case, the value is kept, else it is removed.
 
-### Prepend or append a string
+#### Prepend or append a string
 
 Fill fields "Prepend" and/or "Append" and select the properties to update.
 
-### Set or remove language of a property
+#### Set or remove language of a property
 
 Select the properties to set or remove language.
 Note: all values of the selected properties are updated, so be aware of existing
 languages when they are multiple.
 
-# Order values by language
+### Order values
+
+#### Order values by language
 
 Sometime, we need that the title and the description to be displayed to be in
 one language, but the value in this language is not always the first in the
@@ -80,35 +134,65 @@ displayed in many places.
 So just write the language in the order you want for the properties you want.
 Values with other languages or without language will be kept after.
 
-# Displace values from a property to another one
+### Set or unset visibility of a property
+
+Select the properties to set or unset visibility.
+
+### Displace values from a property to another one
 
 Select the source properties and the destination property, then process edit.
 Some filters (datatype, language, string, visibility) allows to move only
 selected values.
 
-### Set or unset visibility of a property
+### Explode a value into multiple values
 
-Select the properties to set or unset visibility.
+This tool is useful for an import of a csv file, where the checkbox for "multivalue"
+was missed. Select the properties and the separator, that may have multiple
+character.
 
-### Update media html from item
+### Merge two values as uri
 
-Select the items and update media html, then update it like an item value.
+Select the properties and their values will be merged two by two. This tool can
+only be used when the number of values is even. When a value has already the
+datatype "uri" with a label, it is not changed and all values of the property
+are skipped to avoid merge issues. When two uris follow each other, the property
+is skipped too. At least one value should be an url. When the label and the
+values are different urls, the property is skipped. It’s recommended to check
+order of values first.
 
-### Trim property values
+### Convert datatype
 
-Remove leading and trailing whitespaces preventively on any resource creation or
-update, or curatively via the batch edit, so values will be easier to find and
-to compare exactly (fix [#1258]). Note that the curative trimming uses a regex
-when possible (with mysql ≥ 8.0.4 or mariadb ≥ 10.0.5). There is no difference
-in most of the cases, except when there are multiple whitespace mixed (space,
-tabulation, new line, end of line, etc.).
+Select the source datatype and the new datatype. Only some datatype are managed
+currently .
 
-### Deduplicate property values
+### Fill data
 
-Remove exact duplicated values on any new or updated resource preventively.
-Note: preventive deduplication is case sensitive, but curative deduplication is
-case insensitive (it uses a direct query and the Omeka database is case
-insensitive by default).
+#### Update or remove owner
+
+Simply set the user to use or set "Remove user" in the select.
+
+### Fill labels
+
+Select the source datatype and the new datatype. Only some datatype are managed
+currently .
+
+### Update media html from item or media
+
+Select the items or medias and update media html, then update it like an item
+value.
+
+### Update media types (mime-types)
+
+Select the items or medias and set the existing and the new media type. They
+should be standard ones and usually the more precise possible, like `application/tei+xml`
+instead of `application/xml`.
+
+
+TODO
+----
+
+- [x] Add conversion for custom vocab.
+- [ ] Move hard-coded xml xpath into form.
 
 
 Warning
@@ -129,7 +213,7 @@ See online issues on the [module issues] page.
 License
 -------
 
-This module is published under the [CeCILL v2.1] licence, compatible with
+This module is published under the [CeCILL v2.1] license, compatible with
 [GNU/GPL] and approved by [FSF] and [OSI].
 
 This software is governed by the CeCILL license under French law and abiding by
@@ -159,21 +243,27 @@ of the CeCILL license and that you accept its terms.
 Copyright
 ---------
 
-* Copyright Daniel Berthereau, 2018-2019 (see [Daniel-KM])
+* Copyright Daniel Berthereau, 2018-2023 (see [Daniel-KM])
 
-First developed for the [Archives Henri Poincaré] of [Université de Lorraine].
+First developed for the [Archives Henri Poincaré] of [Université de Lorraine],
+then improved for various projects.
 
 
-[Bulk Edit]: https://github.com/Daniel-KM/Omeka-S-module-BulkEdit
+[Bulk Edit]: https://gitlab.com/Daniel-KM/Omeka-S-module-BulkEdit
 [Omeka S]: https://omeka.org/s
 [Installing a module]: https://omeka.org/s/docs/user-manual/modules/#installing-modules
-[Advanced Search Plus]: https://github.com/Daniel-KM/Omeka-S-module-AdvancedSearchPlus
-[#1258]: https://github.com/omeka/omeka-s/issues/1258
-[module issues]: https://github.com/Daniel-KM/Omeka-S-module-BulkEdit/issues
+[Numeric Data Types]: https://github.com/Omeka-S-modules/NumericDataTypes
+[patch]: https://github.com/omeka-s-modules/NumericDataTypes/pull/29
+[version]: https://github.com/Daniel-KM/Omeka-S-module-NumericDataTypes
+[Advanced Search]: https://gitlab.com/Daniel-KM/Omeka-S-module-AdvancedSearch
+[omeka/omeka-s#1258]: https://github.com/omeka/omeka-s/issues/1258
+[Reference]: https://gitlab.com/Daniel-KM/Omeka-S-module-Reference
+[module issues]: https://gitlab.com/Daniel-KM/Omeka-S-module-BulkEdit/-/issues
 [CeCILL v2.1]: https://www.cecill.info/licences/Licence_CeCILL_V2.1-en.html
 [GNU/GPL]: https://www.gnu.org/licenses/gpl-3.0.html
 [FSF]: https://www.fsf.org
 [OSI]: http://opensource.org
 [Archives Henri Poincaré]: https://poincare.univ-lorraine.fr
 [Université de Lorraine]: https://www.univ-lorraine.fr
-[Daniel-KM]: https://github.com/Daniel-KM "Daniel Berthereau"
+[GitLab]: https://gitlab.com/Daniel-KM
+[Daniel-KM]: https://gitlab.com/Daniel-KM "Daniel Berthereau"

@@ -1,0 +1,39 @@
+<?php
+/**
+ * @var \Laminas\View\Renderer\PhpRenderer $this
+ * @var \BulkExport\Api\Representation\ExporterRepresentation $exporter
+ * @var \BulkExport\Form\ExporterForm $form
+ * @var array $exportArgs
+ */
+
+$translate = $this->plugin('translate');
+$escape = $this->plugin('escapeHtml');
+
+$this->htmlElement('body')->appendAttribute('class', 'bulk-exporters bulk-exports edit');
+$this->headLink()->appendStylesheet($this->assetUrl('css/bulk-export-admin.css', 'BulkExport'));
+$form->prepare();
+?>
+
+<?= $this->pageTitle($translate('Start export'), 1, $translate('Bulk export')) ?>
+
+<div id="bulk-export">
+    <h2><?= $escape($translate('Start export')) ?></h2>
+    <h3><?= $escape(sprintf($translate('Exporter: %s'), $exporter->label())) ?></h3>
+    <?php if (isset($exportArgs)): ?>
+    <?php $comment = $exportArgs['comment']; ?>
+    <?php unset($exportArgs['comment']); ?>
+    <p><?= $escape(sprintf($translate('Comment: %s'), $comment)) ?></p>
+    <h3><?= $escape($translate('Parameters')) ?></h3>
+    <h4><?= $escape($translate('Writer')) ?></h4>
+    <div class="value">
+        <pre><?php
+            echo $escape(json_encode($exportArgs['writer'], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
+        ?></pre>
+    </div>
+    <?php endif; ?>
+    <?php
+    echo $this->form()->openTag($form);
+    echo $this->formCollection($form);
+    echo $this->form()->closeTag();
+    ?>
+</div>

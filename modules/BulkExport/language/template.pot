@@ -1,0 +1,1000 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2023-06-12 00:00+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: Module.php:223
+msgid "WARNING:"
+msgstr ""
+
+#: Module.php:229
+msgid "All bulk exports will be removed (folder \"{folder}\")."
+msgstr ""
+
+#: Module.php:235
+msgid "Remove bulk export directory"
+msgstr ""
+
+#: src/Controller/Admin/ExporterController.php:61
+msgid "[No label]"
+msgstr ""
+
+#: src/Controller/OutputController.php:30
+msgid "Unsupported format \"{format}\"."
+msgstr ""
+
+#: src/Controller/OutputController.php:70 src/View/Helper/BulkExport.php:96
+msgid "Unsupported resource type to export."
+msgstr ""
+
+#: src/Controller/OutputController.php:99
+msgid "The list of ids should be a list of numeric internal identifiers."
+msgstr ""
+
+#: src/Controller/OutputController.php:108 src/View/Helper/BulkExport.php:105
+msgid ""
+"A query cannot be used to export \"resources\": set the resource type or use "
+"the list of ids instead."
+msgstr ""
+
+#: src/Generic/AbstractModule.php:80 src/Generic/AbstractModule.php:88
+#: src/Generic/AbstractModule.php:890
+#, php-format
+msgid "This module requires the module \"%s\"."
+msgstr ""
+
+#: src/Generic/AbstractModule.php:93
+#, php-format
+msgid "This module requires modules \"%s\"."
+msgstr ""
+
+#: src/Generic/AbstractModule.php:101
+msgid "This module has resources that cannot be installed."
+msgstr ""
+
+#: src/Generic/AbstractModule.php:108
+msgid ""
+"This module cannot install its tables, because they exist already. Try to "
+"remove them first."
+msgstr ""
+
+#: src/Generic/AbstractModule.php:398
+#, php-format
+msgid "The module removed tables \"%s\" from a previous broken install."
+msgstr ""
+
+#: src/Generic/AbstractModule.php:885
+#, php-format
+msgid "This module requires the module \"%1$s\", version %2$s or above."
+msgstr ""
+
+#: src/Generic/AbstractModule.php:982
+#, php-format
+msgid ""
+"The module \"%s\" was automatically deactivated because the dependencies are "
+"unavailable."
+msgstr ""
+
+#: src/Traits/OpenDocumentTextTemplateTrait.php:19
+msgid "Anonymous"
+msgstr ""
+
+#: src/Traits/OpenDocumentTextTemplateTrait.php:58
+#: src/Traits/OpenDocumentTextTemplateTrait.php:59
+#: src/Traits/OpenDocumentTextTemplateTrait.php:63
+#: src/Traits/OpenDocumentTextTemplateTrait.php:65
+msgid "Bibliography"
+msgstr ""
+
+#: src/Traits/OpenDocumentTextTemplateTrait.php:66
+msgid "Digital library"
+msgstr ""
+
+#: src/Traits/ResourceFieldsTrait.php:171
+msgid "id"
+msgstr ""
+
+#: src/Traits/ResourceFieldsTrait.php:178
+msgid "Resource id"
+msgstr ""
+
+#: src/Traits/ResourceFieldsTrait.php:179
+msgid "Resource identifier"
+msgstr ""
+
+#: src/Traits/ResourceFieldsTrait.php:182
+msgid "Item set id"
+msgstr ""
+
+#: src/Traits/ResourceFieldsTrait.php:185
+msgid "Item id"
+msgstr ""
+
+#: src/Traits/ResourceFieldsTrait.php:186
+msgid "Item identifier"
+msgstr ""
+
+#: src/Traits/ResourceFieldsTrait.php:187
+msgid "Item title"
+msgstr ""
+
+#: src/Traits/ResourceFieldsTrait.php:189
+msgid "Media id"
+msgstr ""
+
+#: src/Traits/ResourceFieldsTrait.php:190
+msgid "Media file"
+msgstr ""
+
+#: src/Traits/ResourceFieldsTrait.php:191
+msgid "Media source"
+msgstr ""
+
+#: src/Traits/ResourceFieldsTrait.php:192
+msgid "File media type"
+msgstr ""
+
+#: src/Traits/ResourceFieldsTrait.php:193
+msgid "File size"
+msgstr ""
+
+#: src/Traits/ResourceFieldsTrait.php:194
+msgid "Original file url"
+msgstr ""
+
+#: src/Traits/ResourceFieldsTrait.php:196
+msgid "Annotation"
+msgstr ""
+
+#: src/Traits/ResourceFieldsTrait.php:197
+msgid "Url"
+msgstr ""
+
+#: src/Traits/ResourceFieldsTrait.php:214
+#, php-format
+msgid "Annotation body: %s"
+msgstr ""
+
+#: src/Traits/ResourceFieldsTrait.php:219
+#, php-format
+msgid "Annotation target: %s"
+msgstr ""
+
+#: src/View/Helper/BulkExport.php:124
+#, php-format
+msgid "Unsupported resource type to export: %s."
+msgstr ""
+
+#: view/bulk/admin/bulk-export/index.phtml:16
+#: view/bulk/admin/export/browse.phtml:15 view/bulk/admin/export/logs.phtml:35
+#: view/bulk/admin/export/show.phtml:17
+#: view/bulk/admin/exporter/configure-writer.phtml:16
+#: view/bulk/admin/exporter/delete.phtml:16
+#: view/bulk/admin/exporter/edit.phtml:16
+#: view/bulk/admin/exporter/start.phtml:17
+msgid "Bulk export"
+msgstr ""
+
+#: view/bulk/admin/bulk-export/index.phtml:21
+msgid "Last exports"
+msgstr ""
+
+#: view/bulk/admin/bulk-export/index.phtml:22
+msgid "See all exports"
+msgstr ""
+
+#: view/bulk/admin/export/browse.phtml:15
+#: view/bulk/admin/export/browse.phtml:17
+msgid "Exports"
+msgstr ""
+
+#: view/bulk/admin/export/browse.phtml:23
+msgid "No exports yet."
+msgstr ""
+
+#: view/bulk/admin/export/export-table.phtml:51
+#: view/bulk/admin/export/show-details.phtml:33
+msgid "Get file"
+msgstr ""
+
+#: view/bulk/admin/export/export-table.phtml:58
+msgid "Stop"
+msgstr ""
+
+#: view/bulk/admin/export/export-table.phtml:63
+msgid "See params"
+msgstr ""
+
+#: view/bulk/admin/export/export-table.phtml:67
+#: view/bulk/admin/export/show-details.phtml:58
+#: view/bulk/admin/export/show.phtml:45
+msgid "See logs"
+msgstr ""
+
+#: view/bulk/admin/export/logs.phtml:24
+msgid "Emergency"
+msgstr ""
+
+#: view/bulk/admin/export/logs.phtml:25
+msgid "Alert"
+msgstr ""
+
+#: view/bulk/admin/export/logs.phtml:26
+msgid "Critical"
+msgstr ""
+
+#: view/bulk/admin/export/logs.phtml:29
+msgid "Notice"
+msgstr ""
+
+#: view/bulk/admin/export/logs.phtml:31
+msgid "Debug"
+msgstr ""
+
+#: view/bulk/admin/export/logs.phtml:35 view/bulk/admin/export/logs.phtml:42
+msgid "Export logs"
+msgstr ""
+
+#: view/bulk/admin/export/logs.phtml:46
+msgid "Show only messages whose severity is higher than or equal to"
+msgstr ""
+
+#: view/bulk/admin/export/logs.phtml:63
+msgid "Message"
+msgstr ""
+
+#: view/bulk/admin/export/logs.phtml:64
+msgid "Severity"
+msgstr ""
+
+#: view/bulk/admin/export/logs.phtml:65
+msgid "Time"
+msgstr ""
+
+#: view/bulk/admin/export/logs.phtml:86
+msgid "Full log"
+msgstr ""
+
+#: view/bulk/admin/export/logs.phtml:103
+msgid "Manage logs"
+msgstr ""
+
+#: view/bulk/admin/export/logs.phtml:108
+msgid "No logs yet."
+msgstr ""
+
+#: view/bulk/admin/export/logs.phtml:108
+msgid "Refresh page"
+msgstr ""
+
+#: view/bulk/admin/export/show-details.phtml:32
+msgid "Output file"
+msgstr ""
+
+#: view/bulk/admin/export/show-details.phtml:37
+msgid "Exporter"
+msgstr ""
+
+#: view/bulk/admin/export/show-details.phtml:57
+#: view/bulk/admin/export/show.phtml:44
+msgid "Logs"
+msgstr ""
+
+#: view/bulk/admin/export/show.phtml:24
+#, php-format
+msgid "Export #%d"
+msgstr ""
+
+#: view/bulk/admin/export/show.phtml:26 view/bulk/admin/exporter/start.phtml:21
+#, php-format
+msgid "Exporter: %s"
+msgstr ""
+
+#: view/bulk/admin/export/show.phtml:27
+#, php-format
+msgid "Owner: %s"
+msgstr ""
+
+#: view/bulk/admin/export/show.phtml:28 view/bulk/admin/exporter/start.phtml:25
+#, php-format
+msgid "Comment: %s"
+msgstr ""
+
+#: view/bulk/admin/export/show.phtml:31
+#, php-format
+msgid "Started: %s"
+msgstr ""
+
+#: view/bulk/admin/export/show.phtml:34
+#, php-format
+msgid "Ended: %s"
+msgstr ""
+
+#: view/bulk/admin/export/show.phtml:37 view/bulk/admin/exporter/start.phtml:26
+msgid "Parameters"
+msgstr ""
+
+#: view/bulk/admin/export/show.phtml:38
+#: view/bulk/admin/exporter/exporter-table.phtml:24
+#: view/bulk/admin/exporter/start.phtml:27
+msgid "Writer"
+msgstr ""
+
+#: view/bulk/admin/exporter/add.phtml:15 view/bulk/admin/exporter/add.phtml:18
+msgid "Create new exporter"
+msgstr ""
+
+#: view/bulk/admin/exporter/add.phtml:15
+msgid "Bulk Export"
+msgstr ""
+
+#: view/bulk/admin/exporter/configure-writer.phtml:16
+#: view/bulk/admin/exporter/configure-writer.phtml:19
+msgid "Configure writer"
+msgstr ""
+
+#: view/bulk/admin/exporter/configure-writer.phtml:20
+#, php-format
+msgid "Writer: %s"
+msgstr ""
+
+#: view/bulk/admin/exporter/configure-writer.phtml:21
+msgid "Fill the default values of the writer."
+msgstr ""
+
+#: view/bulk/admin/exporter/delete.phtml:16
+msgid "Delete exporter"
+msgstr ""
+
+#: view/bulk/admin/exporter/delete.phtml:19
+#, php-format
+msgid "Delete exporter (%s)"
+msgstr ""
+
+#: view/bulk/admin/exporter/delete.phtml:20
+msgid "Are you sure you want to delete this exporter ?"
+msgstr ""
+
+#: view/bulk/admin/exporter/edit.phtml:16
+#: view/bulk/admin/exporter/edit.phtml:19
+msgid "Edit exporter"
+msgstr ""
+
+#: view/bulk/admin/exporter/exporter-table.phtml:15
+msgid "Available exporters"
+msgstr ""
+
+#: view/bulk/admin/exporter/exporter-table.phtml:16
+msgid "Add an exporter"
+msgstr ""
+
+#: view/bulk/admin/exporter/start.phtml:17
+#: view/bulk/admin/exporter/start.phtml:20
+msgid "Start export"
+msgstr ""
+
+#: view/common/bulk-export.phtml:35
+#, php-format
+msgid "Download as spreadsheet %s"
+msgstr ""
+
+#: view/common/bulk-export.phtml:37
+msgid "Download as text"
+msgstr ""
+
+#: view/common/bulk-export.phtml:38
+#, php-format
+msgid "Download as %s"
+msgstr ""
+
+#: data/scripts/upgrade.php:140
+msgid ""
+"It is now possible to export resources as GeoJSON for values filled via "
+"Value Suggest Geonames."
+msgstr ""
+
+#: data/exporters/ods.php:4
+msgid "OpenDocument spreadsheet (ods)"
+msgstr ""
+
+#: data/exporters/csv.php:4 src/Writer/CsvWriter.php:21
+msgid "CSV"
+msgstr ""
+
+#: data/exporters/odt.php:4
+msgid "OpenDocument text (odt)"
+msgstr ""
+
+#: data/exporters/tsv.php:4 src/Writer/TsvWriter.php:11
+msgid "TSV (tab-separated values)"
+msgstr ""
+
+#: Module.php:132 Module.php:444
+msgid "The directory \"{path}\" is not writeable."
+msgstr ""
+
+#: Module.php:160
+msgid ""
+"This module requires the module \"{module}\", version {version} or above."
+msgstr ""
+
+#: Module.php:455
+msgid "The directory \"{path}\" is not writeable: {error}."
+msgstr ""
+
+#: test/BulkExportTest/Job/ExportTest.php:287
+#, php-format
+msgid "No argument files (%s)."
+msgstr ""
+
+#: src/Traits/OpenDocumentTextTemplateTrait.php:55
+#, php-format
+msgid "Bibliography from %s"
+msgstr ""
+
+#: src/Traits/OpenDocumentTextTemplateTrait.php:96
+msgid ""
+"Skipped field \"{fieldname}\" of resource: it contains more than 1000 "
+"characters."
+msgstr ""
+
+#: src/Traits/ResourceFieldsTrait.php:118
+msgid ""
+"Some properties are not exported because they contain more or less than 5000 "
+"characters: {properties}."
+msgstr ""
+
+#: src/Traits/ResourceFieldsTrait.php:225
+#, php-format
+msgid "%1$s: %2$s"
+msgstr ""
+
+#: src/Writer/AbstractFieldsWriter.php:106
+msgid "Output directory \"{folder}\" is not writeable."
+msgstr ""
+
+#: src/Writer/AbstractFieldsWriter.php:131
+msgid "No headers are used in any resources."
+msgstr ""
+
+#: src/Writer/AbstractFieldsWriter.php:149
+msgid "{number} different fields are used in all resources."
+msgstr ""
+
+#: src/Writer/AbstractFieldsWriter.php:205
+msgid "No resource type selected."
+msgstr ""
+
+#: src/Writer/AbstractFieldsWriter.php:210
+msgid "No resource to export."
+msgstr ""
+
+#: src/Writer/AbstractFieldsWriter.php:222
+msgid "All resources of all resource types ({total}) exported."
+msgstr ""
+
+#: src/Writer/AbstractFieldsWriter.php:253
+msgid "Starting export of {total} {resource_type}."
+msgstr ""
+
+#: src/Writer/AbstractFieldsWriter.php:268
+msgid ""
+"The job \"Export\" was stopped: {processed}/{total} resources processed."
+msgstr ""
+
+#: src/Writer/AbstractFieldsWriter.php:312
+#: src/Writer/AbstractFieldsWriter.php:324
+msgid ""
+"{processed}/{total} {resource_type} processed, {succeed} succeed, {skipped} "
+"skipped."
+msgstr ""
+
+#: src/Writer/AbstractFieldsWriter.php:329
+msgid "End export of {total} {resource_type}."
+msgstr ""
+
+#: src/Writer/GeoJsonWriter.php:7
+msgid "GeoJSON"
+msgstr ""
+
+#: src/Writer/OpenDocumentTextWriter.php:14
+msgid "OpenDocument Text"
+msgstr ""
+
+#: src/Writer/OpenDocumentTextWriter.php:24
+#: src/Writer/OpenDocumentSpreadsheetWriter.php:51
+msgid ""
+"To process export of \"{label}\", the php extensions \"zip\" and \"xml\" are "
+"required."
+msgstr ""
+
+#: src/Writer/TextWriter.php:55 src/Writer/AbstractFieldsJsonWriter.php:59
+#: src/Formatter/AbstractFormatter.php:367 src/Formatter/Ods.php:59
+msgid "Unable to open output: {error}."
+msgstr ""
+
+#: src/Writer/AbstractSpreadsheetWriter.php:48
+msgid ""
+"No separator selected: only the first value of each property of each "
+"resource will be output."
+msgstr ""
+
+#: src/Writer/AbstractSpreadsheetWriter.php:65
+msgid "Unsupported format {format} for spreadsheet."
+msgstr ""
+
+#: src/Writer/AbstractSpreadsheetWriter.php:111
+msgid ""
+"Skipped {resource_type} #{resource_id}: it contains the separator "
+"\"{separator}\"."
+msgstr ""
+
+#: src/Writer/JsonTableWriter.php:7
+msgid "Json Table"
+msgstr ""
+
+#: src/Writer/AbstractWriter.php:166 src/Writer/AbstractWriter.php:174
+msgid "The destination folder \"{folder}\" is not writeable."
+msgstr ""
+
+#: src/Writer/AbstractWriter.php:224
+msgid ""
+"Export error when saving \"{filename}\" (temp file: \"{tempfile}\"): "
+"{exception}"
+msgstr ""
+
+#: src/Writer/AbstractWriter.php:231
+msgid "Export error when saving \"{filename}\" (temp file: \"{tempfile}\")."
+msgstr ""
+
+#: src/Writer/AbstractFieldsJsonWriter.php:92
+#: src/Formatter/AbstractFieldsJsonFormatter.php:71
+msgid "Unable to check output: {error}."
+msgstr ""
+
+#: src/Writer/OpenDocumentSpreadsheetWriter.php:12
+msgid "OpenDocument Spreadsheet"
+msgstr ""
+
+#: src/Writer/OpenDocumentSpreadsheetWriter.php:62 src/Formatter/Ods.php:31
+msgid "The temporary folder \"{folder}\" does not exist or is not writeable."
+msgstr ""
+
+#: src/Job/Export.php:42
+msgid "Export error: {error}"
+msgstr ""
+
+#: src/Job/Export.php:51
+msgid "Export started"
+msgstr ""
+
+#: src/Job/Export.php:73
+msgid "Export completed"
+msgstr ""
+
+#: src/Job/Export.php:103
+msgid "The export is available at {url} (size: {size} bytes)."
+msgstr ""
+
+#: src/Job/Export.php:153
+msgid "Export record does not exist"
+msgstr ""
+
+#: src/Job/Export.php:172
+msgid "Writer \"{writer}\" is not available."
+msgstr ""
+
+#: src/Form/SiteSettingsFieldset.php:35 src/Form/SettingsFieldset.php:35
+msgid "Maximum number of resources to export"
+msgstr ""
+
+#: src/Form/SiteSettingsFieldset.php:47 src/Form/SettingsFieldset.php:48
+msgid "Formatters to display in resource pages"
+msgstr ""
+
+#: src/Form/SiteSettingsFieldset.php:59 src/Form/SettingsFieldset.php:60
+#: src/Form/Writer/FormatTrait.php:17
+msgid "Metadata names or headers"
+msgstr ""
+
+#: src/Form/SiteSettingsFieldset.php:61 src/Form/SettingsFieldset.php:62
+#: src/Form/Writer/FormatTrait.php:19
+msgid "Rdf names"
+msgstr ""
+
+#: src/Form/SiteSettingsFieldset.php:62 src/Form/SettingsFieldset.php:63
+#: src/Form/Writer/FormatTrait.php:20
+msgid "Labels"
+msgstr ""
+
+#: src/Form/SiteSettingsFieldset.php:63 src/Form/SettingsFieldset.php:64
+#: src/Form/Writer/FormatTrait.php:21
+msgid "First template alternative name"
+msgstr ""
+
+#: src/Form/SiteSettingsFieldset.php:76 src/Form/SettingsFieldset.php:77
+#: src/Form/Writer/FormatTrait.php:33
+msgid "Format of values"
+msgstr ""
+
+#: src/Form/SiteSettingsFieldset.php:78 src/Form/SettingsFieldset.php:79
+#: src/Form/Writer/FormatTrait.php:35
+msgid "String"
+msgstr ""
+
+#: src/Form/SiteSettingsFieldset.php:79 src/Form/SettingsFieldset.php:80
+msgid "Html (slow with some modules)"
+msgstr ""
+
+#: src/Form/SiteSettingsFieldset.php:92 src/Form/SettingsFieldset.php:93
+#: src/Form/Writer/FormatTrait.php:48
+msgid "Format of linked resources"
+msgstr ""
+
+#: src/Form/SiteSettingsFieldset.php:94 src/Form/SettingsFieldset.php:100
+#: src/Form/Writer/FormatTrait.php:55
+msgid "Omeka url and title"
+msgstr ""
+
+#: src/Form/SiteSettingsFieldset.php:96 src/Form/SettingsFieldset.php:98
+#: src/Form/Writer/FormatTrait.php:53
+msgid "Omeka url"
+msgstr ""
+
+#: src/Form/SiteSettingsFieldset.php:97 src/Form/SettingsFieldset.php:95
+#: src/Form/Writer/FormatTrait.php:50
+msgid "Identifier (property below)"
+msgstr ""
+
+#: src/Form/SiteSettingsFieldset.php:98 src/Form/SettingsFieldset.php:96
+#: src/Form/Writer/FormatTrait.php:51
+msgid "Id"
+msgstr ""
+
+#: src/Form/SiteSettingsFieldset.php:99 src/Form/SettingsFieldset.php:97
+#: src/Form/Writer/FormatTrait.php:52
+msgid "Identifier or id"
+msgstr ""
+
+#: src/Form/SiteSettingsFieldset.php:112 src/Form/SettingsFieldset.php:113
+#: src/Form/Writer/FormatTrait.php:67
+msgid "Property for linked resources"
+msgstr ""
+
+#: src/Form/SiteSettingsFieldset.php:128 src/Form/SettingsFieldset.php:129
+#: src/Form/Writer/FormatTrait.php:82
+msgid "Format of uri"
+msgstr ""
+
+#: src/Form/SiteSettingsFieldset.php:130 src/Form/SettingsFieldset.php:131
+#: src/Form/Writer/FormatTrait.php:84
+msgid "Uri and label separated by a space"
+msgstr ""
+
+#: src/Form/SiteSettingsFieldset.php:131 src/Form/SettingsFieldset.php:132
+#: src/Form/Writer/FormatTrait.php:85
+msgid "Uri only"
+msgstr ""
+
+#: src/Form/SiteSettingsFieldset.php:132 src/Form/SettingsFieldset.php:133
+#: src/Form/Writer/FormatTrait.php:86
+msgid "Html"
+msgstr ""
+
+#: src/Form/SettingsFieldset.php:36
+msgid "This setting is applied only for the direct output."
+msgstr ""
+
+#: src/Form/Writer/SpreadsheetWriterConfigForm.php:18
+msgid "Multi-value separator"
+msgstr ""
+
+#: src/Form/Writer/SpreadsheetWriterConfigForm.php:19
+msgid ""
+"To output all values of each property, cells can be multivalued with this "
+"separator.\n"
+"It is recommended to use a character that is never used, like \"|\", or a "
+"random string."
+msgstr ""
+
+#: src/Form/Writer/MetadataSelectTrait.php:18
+msgid "If empty, all used properties will be returned."
+msgstr ""
+
+#: src/Form/Writer/MetadataSelectTrait.php:26
+#: src/Form/Writer/MetadataSelectTrait.php:50
+msgid "Select one or more metadata…"
+msgstr ""
+
+#: src/Form/Writer/MetadataSelectTrait.php:34
+msgid "Metadata to exclude"
+msgstr ""
+
+#: src/Form/Writer/MetadataSelectTrait.php:35
+msgid ""
+"It is recommended to remove big fields from the list of properties, in "
+"particular extracted text."
+msgstr ""
+
+#: src/Form/Writer/MetadataSelectTrait.php:39
+#: src/Form/Writer/MetadataSelectTrait.php:74
+msgid "Resource metadata"
+msgstr ""
+
+#: src/Form/Writer/MetadataSelectTrait.php:41
+msgid "All used properties more than 5000 characters"
+msgstr ""
+
+#: src/Form/Writer/MetadataSelectTrait.php:76
+#: src/Form/Writer/MetadataSelectTrait.php:95
+#: src/Form/Writer/MetadataSelectTrait.php:103
+#: src/Form/Writer/MetadataSelectTrait.php:113
+#: src/Form/Writer/MetadataSelectTrait.php:121
+msgid "Internal id"
+msgstr ""
+
+#: src/Form/Writer/MetadataSelectTrait.php:77
+msgid "Resource url"
+msgstr ""
+
+#: src/Form/Writer/MetadataSelectTrait.php:84
+msgid "Owner id"
+msgstr ""
+
+#: src/Form/Writer/MetadataSelectTrait.php:85
+msgid "Visibility public/private"
+msgstr ""
+
+#: src/Form/Writer/MetadataSelectTrait.php:87
+msgid "Openness"
+msgstr ""
+
+#: src/Form/Writer/MetadataSelectTrait.php:88
+msgid "All used properties"
+msgstr ""
+
+#: src/Form/Writer/MetadataSelectTrait.php:89
+msgid "All used properties less than 5000 characters"
+msgstr ""
+
+#: src/Form/Writer/MetadataSelectTrait.php:93
+msgid "Item set (for item)"
+msgstr ""
+
+#: src/Form/Writer/MetadataSelectTrait.php:97
+#: src/Form/Writer/MetadataSelectTrait.php:107
+#: src/Form/Writer/MetadataSelectTrait.php:115
+#: src/Form/Writer/MetadataSelectTrait.php:123
+msgid "Label (first title)"
+msgstr ""
+
+#: src/Form/Writer/MetadataSelectTrait.php:101
+msgid "Media (for item)"
+msgstr ""
+
+#: src/Form/Writer/MetadataSelectTrait.php:104
+msgid "Url / File"
+msgstr ""
+
+#: src/Form/Writer/MetadataSelectTrait.php:105
+msgid "Source url / file"
+msgstr ""
+
+#: src/Form/Writer/MetadataSelectTrait.php:111
+msgid "Item (for media)"
+msgstr ""
+
+#: src/Form/Writer/MetadataSelectTrait.php:119
+msgid "Resource (for annotation)"
+msgstr ""
+
+#: src/Form/Writer/ResourceQueryTrait.php:15
+msgid "Resource query"
+msgstr ""
+
+#: src/Form/Writer/ResourceQueryTrait.php:16
+msgid "Limit the resources output. Should be used with one resource type only."
+msgstr ""
+
+#: src/Form/Writer/ResourceTypesSelectTrait.php:15
+msgid "Resource types"
+msgstr ""
+
+#: src/Form/Writer/ResourceTypesSelectTrait.php:16
+msgid ""
+"When multiple types are selected, a column is automatically added to "
+"identify it."
+msgstr ""
+
+#: src/Form/Writer/ResourceTypesSelectTrait.php:27
+msgid "Select one or more resource type…"
+msgstr ""
+
+#: src/Form/Writer/ResourceTypesSelectTrait.php:38
+msgid "required"
+msgstr ""
+
+#: src/Form/Writer/FormatTrait.php:36
+msgid "Html (may contain output of modules)"
+msgstr ""
+
+#: src/Form/Writer/AbstractWriterConfigForm.php:23
+msgid "This optional comment will help admins for future reference."
+msgstr ""
+
+#: src/Form/Writer/AbstractWriterConfigForm.php:28
+msgid "Optional comment for future reference."
+msgstr ""
+
+#: src/Form/Writer/AbstractWriterConfigForm.php:35
+msgid "Use a background job"
+msgstr ""
+
+#: src/Form/Writer/AbstractWriterConfigForm.php:36
+msgid ""
+"For complex formats, the process may require more than 30 seconds, that is "
+"the default duration of web server before error."
+msgstr ""
+
+#: src/Form/Writer/CsvWriterConfigForm.php:16
+msgid "Delimiter"
+msgstr ""
+
+#: src/Form/Writer/CsvWriterConfigForm.php:27
+msgid "Enclosure"
+msgstr ""
+
+#: src/Form/Writer/CsvWriterConfigForm.php:38
+msgid "Escape"
+msgstr ""
+
+#: src/Api/Representation/ExportRepresentation.php:81
+msgid "ready"
+msgstr ""
+
+#: src/Api/Representation/ExportRepresentation.php:87
+msgid "Ready"
+msgstr ""
+
+#: src/Controller/Admin/ExportController.php:25
+msgid "bulk_exports"
+msgstr ""
+
+#: src/Controller/Admin/ExportController.php:70
+msgid "export"
+msgstr ""
+
+#: src/Controller/Admin/ExportController.php:88
+msgid "Export successfully deleted"
+msgstr ""
+
+#: src/Controller/Admin/ExporterController.php:45
+#: src/Controller/Admin/ExporterController.php:93
+#: src/Controller/Admin/ExporterController.php:138
+#: src/Controller/Admin/ExporterController.php:198
+msgid "exporter_id"
+msgstr ""
+
+#: src/Controller/Admin/ExporterController.php:71
+msgid "Exporter successfully saved"
+msgstr ""
+
+#: src/Controller/Admin/ExporterController.php:74
+msgid "Save of exporter failed"
+msgstr ""
+
+#: src/Controller/Admin/ExporterController.php:102
+msgid "This exporter cannot be deleted: exports that use it exist."
+msgstr ""
+
+#: src/Controller/Admin/ExporterController.php:115
+msgid "Exporter successfully deleted"
+msgstr ""
+
+#: src/Controller/Admin/ExporterController.php:118
+msgid "Delete of exporter failed"
+msgstr ""
+
+#: src/Controller/Admin/ExporterController.php:170
+msgid "Writer configuration saved"
+msgstr ""
+
+#: src/Controller/Admin/ExporterController.php:173
+msgid "Save of writer configuration failed"
+msgstr ""
+
+#: src/Controller/Admin/ExporterController.php:271
+msgid "Save of export failed"
+msgstr ""
+
+#: src/Controller/Admin/ExporterController.php:293
+msgid ""
+"Export started in background (job {link_open_job}#{jobId}{link_close}, "
+"{link_open_log}logs{link_close}). This may take a while."
+msgstr ""
+
+#: src/Controller/Admin/ExporterController.php:294
+msgid ""
+"Export processed in (job {link_open_job}#{jobId}{link_close}, {link_open_log}"
+"logs{link_close})."
+msgstr ""
+
+#: src/Controller/Admin/ExporterController.php:313
+msgid "Export start failed"
+msgstr ""
+
+#: src/Controller/Admin/ExporterController.php:374
+msgid "Continue"
+msgstr ""
+
+#: src/Service/FormatterManagerFactory.php:21
+msgid "Missing output format configuration"
+msgstr ""
+
+#: src/Formatter/AbstractFormatter.php:175
+msgid "Unable to format resources as {format}."
+msgstr ""
+
+#: src/Formatter/AbstractFormatter.php:404
+msgid "Unable to save output to file: {error}."
+msgstr ""
+
+#: src/Formatter/Odt.php:27 src/Formatter/Ods.php:21
+msgid ""
+"To process export to \"{format}\", the php extensions \"zip\" and \"xml\" "
+"are required."
+msgstr ""
+
+#: src/Formatter/GeoJson.php:57 src/Formatter/AbstractFieldsFormatter.php:45
+msgid "No metadata are used in any resources."
+msgstr ""
+
+#: src/Formatter/GeoJson.php:154
+msgid "The geonames uri \"{url}\" is invalid."
+msgstr ""
+
+#: src/Formatter/GeoJson.php:277
+msgid "Output is not xml for url \"{url}\"."
+msgstr ""
+
+#: src/Formatter/GeoJson.php:285
+msgid "Output is not a valid xml for url \"{url}\"."
+msgstr ""
+
+#: src/Formatter/GeoJson.php:311
+msgid "Connection error when fetching url \"{url}\": {exception}"
+msgstr ""
+
+#: src/Formatter/GeoJson.php:319
+msgid "Connection issue when fetching url \"{url}\": {msg}"
+msgstr ""
+
+#: src/Formatter/GeoJson.php:328
+msgid "Output is empty for url \"{url}\"."
+msgstr ""
+
+#: config/module.config.php:305
+msgid "Dashboard"
+msgstr ""
+
+#: config/module.config.php:318
+msgid "Past Exports"
+msgstr ""
+
+#: config/module.config.php:335
+msgid "Params"
+msgstr ""

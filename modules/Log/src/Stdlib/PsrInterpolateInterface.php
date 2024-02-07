@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Log\Stdlib;
 
@@ -16,5 +16,5 @@ interface PsrInterpolateInterface
      * @param array $context Associative array with placeholders and strings.
      * @return string
      */
-    public function interpolate($message, array $context = null);
+    public function interpolate($message, array $context = null): string;
 }

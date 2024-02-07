@@ -1,13 +1,14 @@
-<?php
+<?php declare(strict_types=1);
+
 namespace Log\Api\Adapter;
 
-use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Query\Expr\Comparison;
+use Doctrine\ORM\QueryBuilder;
+use Laminas\Log\Logger;
 use Omeka\Api\Adapter\AbstractEntityAdapter;
 use Omeka\Api\Request;
 use Omeka\Entity\EntityInterface;
 use Omeka\Stdlib\ErrorStore;
-use Zend\Log\Logger;
 
 class LogAdapter extends AbstractEntityAdapter
 {
@@ -17,6 +18,18 @@ class LogAdapter extends AbstractEntityAdapter
         'job' => 'job',
         'reference' => 'reference',
         'severity' => 'severity',
+        'message' => 'message',
+        'created' => 'created',
+    ];
+
+    protected $scalarFields = [
+        'id' => 'id',
+        'owner' => 'owner',
+        'job' => 'job',
+        'reference' => 'reference',
+        'severity' => 'severity',
+        'message' => 'message',
+        'context' => 'context',
         'created' => 'created',
     ];
 
@@ -35,52 +48,106 @@ class LogAdapter extends AbstractEntityAdapter
         return \Log\Entity\Log::class;
     }
 
-    public function buildQuery(QueryBuilder $qb, array $query)
+    public function buildQuery(QueryBuilder $qb, array $query): void
     {
-        $isOldOmeka = \Omeka\Module::VERSION < 2;
-        $alias = $isOldOmeka ? $this->getEntityClass() : 'omeka_root';
         $expr = $qb->expr();
 
         // User table is not joined to get only existing users: useless with
         // "on delete set null".
-        if (isset($query['owner_id']) && strlen($query['owner_id'])) {
+        if (isset($query['owner_id']) && strlen((string) $query['owner_id'])) {
             $qb->andWhere($expr->eq(
-                $alias . '.owner',
+                'omeka_root.owner',
                 $this->createNamedParameter($qb, $query['owner_id'])
             ));
         }
 
         // Job table is not joined to get only existing jobs: useless with
         // "on delete cascade".
-        if (isset($query['job_id']) && strlen($query['job_id'])) {
-            $qb->andWhere($expr->eq(
-                $alias . '.job',
-                $this->createNamedParameter($qb, $query['job_id'])
-            ));
+        if (isset($query['job_id'])) {
+            $ids = $query['job_id'];
+            if (!is_array($ids)) {
+                $ids = [$ids];
+            }
+            $ids = array_filter(array_map('intval', $ids));
+            if ($ids) {
+                $qb->andWhere($qb->expr()->in(
+                    'omeka_root.job',
+                    $this->createNamedParameter($qb, $ids)
+                ));
+            } else {
+                // Avoid an issue with a job_id is set in query but empty.
+                // TODO Manage job is null?
+                $qb->andWhere($expr->eq('omeka_root.job', -1));
+            }
         }
 
-        if (isset($query['reference']) && strlen($query['reference'])) {
+        if (isset($query['reference']) && $query['reference'] ) {
             $qb->andWhere($expr->eq(
-                $alias . '.reference',
+                'omeka_root.reference',
                 $this->createNamedParameter($qb, $query['reference'])
             ));
         }
 
         // TODO Allow to search severity by standard name.
-        if (isset($query['severity']) && strlen($query['severity'])) {
+        if (isset($query['severity']) && strlen((string) $query['severity'])) {
             $this->buildQuerySeverityComparison($qb, $query, $query['severity'], 'severity');
         }
 
         // TODO Remove severity_min and severity_max here and replace them by a javascript.
-        if (isset($query['severity_min']) && strlen($query['severity_min'])) {
+        if (isset($query['severity_min']) && strlen((string) $query['severity_min'])) {
             $this->buildQuerySeverityComparison($qb, $query, '<=' . $query['severity_min'], 'severity');
         }
-        if (isset($query['severity_max']) && strlen($query['severity_max'])) {
+        if (isset($query['severity_max']) && strlen((string) $query['severity_max'])) {
             $this->buildQuerySeverityComparison($qb, $query, '>=' . $query['severity_max'], 'severity');
         }
 
         if (isset($query['created']) && strlen($query['created'])) {
             $this->buildQueryDateComparison($qb, $query, $query['created'], 'created');
+        }
+
+        // TODO Manage search in translated messages as they are displayed.
+        if (isset($query['message']) && !empty($query['message'])) {
+            if (!is_array($query['message'])) {
+                $query['message'] = ['text' => $query['message'], 'type' => 'in'];
+            }
+            foreach ($query['message'] as $message) {
+                if (!is_array($message)) {
+                    $message = ['text' => $message, 'type' => 'in'];
+                }
+                if (!isset($message['text']) || !strlen($message['text'])) {
+                    continue;
+                }
+                $text = $message['text'];
+                $queryType = $message['type'] ?? 'in';
+                switch ($queryType) {
+                    case 'neq':
+                        $qb->andWhere($expr->neq(
+                            'omeka_root.message',
+                            $this->createNamedParameter($qb, $text)
+                        ));
+                        break;
+                    case 'eq':
+                        $qb->andWhere($expr->eq(
+                            'omeka_root.message',
+                            $this->createNamedParameter($qb, $text)
+                        ));
+                        break;
+                    case 'nin':
+                        $qb->andWhere($expr->notLike(
+                            'omeka_root.message',
+                            $this->createNamedParameter($qb, '%' . $text . '%')
+                        ));
+                        break;
+                    case 'in':
+                        $qb->andWhere($expr->like(
+                            'omeka_root.message',
+                            $this->createNamedParameter($qb, '%' . $text . '%')
+                        ));
+                        break;
+                    default:
+                        continue 2;
+                }
+            }
         }
     }
 
@@ -88,7 +155,7 @@ class LogAdapter extends AbstractEntityAdapter
         Request $request,
         EntityInterface $entity,
         ErrorStore $errorStore
-    ) {
+    ): void {
         switch ($request->getOperation()) {
             case Request::CREATE:
                 $data = $request->getContent();
@@ -125,11 +192,8 @@ class LogAdapter extends AbstractEntityAdapter
      * @param string $value
      * @param string $column
      */
-    protected function buildQueryComparison(QueryBuilder $qb, array $query, $value, $column)
+    protected function buildQueryComparison(QueryBuilder $qb, array $query, $value, $column): void
     {
-        $isOldOmeka = \Omeka\Module::VERSION < 2;
-        $alias = $isOldOmeka ? $this->getEntityClass() : 'omeka_root';
-
         $matches = [];
         preg_match('/^[^\d]+/', $value, $matches);
         if (!empty($matches[0])) {
@@ -147,15 +211,13 @@ class LogAdapter extends AbstractEntityAdapter
                 'neq' => Comparison::NEQ,
                 'eq' => Comparison::EQ,
             ];
-            $operator = isset($operators[$matches[0]])
-                ? $operators[$matches[0]]
-                : Comparison::EQ;
-            $value = (int) substr($value, strlen($matches[0]));
+            $operator = $operators[$matches[0]] ?? Comparison::EQ;
+            $value = (int) mb_substr($value, mb_strlen($matches[0]));
         } else {
             $operator = Comparison::EQ;
         }
         $qb->andWhere(new Comparison(
-            $alias . '.' . $column,
+            'omeka_root.' . $column,
             $operator,
             $this->createNamedParameter($qb, $value)
         ));
@@ -169,7 +231,7 @@ class LogAdapter extends AbstractEntityAdapter
      * @param string $value
      * @param string $column
      */
-    protected function buildQuerySeverityComparison(QueryBuilder $qb, array $query, $value, $column)
+    protected function buildQuerySeverityComparison(QueryBuilder $qb, array $query, $value, $column): void
     {
         $map = [
             'emergency' => Logger::EMERG,
@@ -194,16 +256,12 @@ class LogAdapter extends AbstractEntityAdapter
     /**
      * Add a comparison condition to query from a date.
      *
-     * @param QueryBuilder $qb
-     * @param array $query
-     * @param string $value
-     * @param string $column
+     * @see \Annotate\Api\Adapter\QueryDateTimeTrait::searchDateTime()
+     * @see \Contribute\Api\Adapter\ContributionAdapter::buildQueryDateComparison()
+     * @see \Log\Api\Adapter\LogAdapter::buildQueryDateComparison()
      */
-    protected function buildQueryDateComparison(QueryBuilder $qb, array $query, $value, $column)
+    protected function buildQueryDateComparison(QueryBuilder $qb, array $query, $value, $column): void
     {
-        $isOldOmeka = \Omeka\Module::VERSION < 2;
-        $alias = $isOldOmeka ? $this->getEntityClass() : 'omeka_root';
-
         // TODO Format the date into a standard mysql datetime.
         $matches = [];
         preg_match('/^[^\d]+/', $value, $matches);
@@ -225,10 +283,8 @@ class LogAdapter extends AbstractEntityAdapter
                 'nex' => 'IS NULL',
             ];
             $operator = trim($matches[0]);
-            $operator = isset($operators[$operator])
-                ? $operators[$operator]
-                : Comparison::EQ;
-            $value = substr($value, strlen($matches[0]));
+            $operator = $operators[$operator] ?? Comparison::EQ;
+            $value = mb_substr($value, mb_strlen($matches[0]));
         } else {
             $operator = Comparison::EQ;
         }
@@ -247,26 +303,27 @@ class LogAdapter extends AbstractEntityAdapter
         // ));
         // return;
 
-        $field = $alias . '.' . $column;
+        $field = 'omeka_root.' . $column;
         switch ($operator) {
             case Comparison::GT:
-                if (strlen($value) < 19) {
-                    $value = substr_replace('9999-12-31 23:59:59', $value, 0, strlen($value) - 19);
+                if (mb_strlen($value) < 19) {
+                    // TODO Manage mb for substr_replace.
+                    $value = substr_replace('9999-12-31 23:59:59', $value, 0, mb_strlen($value) - 19);
                 }
                 $param = $this->createNamedParameter($qb, $value);
                 $predicateExpr = $expr->gt($field, $param);
                 break;
             case Comparison::GTE:
-                if (strlen($value) < 19) {
-                    $value = substr_replace('0000-01-01 00:00:00', $value, 0, strlen($value) - 19);
+                if (mb_strlen($value) < 19) {
+                    $value = substr_replace('0000-01-01 00:00:00', $value, 0, mb_strlen($value) - 19);
                 }
                 $param = $this->createNamedParameter($qb, $value);
                 $predicateExpr = $expr->gte($field, $param);
                 break;
             case Comparison::EQ:
-                if (strlen($value) < 19) {
-                    $valueFrom = substr_replace('0000-01-01 00:00:00', $value, 0, strlen($value) - 19);
-                    $valueTo = substr_replace('9999-12-31 23:59:59', $value, 0, strlen($value) - 19);
+                if (mb_strlen($value) < 19) {
+                    $valueFrom = substr_replace('0000-01-01 00:00:00', $value, 0, mb_strlen($value) - 19);
+                    $valueTo = substr_replace('9999-12-31 23:59:59', $value, 0, mb_strlen($value) - 19);
                     $paramFrom = $this->createNamedParameter($qb, $valueFrom);
                     $paramTo = $this->createNamedParameter($qb, $valueTo);
                     $predicateExpr = $expr->between($field, $paramFrom, $paramTo);
@@ -276,9 +333,9 @@ class LogAdapter extends AbstractEntityAdapter
                 }
                 break;
             case Comparison::NEQ:
-                if (strlen($value) < 19) {
-                    $valueFrom = substr_replace('0000-01-01 00:00:00', $value, 0, strlen($value) - 19);
-                    $valueTo = substr_replace('9999-12-31 23:59:59', $value, 0, strlen($value) - 19);
+                if (mb_strlen($value) < 19) {
+                    $valueFrom = substr_replace('0000-01-01 00:00:00', $value, 0, mb_strlen($value) - 19);
+                    $valueTo = substr_replace('9999-12-31 23:59:59', $value, 0, mb_strlen($value) - 19);
                     $paramFrom = $this->createNamedParameter($qb, $valueFrom);
                     $paramTo = $this->createNamedParameter($qb, $valueTo);
                     $predicateExpr = $expr->not(
@@ -290,15 +347,15 @@ class LogAdapter extends AbstractEntityAdapter
                 }
                 break;
             case Comparison::LTE:
-                if (strlen($value) < 19) {
-                    $value = substr_replace('9999-12-31 23:59:59', $value, 0, strlen($value) - 19);
+                if (mb_strlen($value) < 19) {
+                    $value = substr_replace('9999-12-31 23:59:59', $value, 0, mb_strlen($value) - 19);
                 }
                 $param = $this->createNamedParameter($qb, $value);
                 $predicateExpr = $expr->lte($field, $param);
                 break;
             case Comparison::LT:
-                if (strlen($value) < 19) {
-                    $value = substr_replace('0000-01-01 00:00:00', $value, 0, strlen($value) - 19);
+                if (mb_strlen($value) < 19) {
+                    $value = substr_replace('0000-01-01 00:00:00', $value, 0, mb_strlen($value) - 19);
                 }
                 $param = $this->createNamedParameter($qb, $value);
                 $predicateExpr = $expr->lt($field, $param);

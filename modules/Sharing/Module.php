@@ -3,16 +3,16 @@
 namespace Sharing;
 
 use Omeka\Module\AbstractModule;
-use Zend\Form\Fieldset;
-use Zend\EventManager\SharedEventManagerInterface;
-use Zend\Mvc\MvcEvent;
-use Zend\ServiceManager\ServiceLocatorInterface;
+use Laminas\Form\Fieldset;
+use Laminas\EventManager\SharedEventManagerInterface;
+use Laminas\Mvc\MvcEvent;
+use Laminas\ServiceManager\ServiceLocatorInterface;
 
 class Module extends AbstractModule
 {
     public function getConfig()
     {
-        return include __DIR__.'/config/module.config.php';
+        return include __DIR__ . '/config/module.config.php';
     }
 
     public function onBootstrap(MvcEvent $event)
@@ -195,7 +195,7 @@ class Module extends AbstractModule
                         $attachments = $block->attachments();
                         foreach ($attachments as $attachment) {
                             $item = $attachment->item();
-                            if ($primaryMedia = $item->primaryMedia()) {
+                            if ($item && ($primaryMedia = $item->primaryMedia())) {
                                 $image = $escape($primaryMedia->thumbnailUrl('large'));
                                 break 2;
                             }
@@ -204,7 +204,7 @@ class Module extends AbstractModule
                 break;
             }
         $view->headTitle()->setSeparator(' · ');
-        $pageTitle = $view->headTitle()->renderTitle().' · '.$view->setting('installation_title', 'Omeka S');
+        $pageTitle = $view->headTitle()->renderTitle() . ' · ' . $view->setting('installation_title', 'Omeka S');
         $view->headMeta()->appendProperty('og:title', $pageTitle);
         $view->headMeta()->appendProperty('og:type', 'website');
         $view->headMeta()->appendProperty('og:url', $view->serverUrl(true));
@@ -275,7 +275,7 @@ class Module extends AbstractModule
             ';
 
             foreach ($enabledMethods as $method) {
-                $js = $method.'Javascript';
+                $js = $method . 'Javascript';
                 if (isset($$js)) {
                     echo $$js;
                 }

@@ -1,6 +1,10 @@
 Log (module for Omeka S)
 ========================
 
+> __New versions of this module and support for Omeka S version 3.0 and above
+> are available on [GitLab], which seems to respect users and privacy better
+> than the previous repository.__
+
 [Log] is a module for [Omeka S] that allows to monitor all logging messages and
 background jobs directly in the admin board, in syslog, or in cloud services via
 third parties and make them easily checkable.
@@ -16,14 +20,14 @@ this standard (see below). They can be translated too.
 Installation
 ------------
 
-The module uses an external library, [`webui-popover`], so use the release zip
+The module uses an external library, [webui-popover], so use the release zip
 to install it, or use and init the source.
 
 See general end user documentation for [installing a module].
 
 * From the zip
 
-Download the last release [`Log.zip`] from the list of releases (the master does
+Download the last release [Log.zip] from the list of releases (the master does
 not contain the dependency), and uncompress it in the `modules` directory.
 
 * From the source and for development
@@ -31,25 +35,30 @@ not contain the dependency), and uncompress it in the `modules` directory.
 If the module was installed from the source, rename the name of the folder of
 the module to `Log`, go to the root module, and run:
 
+```sh
+composer install --no-dev
 ```
-    npm install
-    gulp
-```
+
+If an issue appears after upgrade of Omeka, don’t forget to update the packages
+of Omeka: `rm -rf vendor && composer install --no-dev`.
 
 
 Config
 ------
 
-The config is a pure Zend log config: see the [Zend Framework Log] documentation
+The config is a pure Laminas log config: see the [Laminas Framework Log] documentation
 for the format. Only common settings are explained here.
 
 To enable or disable an option or a writer, it is recommended to copy the wanted
 keys inside your own `config/local.config.php`, so the maintenance will be
 simpler.
 
-The default config allows to keep existing log mechanisms: the file `logs/application.log`
-and the background logs in the table `job` inside the Omeka database. They can
-be disabled if wanted.
+The default config keeps the existing log mechanism inside the file `logs/application.log`,
+but removes the logs of the jobs in the table `job` inside the Omeka database.
+This second logs are useless with this module. Furthermore, the default log of
+jobs is a big text field (4GB), so it may prevent to restore a database if there
+is a row is bigger than the param "max_allowed_packet" in the config of
+mariadb/mysql.
 
 The logger allows to define one or more of writers (a file, a database, a cloud
 service, syslog, etc.). All the writers are listed in `config['logger']['writers']`.
@@ -90,17 +99,17 @@ logging (this example shows the default levels):
             'writers' => [
                 'db' => [
                     'options' => [
-                        'filters' => \Zend\Log\Logger::INFO,
+                        'filters' => \Laminas\Log\Logger::INFO,
                     ],
                 ],
                 'stream' => [
                     'options' => [
-                        'filters' => \Zend\Log\Logger::NOTICE,
+                        'filters' => \Laminas\Log\Logger::NOTICE,
                     ],
                 ],
                 'syslog' => [
                     'options' => [
-                        'filters' => \Zend\Log\Logger::ERR,
+                        'filters' => \Laminas\Log\Logger::ERR,
                     ],
                 ],
             ],
@@ -150,7 +159,7 @@ Furthermore, they are managed automatically for background jobs.
 The logs can be saved in an external database. To config it, add a file
 `database-log.ini` beside the main `database.ini` of Omeka S, with its params,
 and the params of the table inside `config['logger']['options']['writers']['db']['options']`.
-Warning: for technical reasons, Omeka use `dbname` and `user`, but Zend uses
+Warning: for technical reasons, Omeka use `dbname` and `user`, but Laminas uses
 `database` and `username`:
 
 ```ini
@@ -169,7 +178,7 @@ used.
 ### Additionnal logging
 
 Other logging can be added. Just add their config in your `['logger']['options']`
-and enable them under the key `['logger']['writers']`. See the [Zend Framework Log]
+and enable them under the key `['logger']['writers']`. See the [Laminas Framework Log]
 documentation for the format of the config.
 
 ### Sentry
@@ -178,21 +187,19 @@ documentation for the format of the config.
 way, following these steps, from the root of Omeka S:
 
 - Sentry requires the library `php-curl`, that should be enabled on the server.
-- Sentry should be installed via composer in the root of Omeka, with platform
-  php = 7.0 instead of platform php = 5.6, so update it in `composer.json`. If
-  not, an old version of Sentry will be used, that doesn't work with other
-  dependencies.
+- Sentry should be installed via composer in the root of Omeka.
 - Include the library:
 
 ```bash
-composer require facile-it/sentry-module
+# Note: Omeka uses composer version 1, so you may have to download it.
+composer require facile-it/sentry-module php-http/curl-client laminas/laminas-diactoros
 ```
 
 - The psr formatter `facile-it/sentry-psr-log` may be added too (need config).
 - Copy the default config file (see // https://github.com/facile-it/sentry-module#client),
   and set your Sentry dsn:
 
-```bash
+```sh
 cp modules/Log/config/sentry.config.local.php.dist config/sentry.config.local.php
 sed -i -r "s|'dsn' => '',|'dsn' => 'https://abcdefabcdefabcdefabcdefabcdefab@sentry.io/1234567',|" config/sentry.config.local.php
 ```
@@ -204,12 +211,12 @@ of module_listener_options:
 ```php
 return [
     'modules' => [
-        'Zend\Form',
-        'Zend\I18n',
-        'Zend\Mvc\I18n',
-        'Zend\Mvc\Plugin\Identity',
-        'Zend\Navigation',
-        'Zend\Router',
+        'Laminas\Form',
+        'Laminas\I18n',
+        'Laminas\Mvc\I18n',
+        'Laminas\Mvc\Plugin\Identity',
+        'Laminas\Navigation',
+        'Laminas\Router',
         'Omeka',
         'Facile\SentryModule',
     ],
@@ -298,9 +305,9 @@ $this->logger()->info(
 // output in database: The item #43 has been updated by user #1.
 ```
 
-In this implementation, like the default Zend stream logger, extra data that are
-not mappable are json encoded and appended to the end of the message via the key
-`{extra}`. So this key should not be used in the context when there are
+In this implementation, like the default Laminas stream logger, extra data that
+are not mappable are json encoded and appended to the end of the message via the
+key `{extra}`. So this key should not be used in the context when there are
 non-mapped keys.
 
 ```php
@@ -321,7 +328,7 @@ It can be added at the beginning of the process to avoid to set it for each log:
 
 ```php
 // PSR-3 logging with reference id (a random number if not set).
-$referenceIdProcessor = new \Zend\Log\Processor\ReferenceId();
+$referenceIdProcessor = new \Laminas\Log\Processor\ReferenceId();
 $referenceIdProcessor->setReferenceId('bulk/import/27');
 $this->logger()->addProcessor($referenceIdProcessor);
 $this->logger()->info(
@@ -380,6 +387,14 @@ By construction, the plural is not managed: only one message is saved in the
 log. So, if any, the plural message should be prepared before the logging.
 
 
+TODO
+----
+
+- [ ] Use the second entity manager in all cases.
+- [ ] Add an option to copy logs inside jobs when the module is uninstalled.
+- [ ] Fix incompatibility between authentication modules (Ldap, Cas, Shibboleth). The user id is currently disabled in such a case.
+
+
 Warning
 -------
 
@@ -392,13 +407,13 @@ your archives regularly so you can roll back if needed.
 Troubleshooting
 ---------------
 
-See online issues on the [module issues] page on GitHub.
+See online issues on the [module issues] page on GitLab.
 
 
 License
 -------
 
-This module is published under the [CeCILL v2.1] licence, compatible with
+This module is published under the [CeCILL v2.1] license, compatible with
 [GNU/GPL] and approved by [FSF] and [OSI].
 
 This software is governed by the CeCILL license under French law and abiding by
@@ -424,34 +439,35 @@ conditions as regards security.
 The fact that you are presently reading this means that you have had knowledge
 of the CeCILL license and that you accept its terms.
 
-* The library [`webui-popover`] is published under the license [MIT].
-* The library [`facile/sentry`] is published under the license [MIT].
+* The library [webui-popover] is published under the license [MIT].
+* The library [facile/sentry] is published under the license [MIT].
 
 
 Copyright
 ---------
 
-* Copyright Daniel Berthereau, 2017-2019 [Daniel-KM] on GitHub)
+* Copyright Daniel Berthereau, 2017-2022 [Daniel-KM] on GitLab)
 
-* Library [`webui-popover`]: Sandy Walker
-* Library [`facile/sentry`]: Copyright 2016 Thomas Mauro Vargiu
+* Library [webui-popover]: Sandy Walker
+* Library [facile/sentry]: Copyright 2016 Thomas Mauro Vargiu
 
 
-[Log]: https://github.com/Daniel-KM/Omeka-S-module-Log
+[Log]: https://gitlab.com/Daniel-KM/Omeka-S-module-Log
 [Omeka S]: https://omeka.org/s
 [PSR-3]: http://www.php-fig.org/psr/psr-3
 [PHP-FIG]: http://www.php-fig.org
-[`webui-popover`]: https://github.com/sandywalker/webui-popover
+[webui-popover]: https://github.com/sandywalker/webui-popover
 [installing a module]: http://dev.omeka.org/docs/s/user-manual/modules/#installing-modules
-[`Log.zip`]: https://github.com/Daniel-KM/Omeka-S-module-Log/releases
-[Zend Framework Log]: https://docs.zendframework.com/zend-log
-[config of the module]: https://github.com/Daniel-KM/Omeka-S-module-Log/blob/master/config/module.config.php#L5-L115
+[Log.zip]: https://gitlab.com/Daniel-KM/Omeka-S-module-Log/-/releases
+[Laminas Framework Log]: https://docs.laminas.dev/laminas-log
+[config of the module]: https://gitlab.com/Daniel-KM/Omeka-S-module-Log/-/blob/master/config/module.config.php#L5-117
 [Sentry]: https://sentry.io
-[`facile/sentry`]: https://github.com/facile-it/sentry-module
-[module issues]: https://github.com/Daniel-KM/Omeka-S-module-Log/issues
+[facile/sentry]: https://github.com/facile-it/sentry-module
+[module issues]: https://gitlab.com/Daniel-KM/Omeka-S-module-Log/-/issues
 [CeCILL v2.1]: https://www.cecill.info/licences/Licence_CeCILL_V2.1-en.html
 [GNU/GPL]: https://www.gnu.org/licenses/gpl-3.0.html
 [FSF]: https://www.fsf.org
 [OSI]: http://opensource.org
 [MIT]: https://github.com/sandywalker/webui-popover/blob/master/LICENSE.txt
-[Daniel-KM]: https://github.com/Daniel-KM "Daniel Berthereau"
+[GitLab]: https://gitlab.com/Daniel-KM
+[Daniel-KM]: https://gitlab.com/Daniel-KM "Daniel Berthereau"

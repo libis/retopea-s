@@ -1,24 +1,27 @@
-<?php
+<?php declare(strict_types=1);
+
 namespace Internationalisation;
+
+use Omeka\Stdlib\Message;
 
 /**
  * @var Module $this
- * @var \Zend\ServiceManager\ServiceLocatorInterface $serviceLocator
+ * @var \Laminas\ServiceManager\ServiceLocatorInterface $services
  * @var string $newVersion
  * @var string $oldVersion
  *
+ * @var \Omeka\Api\Manager $api
+ * @var \Omeka\Settings\Settings $settings
  * @var \Doctrine\DBAL\Connection $connection
  * @var \Doctrine\ORM\EntityManager $entityManager
- * @var \Omeka\Api\Manager $api
+ * @var \Omeka\Mvc\Controller\Plugin\Messenger $messenger
  */
-$services = $serviceLocator;
-$settings = $services->get('Omeka\Settings');
-$config = require dirname(dirname(__DIR__)) . '/config/module.config.php';
-$connection = $services->get('Omeka\Connection');
-$entityManager = $services->get('Omeka\EntityManager');
 $plugins = $services->get('ControllerPluginManager');
 $api = $plugins->get('api');
-$space = strtolower(__NAMESPACE__);
+$settings = $services->get('Omeka\Settings');
+$connection = $services->get('Omeka\Connection');
+$messenger = $plugins->get('messenger');
+$entityManager = $services->get('Omeka\EntityManager');
 
 if (version_compare($oldVersion, '3.2.0', '<')) {
     $settings = $services->get('Omeka\Settings\Site');
@@ -27,9 +30,9 @@ if (version_compare($oldVersion, '3.2.0', '<')) {
     foreach ($siteIds as $siteId) {
         $settings->setTargetId($siteId);
         $settings->set('internationalisation_fallbacks',
-            $config[$space]['site_settings']['internationalisation_fallbacks']);
+            $config['internationalisation']['site_settings']['internationalisation_fallbacks']);
         $settings->set('internationalisation_required_languages',
-            $config[$space]['site_settings']['internationalisation_required_languages']);
+            $config['internationalisation']['site_settings']['internationalisation_required_languages']);
     }
 }
 
@@ -44,7 +47,7 @@ SQL;
     // See core commit #2689ce92f.
     $sqls = array_filter(array_map('trim', explode(";\n", $sql)));
     foreach ($sqls as $sql) {
-        $connection->exec($sql);
+        $connection->executeStatement($sql);
     }
 }
 
@@ -64,7 +67,7 @@ SQL;
     // See core commit #2689ce92f.
     $sqls = array_filter(array_map('trim', explode(";\n", $sql)));
     foreach ($sqls as $sql) {
-        $connection->exec($sql);
+        $connection->executeStatement($sql);
     }
 
     $settings = $services->get('Omeka\Settings\Site');
@@ -76,10 +79,10 @@ SQL;
     }
 }
 
-if (version_compare($oldVersion, '3.2.10', '<')) {
+if (version_compare($oldVersion, '3.3.10', '<')) {
     $sql = <<<SQL
 UPDATE `site_page_block` SET `layout` = "mirrorPage"
 WHERE `layout` = "simplePage";
 SQL;
-    $connection->exec($sql);
+    $connection->executeStatement($sql);
 }

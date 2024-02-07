@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 namespace Log\Api\Representation;
 
 use Log\Stdlib\PsrMessage;
@@ -59,19 +59,17 @@ class LogRepresentation extends AbstractEntityRepresentation
     public function severityLabel()
     {
         $severities = [
-            \Zend\Log\Logger::EMERG => 'emergency', // @translate
-            \Zend\Log\Logger::ALERT => 'alert', // @translate
-            \Zend\Log\Logger::CRIT => 'critical', // @translate
-            \Zend\Log\Logger::ERR => 'error', // @translate
-            \Zend\Log\Logger::WARN => 'warning', // @translate
-            \Zend\Log\Logger::NOTICE => 'notice', // @translate
-            \Zend\Log\Logger::INFO => 'info', // @translate
-            \Zend\Log\Logger::DEBUG => 'debug', // @translate
+            \Laminas\Log\Logger::EMERG => 'emergency', // @translate
+            \Laminas\Log\Logger::ALERT => 'alert', // @translate
+            \Laminas\Log\Logger::CRIT => 'critical', // @translate
+            \Laminas\Log\Logger::ERR => 'error', // @translate
+            \Laminas\Log\Logger::WARN => 'warning', // @translate
+            \Laminas\Log\Logger::NOTICE => 'notice', // @translate
+            \Laminas\Log\Logger::INFO => 'info', // @translate
+            \Laminas\Log\Logger::DEBUG => 'debug', // @translate
         ];
         $severity = $this->severity();
-        return isset($severities[$severity])
-            ? $severities[$severity]
-            : $severity;
+        return $severities[$severity] ?? $severity;
     }
 
     /**
@@ -104,7 +102,7 @@ class LogRepresentation extends AbstractEntityRepresentation
             $hyperlink = $this->getViewHelper('hyperlink');
             $url = $this->getViewHelper('url');
             foreach ($context as $key => $value) {
-                $cleanKey = preg_replace('~[^a-z]~', '', strtolower($key));
+                $cleanKey = preg_replace('~[^a-z]~', '', strtolower((string) $key));
                 switch ($cleanKey) {
                     case 'itemid':
                     case 'itemsetid':
@@ -128,9 +126,7 @@ class LogRepresentation extends AbstractEntityRepresentation
                         break;
                     case 'resourceid':
                     case 'id':
-                        $resourceType = isset($context['resource'])
-                            ? $context['resource']
-                            : (isset($context['resource_type']) ? $context['resource_type'] : null);
+                        $resourceType = $context['resource'] ?? $context['resource_name'] ?? $context['resource_type'] ?? null;
                         if ($resourceType) {
                             $resourceTypes = [
                                 'item' => 'item',
@@ -138,6 +134,8 @@ class LogRepresentation extends AbstractEntityRepresentation
                                 'itemset' => 'item-set',
                                 'itemsets' => 'item-set',
                                 'media' => 'media',
+                                'user' => 'user',
+                                'users' => 'user',
                                 'annotation' => 'annotation',
                                 'annotations' => 'annotation',
                             ];
@@ -146,6 +144,15 @@ class LogRepresentation extends AbstractEntityRepresentation
                                 $resourceType = $resourceTypes[$resourceType];
                                 $context[$key] = $hyperlink($value, $url('admin/id', ['controller' => $resourceType, 'id' => $value]));
                                 $escapeHtml = false;
+                                if (isset($context['resource'])) {
+                                    $context['resource'] = $translator->translate($context['resource']);
+                                }
+                                if (isset($context['resource_name'])) {
+                                    $context['resource_name'] = $translator->translate($context['resource_name']);
+                                }
+                                if (isset($context['resource_type'])) {
+                                    $context['resource_type'] = $translator->translate($context['resource_type']);
+                                }
                             }
                         }
                         break;

@@ -1,9 +1,9 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Log\Formatter;
 
 use DateTime;
-use Zend\Log\Formatter\Base;
+use Laminas\Log\Formatter\Base;
 
 class PsrLogDb extends Base
 {
@@ -53,7 +53,7 @@ class PsrLogDb extends Base
     /**
      * Formats the date time for mysql.
      *
-     * @see \Zend\Log\Formatter\Db::format()
+     * @see \Laminas\Log\Formatter\Db::format()
      *
      * @param array $event
      * @return array
@@ -61,7 +61,7 @@ class PsrLogDb extends Base
     protected function normalizeLogDateTimeFormat($event)
     {
         $format = $this->getDateTimeFormat();
-        array_walk_recursive($event, function (&$value) use ($format) {
+        array_walk_recursive($event, function (&$value) use ($format): void {
             if ($value instanceof DateTime) {
                 $value = $value->format($format);
             }

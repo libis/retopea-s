@@ -1,13 +1,13 @@
-<?php
+<?php declare(strict_types=1);
 namespace Internationalisation\Mvc;
 
-use Zend\EventManager\AbstractListenerAggregate;
-use Zend\EventManager\EventManagerInterface;
-use Zend\Mvc\MvcEvent;
+use Laminas\EventManager\AbstractListenerAggregate;
+use Laminas\EventManager\EventManagerInterface;
+use Laminas\Mvc\MvcEvent;
 
 class MvcListeners extends AbstractListenerAggregate
 {
-    public function attach(EventManagerInterface $events, $priority = 1)
+    public function attach(EventManagerInterface $events, $priority = 1): void
     {
         $this->listeners[] = $events->attach(
             MvcEvent::EVENT_ROUTE,
@@ -18,9 +18,10 @@ class MvcListeners extends AbstractListenerAggregate
     /**
      * Add theme translations.
      *
+     * @see \Laminas\I18n\Translator\TranslatorInterface
      * @param MvcEvent $event
      */
-    public function prepareTranslations(MvcEvent $event)
+    public function prepareTranslations(MvcEvent $event): void
     {
         $services = $event->getApplication()->getServiceManager();
         if (!$services->get('Omeka\Status')->isSiteRequest()) {
@@ -34,7 +35,6 @@ class MvcListeners extends AbstractListenerAggregate
             return;
         }
 
-        /** @var \Zend\I18n\Translator\TranslatorInterface $translator */
         $services->get('MvcTranslator')->getDelegatedTranslator()
             ->addTranslationFilePattern('gettext', $themeLanguagePath, '%s.mo', 'default');
     }

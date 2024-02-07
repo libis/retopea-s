@@ -1,9 +1,9 @@
-<?php
+<?php declare(strict_types=1);
 namespace Internationalisation\Service\ViewHelper;
 
 use Internationalisation\View\Helper\LocaleValue;
 use Interop\Container\ContainerInterface;
-use Zend\ServiceManager\Factory\FactoryInterface;
+use Laminas\ServiceManager\Factory\FactoryInterface;
 
 /**
  * Service factory to get the locale value view helper.

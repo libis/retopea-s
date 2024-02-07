@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 namespace Internationalisation;
 
 return [
@@ -34,6 +34,7 @@ return [
         ],
         'factories' => [
             'languageIso' => Service\ViewHelper\LanguageIsoFactory::class,
+            'languageList' => Service\ViewHelper\LanguageListFactory::class,
             'languageSwitcher' => Service\ViewHelper\LanguageSwitcherFactory::class,
             'localeValue' => Service\ViewHelper\LocaleValueFactory::class,
         ],
@@ -50,7 +51,7 @@ return [
         ],
         'factories' => [
             Form\Element\SitesPageSelect::class => Service\Form\Element\SitesPageSelectFactory::class,
-            Form\DuplicateSiteFieldset::class => \Zend\Form\ElementFactory::class,
+            Form\DuplicateSiteFieldset::class => \Laminas\Form\ElementFactory::class,
             Form\SiteSettingsFieldset::class => Service\Form\SiteSettingsFieldsetFactory::class,
             \Omeka\Form\SitePageForm::class => Service\Form\SitePageFormFactory::class,
         ],

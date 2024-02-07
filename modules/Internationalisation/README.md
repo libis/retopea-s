@@ -1,6 +1,10 @@
 Internationalisation (module for Omeka S)
 =========================================
 
+> __New versions of this module and support for Omeka S version 3.0 and above
+> are available on [GitLab], which seems to respect users and privacy better
+> than the previous repository.__
+
 [Internationalisation] is a module for [Omeka S] that allows visitors to switch
 between sites pages, when the sites are managed by language.
 
@@ -33,7 +37,7 @@ directory.
 If the module was installed from the source, rename the name of the folder of
 the module to `Internationalisation`, go to the root of the module, and run:
 
-```
+```sh
 composer install --no-dev
 ```
 
@@ -69,11 +73,12 @@ Set the groups of all sites that will be translated. For example if you have a
 main site and three exhibits, or four sites for different libraries:
 
 ```
-my-site-fra, my-site-way, my-site-rus
-my-exhibit-fra, my-exhibit-rus
-other-exhibit-fra, other-exhibit-rus
+my-site-fra, my-site-way, my-site-vie
+my-exhibit-fra, my-exhibit-vie
+other-exhibit-fra, other-exhibit-vie
 fourth-site
 ```
+
 Here, the first site is available in three languages, the second and third ones
 in two languages and the last is not translated (and can be omitted).
 
@@ -107,7 +112,7 @@ add the view helper somewhere in the file `layout.phtml`, generally in the
 header:
 
 ```php
-<?php echo $this->languageSwitcher(); ?>
+<?= $this->languageSwitcher() ?>
 <?php // Or better, to make the theme more generic and resilient in case of an upgrade: ?>
 <?php if ($this->getHelperPluginManager()->has('languageSwitcher')) echo $this->languageSwitcher(); ?>
 ```
@@ -118,70 +123,20 @@ and "locale_as_code". Other options are passed to the template.
 
 ### Properties
 
-The display of the translated properties requires some manual changes to be
-displayed. There are two ways to get translated properties: the first one
-requires to add five lines of code in the core, the second one implies many
-changes in the theme. Only one of them is needed, so choose the one according to
-your needs. Note that the method `displayTitle()` cannot be used to get the
-translated title in Omeka 2.
-
-#### Via the core (for Omeka < 2.1)
-
-Include patch [#1506] in the same file [`application/src/Api/Representation/AbstractResourceEntityRepresentation.php` ]:
-
-```php
-    public function title()
-    {
-        return $this->resource->getTitle();
-        $title = $this->resource->getTitle();
-
-        $eventManager = $this->getEventManager();
-        $args = $eventManager->prepareArgs(['title' => $title]);
-        $eventManager->trigger('rep.resource.title', $this, $args);
-
-        return $args['title'];
-    }
-```
-
-#### Via the theme
-
-##### Modification in the theme (Omeka <= 2.0.2 ; all versions for the title)
-
-Each time that the theme displays a value or a list of values of a resource, the
-code should use the helper `localeValue()`. This is the case in many places:
-
-```php
-// Replace:
-echo $item->value('dcterms:title');
-// By:
-$localeValue = $this->plugin('localeValue');
-echo $localeValue($item, 'dcterms:title');
-
-// To replace with $localeValue().
-echo $item->displayTitle();
-echo $item->displayDescription();
-
-// To replace by a manual hyperlink.
-echo $item->linkPretty();
-```
-
-Only the method `$resource->displayValues()` is automatically managed.
-
-Note that the template `common/resource-values.phtml` may need to be updated,
-because with some settings, all values of a property can be removed.
-
+Before the module version 3.3 (Omeka < 3.0), some changes were required in the
+core or in the them. See older readme for them.
 
 ### API external requests
 
 #### Translations
 
 To get the list of all the translations of the interface, you can use the module
-[ApiInfo] and go to https://example.org/api/infos/translations?locale=fr.
+[Api Info] and go to https://example.org/api/infos/translations?locale=fr.
 
 For a better output (or for people who don’t have a json viewer integrated to
 browser), you can add "&pretty_print=1" to the url. For a still better output,
 you can use the module [Next] that doesn’t escape unicode characters by default
-(waiting for upstream pull request [omeka/omeka-s#1493]).
+([omeka/omeka-s#1493]).
 
 Note that Omeka doesn’t separate admin and public strings.
 
@@ -189,7 +144,7 @@ Note that Omeka doesn’t separate admin and public strings.
 
 To translate the property labels (for example "Title" for dcterms:title), the
 resource class label ("Book" for bibo:Book) and the resource template label, the
-client can add `&ùse_locale=xx_YY` and `&use_template_label=1` to the api
+client can add `&use_locale=xx_YY` and `&use_template_label=1` to the api
 queries. In such way, the api will response for example French "Auteur" for the
 property "dcterms:creator" on a template "Book").
 
@@ -197,9 +152,9 @@ property "dcterms:creator" on a template "Book").
 TODO
 ----
 
-- [ ] Return original page when it is not translated in a site, instead of an error.
+- [ ] Return original page when it is not translated in a site, instead of an error (virtual instant mirror page).
 - [ ] Add links for easier browsing between translated pages.
-- [ ] Add a button to duplicate a site (item pool, pages and navigation, relations).
+- [x] Add a button to duplicate a site (item pool, pages and navigation, relations).
 - [ ] Add a button to duplicate a page or to append blocks of a page to another one.
 - [x] Add a button to apply settings of another site (except translatable content).
 - [ ] Add automatic selection of the site with the browser language.
@@ -227,7 +182,7 @@ your archives regularly so you can roll back if needed.
 Troubleshooting
 ---------------
 
-See online issues on the [module issues] page on GitHub.
+See online issues on the [module issues] page on GitLab.
 
 
 License
@@ -235,7 +190,7 @@ License
 
 ### Module
 
-This module is published under the [CeCILL v2.1] licence, compatible with
+This module is published under the [CeCILL v2.1] license, compatible with
 [GNU/GPL] and approved by [FSF] and [OSI].
 
 This software is governed by the CeCILL license under French law and abiding by
@@ -271,25 +226,25 @@ Copyright
 
 This module was built for [Watau].
 
-* Copyright Daniel Berthereau, 2019-2020 (see [Daniel-KM] on GitHub)
-* Copyright BibLibre, 2017 (see [BibLibre] on Github), for the switcher
+* Copyright Daniel Berthereau, 2019-2023 (see [Daniel-KM] on GitLab)
+* Copyright BibLibre, 2017 (see [BibLibre] on GitLab), for the switcher
 
 
-[Internationalisation]: https://github.com/Daniel-KM/Omeka-S-module-Internationalisation
+[Internationalisation]: https://gitlab.com/Daniel-KM/Omeka-S-module-Internationalisation
 [Omeka S]: https://omeka.org/s
 [MultiLanguage]: https://github.com/patrickmj/multilanguage
-[Locale Switcher]: https://github.com/Daniel-KM/Omeka-plugin-LocaleSwitcher
+[Locale Switcher]: https://gitlab.com/Daniel-KM/Omeka-plugin-LocaleSwitcher
 [Omeka Classic]: https://omeka.org/classic
-[Generic]: https://github.com/Daniel-KM/Omeka-S-module-Generic
-[Internationalisation.zip]: https://github.com/Daniel-KM/Omeka-S-module-Internationalisation/releases
-[Installing a module]: http://dev.omeka.org/docs/s/user-manual/modules/#installing-modules
+[Generic]: https://gitlab.com/Daniel-KM/Omeka-S-module-Generic
+[Internationalisation.zip]: https://gitlab.com/Daniel-KM/Omeka-S-module-Internationalisation/-/releases
+[Installing a module]: https://omeka.org/s/docs/user-manual/modules/#installing-modules
 [`application/src/Api/Representation/AbstractResourceEntityRepresentation.php`]: https://github.com/omeka/omeka-s/blob/v1.4.0/application/src/Api/Representation/AbstractResourceEntityRepresentation.php#L279
 [`application/src/Api/Representation/AbstractResourceEntityRepresentation.php` ]: https://github.com/omeka/omeka-s/blob/v1.4.0/application/src/Api/Representation/AbstractResourceEntityRepresentation.php#L489
 [#1506]: https://github.com/omeka/omeka-s/pull/1506/files
 [omeka/omeka-s#1493]: https://github.com/omeka/omeka-s/pull/1493
-[ApiInfo]: https://github.com/Daniel-KM/Omeka-S-module-ApiInfo
-[Next]: https://github.com/Daniel-KM/Omeka-S-module-Next
-[module issues]: https://github.com/Daniel-KM/Omeka-S-module-Internationalisation/issues
+[Api Info]: https://gitlab.com/Daniel-KM/Omeka-S-module-ApiInfo
+[Next]: https://gitlab.com/Daniel-KM/Omeka-S-module-Next
+[module issues]: https://gitlab.com/Daniel-KM/Omeka-S-module-Internationalisation/-/issues
 [CeCILL v2.1]: https://www.cecill.info/licences/Licence_CeCILL_V2.1-en.html
 [GNU/GPL]: https://www.gnu.org/licenses/gpl-3.0.html
 [FSF]: https://www.fsf.org
@@ -297,4 +252,5 @@ This module was built for [Watau].
 [flag icons]: https://github.com/lipis/flag-icon-css
 [Watau]: https://watau.fr
 [BibLibre]: https://github.com/BibLibre
-[Daniel-KM]: https://github.com/Daniel-KM "Daniel Berthereau"
+[GitLab]: https://gitlab.com/Daniel-KM
+[Daniel-KM]: https://gitlab.com/Daniel-KM "Daniel Berthereau"

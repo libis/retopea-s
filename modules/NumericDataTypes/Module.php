@@ -5,9 +5,9 @@ use Composer\Semver\Comparator;
 use Doctrine\Common\Collections\Criteria;
 use NumericDataTypes\Form\Element\ConvertToNumeric;
 use Omeka\Module\AbstractModule;
-use Zend\EventManager\Event;
-use Zend\EventManager\SharedEventManagerInterface;
-use Zend\ServiceManager\ServiceLocatorInterface;
+use Laminas\EventManager\Event;
+use Laminas\EventManager\SharedEventManagerInterface;
+use Laminas\ServiceManager\ServiceLocatorInterface;
 
 class Module extends AbstractModule
 {
@@ -125,7 +125,6 @@ class Module extends AbstractModule
             'Omeka\Api\Adapter\ItemAdapter',
             'api.preprocess_batch_update',
             function (Event $event) {
-                $adapter = $event->getTarget();
                 $data = $event->getParam('data');
                 $rawData = $event->getParam('request')->getContent();
                 if ($this->convertToNumericDataIsValid($rawData)) {
@@ -281,7 +280,7 @@ class Module extends AbstractModule
         }
         $adapter = $event->getTarget();
         $qb = $event->getParam('queryBuilder');
-        foreach ($this->getNumericDataTypes() as $dataTypeName => $dataType) {
+        foreach ($this->getNumericDataTypes() as $dataType) {
             $dataType->buildQuery($adapter, $qb, $query);
         }
     }
@@ -310,7 +309,7 @@ class Module extends AbstractModule
         if ('numeric' !== $namespace || !is_string($type) || !is_numeric($propertyId)) {
             return;
         }
-        foreach ($this->getNumericDataTypes() as $dataTypeName => $dataType) {
+        foreach ($this->getNumericDataTypes() as $dataType) {
             $dataType->sortQuery($adapter, $qb, $query, $type, $propertyId);
         }
     }
@@ -322,25 +321,27 @@ class Module extends AbstractModule
      */
     public function addSortings(Event $event)
     {
+        $numericDataTypes = $this->getNumericDataTypes();
         $qb = $this->getServiceLocator()->get('Omeka\EntityManager')->createQueryBuilder();
-        $qb->select('p')->from('Omeka\Entity\ResourceTemplateProperty', 'p');
-        foreach (array_values($this->getNumericDataTypes()) as $index => $dataType) {
-            $qb->orWhere("p.dataType = ?$index");
-            $qb->setParameter($index, $dataType->getName());
-        }
+        $qb->select(['p.id', 'p.label', 'rtp.dataType'])
+            ->from('Omeka\Entity\ResourceTemplateProperty', 'rtp')
+            ->innerJoin('rtp.property', 'p');
+        $qb->andWhere($qb->expr()->isNotNull('rtp.dataType'));
         $query = $qb->getQuery();
 
         $numericSortBy = [];
-        foreach ($query->getResult() as $templateProperty) {
-            $property = $templateProperty->getProperty();
-            $template = $templateProperty->getResourceTemplate();
-            $value = sprintf('%s:%s', $templateProperty->getDataType(), $property->getId());
-            if (!isset($numericSortBy[$value])) {
-                $numericSortBy[$value] = [
-                    'label' => sprintf('%s (%s)', $property->getLabel(), $templateProperty->getDataType()),
-                    'value' => $value,
-                    'template_labels' => [],
-                ];
+        foreach ($query->getResult() as $templatePropertyData) {
+            $dataTypes = $templatePropertyData['dataType'];
+            foreach ($dataTypes as $dataType) {
+                if (isset($numericDataTypes[$dataType])) {
+                    $value = sprintf('%s:%s', $dataType, $templatePropertyData['id']);
+                    if (!isset($numericSortBy[$value])) {
+                        $numericSortBy[$value] = [
+                            'label' => sprintf('%s (%s)', $templatePropertyData['label'], $dataType),
+                            'value' => $value,
+                        ];
+                    }
+                }
             }
         }
         // Sort options alphabetically.

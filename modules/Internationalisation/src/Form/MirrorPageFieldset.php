@@ -1,12 +1,12 @@
-<?php
+<?php declare(strict_types=1);
 namespace Internationalisation\Form;
 
 use Internationalisation\Form\Element\SitesPageSelect;
-use Zend\Form\Fieldset;
+use Laminas\Form\Fieldset;
 
 class MirrorPageFieldset extends Fieldset
 {
-    public function init()
+    public function init(): void
     {
         $this->add([
             'name' => 'o:block[__blockIndex__][o:data][page]',

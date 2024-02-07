@@ -1,9 +1,9 @@
-<?php
+<?php declare(strict_types=1);
 namespace Reference\Service\BlockLayout;
 
 use Interop\Container\ContainerInterface;
+use Laminas\ServiceManager\Factory\FactoryInterface;
 use Reference\Site\BlockLayout\Reference;
-use Zend\ServiceManager\Factory\FactoryInterface;
 
 class ReferenceFactory implements FactoryInterface
 {
@@ -14,10 +14,9 @@ class ReferenceFactory implements FactoryInterface
      */
     public function __invoke(ContainerInterface $services, $requestedName, array $options = null)
     {
-        $controllerPluginManager = $services->get('ControllerPluginManager');
+        $plugins = $services->get('ControllerPluginManager');
         return new Reference(
-            $controllerPluginManager->get('api'),
-            $controllerPluginManager->get('reference')
+            $plugins->get('api')
         );
     }
 }

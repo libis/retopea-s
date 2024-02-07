@@ -1,22 +1,29 @@
 <?php
 /**
- * @var \Zend\View\Renderer\PhpRenderer $this
+ * @var \Laminas\View\Renderer\PhpRenderer $this
  * @var \Omeka\Api\Representation\JobRepresentation $resource
  * @var \Omeka\Api\Representation\JobRepresentation $job
  * @var \Omeka\Form\ConfirmForm $confirmForm
  */
 
 // Copy of Omeka application/view/omeka/admin/job/show.phtml, with a link added in the bottom.
-// This process is currently simpler because the controller changed in the config in Omeka 1.2.1.
 
 $translate = $this->plugin('translate');
 $escape = $this->plugin('escapeHtml');
 $url = $this->plugin('url');
 $this->htmlElement('body')->appendAttribute('class', 'jobs show');
+
+$hasProgress = method_exists($job, 'step');
 if ($job->started()) {
     $started = $this->i18n()->dateFormat($job->started(), 'long', 'long');
+    if ($hasProgress) {
+        $step = $job->step();
+        $totalSteps = $job->totalSteps();
+        $progress = $totalSteps ? sprintf('%s / %s', $step, $totalSteps) : $translate('[undefined]');
+    }
 } else {
     $started = $translate('[not started]');
+    $progress = '-';
 }
 if ($job->ended()) {
     $ended = $this->i18n()->dateFormat($job->ended(), 'long', 'long');
@@ -29,64 +36,71 @@ if ($owner = $job->owner()) {
     $ownerText = $translate('[no owner]');
 }
 ?>
-<?php echo $this->pageTitle('#' . $escape($job->id()), 1, $translate('Jobs')); ?>
+
+<?= $this->pageTitle('#' . $escape($job->id()), 1, $translate('Jobs')) ?>
 <div id="page-actions">
     <?php if ('in_progress' == $job->status()): ?>
-        <?php echo $this->form($confirmForm); ?>
+        <?= $this->form($confirmForm) ?>
     <?php endif; ?>
 </div>
 
 <div class="meta-group">
-    <h4><?php echo $translate('Status'); ?></h4>
-    <div class="value"><?php echo $job->statusLabel(); ?></div>
+    <h4><?= $translate('Status') ?></h4>
+    <div class="value"><?= $job->statusLabel() ?></div>
+</div>
+<?php if ($hasProgress): ?>
+<div class="meta-group">
+    <h4><?= $translate('Progress') ?></h4>
+    <div class="value"><?= $progress ?></div>
+</div>
+<?php endif; ?>
+<div class="meta-group">
+    <h4><?= $translate('Started') ?></h4>
+    <div class="value"><?= $started ?></div>
 </div>
 <div class="meta-group">
-    <h4><?php echo $translate('Started'); ?></h4>
-    <div class="value"><?php echo $started; ?></div>
+    <h4><?= $translate('Ended') ?></h4>
+    <div class="value"><?= $ended ?></div>
 </div>
 <div class="meta-group">
-    <h4><?php echo $translate('Ended'); ?></h4>
-    <div class="value"><?php echo $ended; ?></div>
+    <h4><?= $translate('Class') ?></h4>
+    <div class="value"><?= $job->jobClass() ?></div>
 </div>
 <div class="meta-group">
-    <h4><?php echo $translate('Class'); ?></h4>
-    <div class="value"><?php echo $job->jobClass(); ?></div>
+    <h4><?= $translate('Owner') ?></h4>
+    <div class="value"><?= $ownerText ?></div>
 </div>
 <div class="meta-group">
-    <h4><?php echo $translate('Owner'); ?></h4>
-    <div class="value"><?php echo $ownerText; ?></div>
-</div>
-<div class="meta-group">
-    <h4><?php echo $translate('Args'); ?></h4>
+    <h4><?= $translate('Args') ?></h4>
     <?php if ($job->args()): ?>
-        <?php $args = json_encode($job->args(), JSON_PRETTY_PRINT); ?>
-        <div class="value"><pre><?php echo $args; ?></pre></div>
+        <?php $args = json_encode($job->args(), JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_LINE_TERMINATORS); ?>
+        <div class="value"><pre><?= $escape($args) ?></pre></div>
     <?php else: ?>
-    <div class="value"><?php echo $translate('[no args]') ?></div>
+    <div class="value"><?= $translate('[no args]') ?></div>
     <?php endif; ?>
 </div>
 <div class="meta-group">
-    <h4><?php echo $translate('Log'); ?></h4>
+    <h4><?= $translate('Log') ?></h4>
     <div class="value">
     <?php if ($job->log()): ?>
-    <?php echo $this->hyperlink($translate('view log'),
+    <?= $this->hyperlink($translate('view log'),
         $url(null, ['action' => 'log'], true),
-        ['target' => '_blank']); ?>
+        ['target' => '_blank']) ?>
     <?php else: ?>
-    <?php echo $translate('[no log]') ?>
+    <?= $translate('[no log]') ?>
     <?php endif; ?>
     </div>
 </div>
 <?php // Specific part for the module Log. ?>
 <div class="meta-group">
-    <h4><?php echo $translate('Log (database)'); ?></h4>
+    <h4><?= $translate('Log (database)') ?></h4>
     <div class="value">
-    <?php $totalLogs = $this->api()->search('logs', ['job_id' => $job->id()])->getTotalResults()?>
+    <?php $totalLogs = $this->api()->search('logs', ['job_id' => $job->id(), 'limit' => 0])->getTotalResults(); ?>
     <?php if ($totalLogs): ?>
-    <?php echo $this->hyperlink(sprintf($translate('View log (%d results)'), $totalLogs),
-        $url('admin/log/default', [], ['query' => ['job_id' => $job->id()]])); ?>
+    <?= $this->hyperlink(sprintf($translate('View log (%d results)'), $totalLogs),
+        $url('admin/log/default', [], ['query' => ['job_id' => $job->id()]])) ?>
     <?php else: ?>
-    <?php echo $translate('[no log]'); ?>
+    <?= $translate('[no log]') ?>
     <?php endif; ?>
     </div>
 </div>

@@ -8,13 +8,11 @@ use Omeka\Api\Exception\NotFoundException;
 use Omeka\Api\Representation\SiteRepresentation;
 use Omeka\Api\Representation\SitePageRepresentation;
 use Omeka\Api\Representation\SitePageBlockRepresentation;
-use Omeka\Entity\SitePageBlock;
 use Omeka\Module\Manager as ModuleManager;
 use Omeka\Site\BlockLayout\AbstractBlockLayout;
-use Omeka\Stdlib\ErrorStore;
 use Omeka\Stdlib\HtmlPurifier;
-use Zend\Form\Element;
-use Zend\View\Renderer\PhpRenderer;
+use Laminas\Form\Element;
+use Laminas\View\Renderer\PhpRenderer;
 
 abstract class AbstractMap extends AbstractBlockLayout
 {
@@ -41,6 +39,11 @@ abstract class AbstractMap extends AbstractBlockLayout
         $view->headScript()->appendFile($view->assetUrl('vendor/leaflet/leaflet.js', 'Mapping'));
         $view->headScript()->appendFile($view->assetUrl('js/control.default-view.js', 'Mapping'));
         $view->headScript()->appendFile($view->assetUrl('vendor/leaflet.providers/leaflet-providers.js', 'Mapping'));
+    }
+
+    public function prepareRender(PhpRenderer $view)
+    {
+        $view->headLink()->appendStylesheet($view->assetUrl('css/mapping.css', 'Mapping'));
     }
 
     public function form(PhpRenderer $view, SiteRepresentation $site,
@@ -171,7 +174,7 @@ abstract class AbstractMap extends AbstractBlockLayout
             if (isset($data['timeline']['timenav_position']) && in_array($data['timeline']['timenav_position'], ['full_width_below', 'full_width_above'])) {
                 $timeline['timenav_position'] = $data['timeline']['timenav_position'];
             }
-            if (isset($data['timeline']['data_type_properties'])) { 
+            if (isset($data['timeline']['data_type_properties'])) {
                 // Anticipate future use of multiple numeric properties per
                 // timeline by saving an array of properties.
                 if (is_string($data['timeline']['data_type_properties'])) {
@@ -182,7 +185,7 @@ abstract class AbstractMap extends AbstractBlockLayout
                         if (is_string($dataTypeProperty)) {
                             $dataTypeProperty = explode(':', $dataTypeProperty);
                             if (3 === count($dataTypeProperty)) {
-                                list($namespace, $type, $propertyId) = $dataTypeProperty;
+                                [$namespace, $type, $propertyId] = $dataTypeProperty;
                                 if ('numeric' === $namespace
                                     && in_array($type, ['timestamp', 'interval'])
                                     && is_numeric($propertyId)
@@ -316,6 +319,7 @@ abstract class AbstractMap extends AbstractBlockLayout
                 'url' => $media->thumbnailUrl('large'),
                 'thumbnail' => $media->thumbnailUrl('medium'),
                 'link' => $item->url(),
+                'alt' => $media->altTextResolved(),
             ];
         }
 
@@ -331,7 +335,7 @@ abstract class AbstractMap extends AbstractBlockLayout
                 'second' => $dateTime['second'],
             ];
         } elseif ('numeric:interval' === $dataType) {
-            list($intervalStart, $intervalEnd) = explode('/', $value->value());
+            [$intervalStart, $intervalEnd] = explode('/', $value->value());
             $dateTimeStart = Timestamp::getDateTimeFromValue($intervalStart);
             $event['start_date'] = [
                 'year' => $dateTimeStart['year'],

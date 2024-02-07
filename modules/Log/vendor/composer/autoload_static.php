@@ -4,27 +4,43 @@
 
 namespace Composer\Autoload;
 
-class ComposerStaticInite19fa5a902b0a73259048743d1ce6c68
+class ComposerStaticInitfbe6d1793a5a40a9ea0eb39f4ef7d081
 {
     public static $prefixLengthsPsr4 = array (
+        'O' => 
+        array (
+            'OomphInc\\ComposerInstallersExtender\\' => 36,
+        ),
         'L' => 
         array (
             'Log\\' => 4,
         ),
+        'C' => 
+        array (
+            'Composer\\Installers\\' => 20,
+        ),
     );
 
     public static $prefixDirsPsr4 = array (
+        'OomphInc\\ComposerInstallersExtender\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/oomphinc/composer-installers-extender/src',
+        ),
         'Log\\' => 
         array (
             0 => __DIR__ . '/../..' . '/src',
+        ),
+        'Composer\\Installers\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/composer/installers/src/Composer/Installers',
         ),
     );
 
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
-            $loader->prefixLengthsPsr4 = ComposerStaticInite19fa5a902b0a73259048743d1ce6c68::$prefixLengthsPsr4;
-            $loader->prefixDirsPsr4 = ComposerStaticInite19fa5a902b0a73259048743d1ce6c68::$prefixDirsPsr4;
+            $loader->prefixLengthsPsr4 = ComposerStaticInitfbe6d1793a5a40a9ea0eb39f4ef7d081::$prefixLengthsPsr4;
+            $loader->prefixDirsPsr4 = ComposerStaticInitfbe6d1793a5a40a9ea0eb39f4ef7d081::$prefixDirsPsr4;
 
         }, null, ClassLoader::class);
     }

@@ -1,9 +1,10 @@
-<?php
+<?php declare(strict_types=1);
+
 namespace BulkEdit\Mvc\Controller\Plugin;
 
 use Doctrine\ORM\EntityManager;
-use Zend\Log\LoggerInterface;
-use Zend\Mvc\Controller\Plugin\AbstractPlugin;
+use Laminas\Log\LoggerInterface;
+use Laminas\Mvc\Controller\Plugin\AbstractPlugin;
 
 class TrimValues extends AbstractPlugin
 {
@@ -49,7 +50,6 @@ class TrimValues extends AbstractPlugin
         // The entity manager can not be used directly, because it doesn't
         // manage regex.
         $connection = $this->entityManager->getConnection();
-        $logger = $this->logger;
 
         $idsString = is_null($resourceIds) ? '' : implode(',', $resourceIds);
 
@@ -63,48 +63,52 @@ class TrimValues extends AbstractPlugin
         ) {
             // The pattern is a full unicode one.
             $query = <<<'SQL'
-UPDATE value v
+UPDATE `value` AS `v`
 SET
-v.value = NULLIF(REGEXP_REPLACE(v.value, "^[\\s\\h\\v[:blank:][:space:]]+|[\\s\\h\\v[:blank:][:space:]]+$", ""), ""),
-v.lang = NULLIF(REGEXP_REPLACE(v.lang, "^[\\s\\h\\v[:blank:][:space:]]+|[\\s\\h\\v[:blank:][:space:]]+$", ""), ""),
-v.uri = NULLIF(REGEXP_REPLACE(v.uri, "^[\\s\\h\\v[:blank:][:space:]]+|[\\s\\h\\v[:blank:][:space:]]+$", ""), "")
+`v`.`value` = NULLIF(REGEXP_REPLACE(`v`.`value`, "^[\\s\\h\\v[:blank:][:space:]]+|[\\s\\h\\v[:blank:][:space:]]+$", ""), ""),
+`v`.`lang` = NULLIF(REGEXP_REPLACE(`v`.`lang`, "^[\\s\\h\\v[:blank:][:space:]]+|[\\s\\h\\v[:blank:][:space:]]+$", ""), ""),
+`v`.`uri` = NULLIF(REGEXP_REPLACE(`v`.`uri`, "^[\\s\\h\\v[:blank:][:space:]]+|[\\s\\h\\v[:blank:][:space:]]+$", ""), "")
 SQL;
         } else {
             // The pattern uses a simple trim.
             $query = <<<'SQL'
-UPDATE value v
+UPDATE `value` AS `v`
 SET
-v.value = NULLIF(TRIM(TRIM("\t" FROM TRIM("\n" FROM TRIM("\r" FROM TRIM("\n" FROM v.value))))), ""),
-v.lang = NULLIF(TRIM(TRIM("\t" FROM TRIM("\n" FROM TRIM("\r" FROM TRIM("\n" FROM v.lang))))), ""),
-v.uri = NULLIF(TRIM(TRIM("\t" FROM TRIM("\n" FROM TRIM("\r" FROM TRIM("\n" FROM v.uri))))), "")
+`v`.`value` = NULLIF(TRIM(TRIM("\t" FROM TRIM("\n" FROM TRIM("\r" FROM TRIM("\n" FROM `v`.`value`))))), ""),
+`v`.`lang` = NULLIF(TRIM(TRIM("\t" FROM TRIM("\n" FROM TRIM("\r" FROM TRIM("\n" FROM `v`.`lang`))))), ""),
+`v`.`uri` = NULLIF(TRIM(TRIM("\t" FROM TRIM("\n" FROM TRIM("\r" FROM TRIM("\n" FROM `v`.`uri`))))), "")
 SQL;
         }
 
         if ($idsString) {
             $query .= "\n" . <<<SQL
-WHERE v.resource_id IN ($idsString)
+WHERE `v`.`resource_id` IN ($idsString)
 SQL;
         }
 
-        $trimmed = $connection->exec($query);
-        $logger->info(sprintf('Trimmed %d values.', $trimmed));
+        $processed = $connection->executeStatement($query);
+        if ($processed) {
+            $this->logger->info(sprintf('Trimmed %d values.', $processed));
+        }
 
         // Remove empty values, even if there is a language.
         $query = <<<'SQL'
-DELETE FROM value
-WHERE value_resource_id IS NULL
-AND value IS NULL
-AND uri IS NULL
+DELETE FROM `value`
+WHERE `value_resource_id` IS NULL
+AND `value` IS NULL
+AND `uri` IS NULL
 SQL;
         if ($idsString) {
             $query .= "\n" . <<<SQL
-AND resource_id IN ($idsString)
+AND `resource_id` IN ($idsString)
 SQL;
         }
-        $deleted = $connection->exec($query);
-        $logger->info(sprintf('Removed %d empty string values after trimming.', $deleted));
 
-        return $trimmed;
+        $deleted = $connection->executeStatement($query);
+        if ($deleted) {
+            $this->logger->info(sprintf('Removed %d empty string values after trimming.', $deleted));
+        }
+        return $processed;
     }
 
     /**
@@ -123,8 +127,7 @@ SQL;
         $connection = $this->entityManager->getConnection();
 
         $sql = 'SHOW VARIABLES LIKE "version";';
-        $stmt = $connection->query($sql);
-        $version = $stmt->fetchAll(\PDO::FETCH_KEY_PAIR);
+        $version = $connection->executeQuery($sql)->fetchAllKeyValue();
         $version = reset($version);
 
         $isMySql = stripos($version, 'mysql') !== false;
@@ -142,8 +145,7 @@ SQL;
         }
 
         $sql = 'SHOW VARIABLES LIKE "innodb_version";';
-        $stmt = $connection->query($sql);
-        $version = $stmt->fetchAll(\PDO::FETCH_KEY_PAIR);
+        $version = $connection->executeQuery($sql)->fetchAllKeyValue();
         $version = reset($version);
         $isInnoDb = !empty($version);
         if ($isInnoDb) {

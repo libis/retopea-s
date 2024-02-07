@@ -1,6 +1,12 @@
 Generic Module (module for Omeka S)
 ===================================
 
+
+> __New versions of this module and support for Omeka S version 3.0 and above
+> are available on [GitLab], which seems to respect users and privacy better
+> than the previous repository.__
+
+
 [Generic Module] is a module for [Omeka S] that allows to manage all common one
 time tasks (install, config, settings management…) from the config of another
 module, so it avoids the developer to copy-paste common code between modules.
@@ -26,7 +32,7 @@ installed or not enabled in the admin modules panel.
 Usage (for developer)
 ---------------------
 
-*** Main Usage
+### Main Usage
 
 This module contains a generic abstract class `AbstractModule`, that extends
 itself the Omeka one, so make your module extends it.
@@ -69,35 +75,18 @@ class Module extends AbstractModule
 }
 ```
 
-*** Installing resources
+### Installing resources
 
-To install resources, you need to include another file, for example:
+To install resources, you need to include the file `InstallResources.php`. The
+files that contains vocabs, custom vocabs, and templates inside `data/` will be
+automatically imported.
 
-```
-    public function install(ServiceLocatorInterface $serviceLocator)
-    {
-        parent::install($serviceLocator);
 
-        $this->setServiceLocator($serviceLocator);
-        $this->installResources();
-    }
+TODO
+----
 
-    protected function installResources()
-    {
-        require_once dirname(__DIR__) . '/Generic/InstallResources.php';
-
-        $services = $this->getServiceLocator();
-        $installResources = new \Generic\InstallResources($services);
-        $installResources = $installResources();
-
-        // Check and install a resource template.
-        $installResources->createResourceTemplate($filepath);
-        ...
-    }
-```
-
-This second part of the module is still in development to install resources
-automatically.
+- [ ] Check version for themes.
+- [ ] Merge with EasyAdmin?
 
 
 Warning
@@ -112,13 +101,13 @@ your archives regularly so you can roll back if needed.
 Troubleshooting
 ---------------
 
-See online issues on the [module issues] page on GitHub.
+See online issues on the [module issues] page on GitLab.
 
 
 License
 -------
 
-This module is published under the [CeCILL v2.1] licence, compatible with
+This module is published under the [CeCILL v2.1] license, compatible with
 [GNU/GPL] and approved by [FSF] and [OSI].
 
 In consideration of access to the source code and the rights to copy, modify and
@@ -141,15 +130,16 @@ altered, and that no provisions are either added or removed herefrom.
 Copyright
 ---------
 
-* Copyright Daniel Berthereau, 2018-2019 (see [Daniel-KM] on GitHub)
+* Copyright Daniel Berthereau, 2018-2023 (see [Daniel-KM] on GitLab)
 
 
-[Generic module]: https://github.com/Daniel-KM/Omeka-S-module-Generic
+[Generic module]: https://gitlab.com/Daniel-KM/Omeka-S-module-Generic
 [Omeka S]: https://omeka.org/s
-[module issues]: https://github.com/Daniel-KM/Omeka-S-module-Generic/issues
+[GitLab]: https://gitlab.com/Daniel-KM/Omeka-S-module-Generic
+[module issues]: https://gitlab.com/Daniel-KM/Omeka-S-module-Generic/-/issues
 [CeCILL v2.1]: https://www.cecill.info/licences/Licence_CeCILL_V2.1-en.html
 [GNU/GPL]: https://www.gnu.org/licenses/gpl-3.0.html
 [FSF]: https://www.fsf.org
 [OSI]: http://opensource.org
-[MIT]: http://http://opensource.org/licenses/MIT
-[Daniel-KM]: https://github.com/Daniel-KM "Daniel Berthereau"
+[MIT]: http://opensource.org/licenses/MIT
+[Daniel-KM]: https://gitlab.com/Daniel-KM "Daniel Berthereau"

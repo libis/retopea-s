@@ -1,0 +1,46 @@
+<?php
+/**
+ * @var \Laminas\View\Renderer\PhpRenderer $this
+ * @var \BulkExport\Api\Representation\ExportRepresentation $export
+ * @var \BulkExport\Api\Representation\ExportRepresentation $resource
+ */
+
+$plugins = $this->getHelperPluginManager();
+$escape = $plugins->get('escapeHtml');
+$translate = $plugins->get('translate');
+$hyperlink = $plugins->get('hyperlink');
+
+$this->htmlElement('body')->appendAttribute('class', 'bulk-exports show');
+$this->headLink()->appendStylesheet($this->assetUrl('css/bulk-export-admin.css', 'BulkExport'));
+?>
+
+<?= $this->pageTitle($translate('Export'), 1, $translate('Bulk export')) ?>
+
+<nav class="section-nav">
+    <?= $this->navigation('Laminas\Navigation\BulkExport')->menu() ?>
+</nav>
+
+<div id="bulk-export">
+    <h2><?= $escape(sprintf($translate('Export #%d'), $export->id())) ?></h2>
+    <ul>
+        <li><?= sprintf($translate('Exporter: %s'), $export->exporter()->label()) ?></li>
+        <li><?= sprintf($translate('Owner: %s'), $export->owner() ? $hyperlink($export->owner()->name(), $export->owner()->adminUrl()) : $translate('[Unknown]')) ?></li>
+        <li><?= sprintf($translate('Comment: %s'), $export->comment()) ?></li>
+        <li><?= sprintf($translate('Status: %s'), $export->statusLabel()) ?></li>
+        <?php if ($v = $export->started()): ?>
+        <li><?= sprintf($translate('Started: %s'), $v->format('Y-m-d H:i:s')) ?></li>
+        <?php endif; ?>
+        <?php if ($v = $export->ended()): ?>
+        <li><?= sprintf($translate('Ended: %s'), $v->format('Y-m-d H:i:s')) ?></li>
+        <?php endif; ?>
+    </ul>
+    <h3><?= $escape($translate('Parameters')) ?></h3>
+    <h4><?= $escape($translate('Writer')) ?></h4>
+    <div class="value">
+        <pre><?php
+            echo $escape(json_encode($export->writerParams(), JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
+        ?></pre>
+    </div>
+    <h4><?= $escape($translate('Logs')) ?></h4>
+    <?= $this->hyperlink($translate('See logs'), $this->url('admin/bulk-export/id', ['controller' => 'export', 'action' => 'logs', 'id' => $export->id()])) ?>
+</div>

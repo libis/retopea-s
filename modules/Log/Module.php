@@ -1,7 +1,7 @@
-<?php
+<?php declare(strict_types=1);
 
 /*
- * Copyright Daniel Berthereau, 2017-2018
+ * Copyright Daniel Berthereau, 2017-2021
  *
  * This software is governed by the CeCILL license under French law and abiding
  * by the rules of distribution of free software.  You can use, modify and/ or
@@ -36,17 +36,35 @@ if (!class_exists(\Generic\AbstractModule::class)) {
 }
 
 use Generic\AbstractModule;
+use Laminas\Mvc\MvcEvent;
 use Omeka\Permissions\Assertion\OwnsEntityAssertion;
-use Zend\Mvc\MvcEvent;
 
 class Module extends AbstractModule
 {
-    const NAMESPACE = __NAMESPACE__;
+    public const NAMESPACE = __NAMESPACE__;
 
-    public function onBootstrap(MvcEvent $event)
+    public function onBootstrap(MvcEvent $event): void
     {
         parent::onBootstrap($event);
         $this->addAclRules();
+    }
+
+    protected function postInstall(): void
+    {
+        $services = $this->getServiceLocator();
+        $t = $services->get('MvcTranslator');
+        $messenger = new \Omeka\Mvc\Controller\Plugin\Messenger;
+        $config = $services->get('Config');
+        if (empty($config['logger']['log'])) {
+            $messenger->addError($t->translate("Logging is not active. You should enable it in the file config/local.config.php: `'log' => true`.")); // @translate
+        }
+        $messenger->addWarning($t->translate('You may need to update config/local.config.php to update your log settings.')); // @translate
+        $message = new \Omeka\Stdlib\Message(
+            $t->translate('See examples of config in the %sreadme%s.'), // @translate
+            '<a href="https://gitlab.com/Daniel-KM/Omeka-S-module-Log/#config" target="_blank">', '</a>'
+        );
+        $message->setEscapeHtml(false);
+        $messenger->addNotice($message);
     }
 
     /**
@@ -54,7 +72,7 @@ class Module extends AbstractModule
      *
      * @todo Keep rights for Annotation only (body and  target are internal classes).
      */
-    protected function addAclRules()
+    protected function addAclRules(): void
     {
         /** @var \Omeka\Permissions\Acl $acl */
         $services = $this->getServiceLocator();
@@ -62,7 +80,7 @@ class Module extends AbstractModule
 
         // The resources are added automatically by Omeka (@see \Omeka\Service\AclFactory::addResources).
 
-        // Nevertheless, acl should be specified, because log is not resource.
+        // Nevertheless, acl should be specified, because log is not a resource.
         $entityManagerFilters = $services->get('Omeka\EntityManager')->getFilters();
         $entityManagerFilters->enable('log_visibility');
         $entityManagerFilters->getFilter('log_visibility')->setAcl($acl);
@@ -84,57 +102,58 @@ class Module extends AbstractModule
 
         // TODO Check if not allowed to create log by api?
         // Everybody can create log.
-        $acl->allow(
-            null,
-            [
-                \Log\Api\Adapter\LogAdapter::class,
-                \Log\Entity\Log::class,
-            ],
-            ['create']
-        );
+        $acl
+            ->allow(
+                null,
+                [
+                    \Log\Api\Adapter\LogAdapter::class,
+                    \Log\Entity\Log::class,
+                ],
+                ['create']
+            )
 
-        // Everybody can see own logs, except guest user or visitors.
+            // Everybody can see own logs, except guest user or visitors.
+            ->allow(
+                $baseRoles,
+                [\Log\Entity\Log::class],
+                ['read'],
+                new OwnsEntityAssertion
+            )
+            ->allow(
+                $baseRoles,
+                [\Log\Api\Adapter\LogAdapter::class],
+                ['read', 'search']
+            )
+            ->allow(
+                $baseRoles,
+                [\Log\Controller\Admin\LogController::class],
+                ['browse', 'search', 'show-details']
+            )
 
-        $acl->allow(
-            $baseRoles,
-            [\Log\Entity\Log::class],
-            ['read'],
-            new OwnsEntityAssertion
-        );
-        $acl->allow(
-            $baseRoles,
-            [\Log\Api\Adapter\LogAdapter::class],
-            ['read', 'search']
-        );
-        $acl->allow(
-            $baseRoles,
-            [\Log\Controller\Admin\LogController::class],
-            ['browse', 'search', 'show-details']
-        );
+            ->allow(
+                $editorRoles,
+                [\Log\Entity\Log::class],
+                ['read', 'view-all']
+            )
+            ->allow(
+                $editorRoles,
+                [\Log\Api\Adapter\LogAdapter::class],
+                ['read', 'search']
+            )
+            ->allow(
+                $editorRoles,
+                [\Log\Controller\Admin\LogController::class],
+                ['browse', 'search', 'show-details']
+            )
 
-        $acl->allow(
-            $editorRoles,
-            [\Log\Entity\Log::class],
-            ['read', 'view-all']
-        );
-        $acl->allow(
-            $editorRoles,
-            [\Log\Api\Adapter\LogAdapter::class],
-            ['read', 'search']
-        );
-        $acl->allow(
-            $editorRoles,
-            [\Log\Controller\Admin\LogController::class],
-            ['browse', 'search', 'show-details']
-        );
-
-        $acl->allow(
-            $adminRoles,
-            [
-                \Log\Entity\Log::class,
-                \Log\Api\Adapter\LogAdapter::class,
-                \Log\Controller\Admin\LogController::class,
-            ]
-        );
+            ->allow(
+                $adminRoles,
+                [
+                    \Log\Entity\Log::class,
+                    \Log\Api\Adapter\LogAdapter::class,
+                    \Log\Controller\Admin\LogController::class,
+                ]
+            )
+        ;
     }
 }

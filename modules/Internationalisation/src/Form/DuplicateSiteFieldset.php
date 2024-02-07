@@ -1,17 +1,17 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Internationalisation\Form;
 
+use Laminas\Form\Element;
+use Laminas\Form\Fieldset;
+use Laminas\InputFilter\InputFilter;
 use Omeka\Form\Element\SiteSelect;
-use Zend\Form\Element;
-use Zend\Form\Fieldset;
-use Zend\InputFilter\InputFilter;
 
 class DuplicateSiteFieldset extends Fieldset
 {
     protected $label = 'Duplicate site'; // @translate
 
-    public function init()
+    public function init(): void
     {
         $isNew = (bool) $this->getOption('is_new');
 
@@ -29,8 +29,8 @@ class DuplicateSiteFieldset extends Fieldset
         }
 
         $this
-            ->setName('internationalisation')
-            ->setAttribute('id', 'internationalisation')
+            ->setName('duplicate')
+            ->setAttribute('id', 'duplicate')
             ->add([
                 'name' => 'is_new',
                 'type' => Element\Hidden::class,
@@ -102,8 +102,8 @@ class DuplicateSiteFieldset extends Fieldset
                     'name' => 'locale',
                     'type' => 'Omeka\Form\Element\LocaleSelect',
                     'options' => [
-                        'label' => 'Locale', // @translate
-                        'info' => 'Locale/language code for this site. Leave blank to use the global locale setting.', // @translate
+                        'label' => 'Locale/language code', // @translate
+                        'info' => 'Leave blank to use the global locale setting.', // @translate
                     ],
                     'attributes' => [
                         'id' => 'locale',
@@ -113,7 +113,7 @@ class DuplicateSiteFieldset extends Fieldset
         }
     }
 
-    public function updateInputFilter(InputFilter $inputFilter)
+    public function updateInputFilter(InputFilter $inputFilter): void
     {
         $inputFilter
             ->add([

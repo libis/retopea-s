@@ -1,15 +1,15 @@
-<?php
+<?php declare(strict_types=1);
+
 namespace Reference\Site\BlockLayout;
 
-use Omeka\Api\Representation\SitePageRepresentation;
+use Laminas\View\Renderer\PhpRenderer;
 use Omeka\Api\Representation\SitePageBlockRepresentation;
+use Omeka\Api\Representation\SitePageRepresentation;
 use Omeka\Api\Representation\SiteRepresentation;
 use Omeka\Entity\SitePageBlock;
 use Omeka\Mvc\Controller\Plugin\Api;
 use Omeka\Site\BlockLayout\AbstractBlockLayout;
 use Omeka\Stdlib\ErrorStore;
-use Reference\Mvc\Controller\Plugin\Reference as ReferencePlugin;
-use Zend\View\Renderer\PhpRenderer;
 
 class Reference extends AbstractBlockLayout
 {
@@ -24,20 +24,12 @@ class Reference extends AbstractBlockLayout
     protected $api;
 
     /**
-     * @var ReferencePlugin
-     */
-    protected $referencePlugin;
-
-    /**
      * @param Api $api
-     * @param ReferencePlugin $referencePlugin
      */
     public function __construct(
-        Api $api,
-        ReferencePlugin $referencePlugin
+        Api $api
     ) {
         $this->api = $api;
-        $this->referencePlugin = $referencePlugin;
     }
 
     public function getLabel()
@@ -45,51 +37,51 @@ class Reference extends AbstractBlockLayout
         return 'Reference'; // @translate
     }
 
-    public function onHydrate(SitePageBlock $block, ErrorStore $errorStore)
+    public function onHydrate(SitePageBlock $block, ErrorStore $errorStore): void
     {
         $data = $block->getData();
 
         // Check if data are already formatted, checking the main value.
-        if (!empty($data['args']['term'])) {
+        if (!empty($data['args']['fields'])) {
             return;
         }
 
-        if (!empty($data['args']['property'])) {
-            $data['args']['term'] = $data['args']['property'];
+        if (!empty($data['args']['properties'])) {
+            $data['args']['fields'] = $data['args']['properties'];
             $data['args']['type'] = 'properties';
-        } elseif (!empty($data['args']['resource_class'])) {
-            $data['args']['term'] = $data['args']['resource_class'];
+        } elseif (!empty($data['args']['resource_classes'])) {
+            $data['args']['fields'] = $data['args']['resource_classes'];
             $data['args']['type'] = 'resource_classes';
         } else {
-            $errorStore->addError('property', 'To create references, there must be a property or a resource class.'); // @translate
+            $errorStore->addError('properties', 'To create references, there must be one or more properties or resource classes.'); // @translate
             return;
         }
         if (empty($data['args']['resource_name'])) {
             $data['args']['resource_name'] = 'items';
         }
         $query = [];
-        parse_str($data['args']['query'], $query);
+        parse_str(ltrim((string) $data['args']['query'], "? \t\n\r\0\x0B"), $query);
         $data['args']['query'] = $query;
 
         $data['args']['order'] = empty($data['args']['order'])
             ? ['alphabetic' => 'ASC']
             : [strtok($data['args']['order'], ' ') => strtok(' ')];
 
-        // Make the search simpler and quicker later on display.
-        // TODO To be removed in Omeka 1.2.
-        $data['args']['termId'] = $this->api->searchOne($data['args']['type'], [
-            'term' => $data['args']['term'],
-        ])->getContent()->id();
+        $data['args']['languages'] = strlen(trim($data['args']['languages']))
+            ? array_unique(array_map('trim', explode('|', $data['args']['languages'])))
+            : [];
 
         // Normalize options.
-        $data['options']['link_to_single'] = (bool) $data['options']['link_to_single'];
-        $data['options']['custom_url'] = (bool) $data['options']['custom_url'];
-        $data['options']['skiplinks'] = (bool) $data['options']['skiplinks'];
-        $data['options']['headings'] = (bool) $data['options']['headings'];
-        $data['options']['total'] = (bool) $data['options']['total'];
+        $data['options']['by_initial'] = !empty($data['options']['by_initial']);
+        $data['options']['link_to_single'] = !empty($data['options']['link_to_single']);
+        $data['options']['custom_url'] = !empty($data['options']['custom_url']);
+        $data['options']['skiplinks'] = !empty($data['options']['skiplinks']);
+        $data['options']['headings'] = !empty($data['options']['headings']);
+        $data['options']['total'] = !empty($data['options']['total']);
+        $data['options']['list_by_max'] = (int) $data['options']['list_by_max'];
 
-        unset($data['args']['property']);
-        unset($data['args']['resource_class']);
+        unset($data['args']['properties']);
+        unset($data['args']['resource_classes']);
 
         $block->setData($data);
     }
@@ -112,7 +104,7 @@ class Reference extends AbstractBlockLayout
             $data = $block->data() + $defaultSettings;
             if (is_array($data['args']['query'])) {
                 $data['args']['query'] = urldecode(
-                    http_build_query($data['args']['query'], "\n", '&', PHP_QUERY_RFC3986)
+                    http_build_query($data['args']['query'], '', '&', PHP_QUERY_RFC3986)
                 );
             }
         } else {
@@ -120,19 +112,30 @@ class Reference extends AbstractBlockLayout
             $data['args']['query'] = 'site_id=' . $site->id();
         }
 
-        switch ($data['args']['type']) {
-            case 'resource_classes':
-                $data['args']['resource_class'] = $data['args']['term'];
-                break;
-            case 'properties':
-                $data['args']['property'] = $data['args']['term'];
-                break;
+        if (empty($data['args']['fields'])) {
+            // Nothing.
+        } else {
+            foreach ($data['args']['fields'] as $field) {
+                if ($this->isResourceClass($field)) {
+                    $data['args']['resource_classes'][] = $field;
+                } else {
+                    $data['args']['properties'][] = $field;
+                }
+            }
         }
-        unset($data['args']['terms']);
+        unset($data['args']['fields']);
 
-        $data['args']['order'] = key($data['args']['order']) . ' ' . reset($data['args']['order']);
+        $data['args']['order'] = (key($data['args']['order']) === 'alphabetic' ? 'alphabetic' : 'total') . ' ' . reset($data['args']['order']);
+
+        if (isset($data['args']['languages']) && is_array($data['args']['languages'])) {
+            $data['args']['languages'] = implode('|', $data['args']['languages']);
+        }
 
         $fieldset = $formElementManager->get($blockFieldset);
+        $fieldset
+            ->get('o:block[__blockIndex__][o:data][args]')
+            ->get('query')
+            ->setOption('query_resource_type', $data['resource_type'] ?? 'items');
         // TODO Fix set data for radio buttons.
         $fieldset->setData([
             'o:block[__blockIndex__][o:data][args]' => $data['args'],
@@ -141,12 +144,12 @@ class Reference extends AbstractBlockLayout
 
         $fieldset->prepare();
 
-        $html = '<p>' . $view->translate('Choose a property or a resource class.') . '</p>';
+        $html = '<p>' . $view->translate('Choose one or more properties or one or more resource classes.') . '</p>';
         $html .= $view->formCollection($fieldset);
         return $html;
     }
 
-    public function prepareRender(PhpRenderer $view)
+    public function prepareRender(PhpRenderer $view): void
     {
         $view->headLink()
             ->appendStylesheet($view->assetUrl('css/reference.css', 'Reference'));
@@ -155,26 +158,59 @@ class Reference extends AbstractBlockLayout
     public function render(PhpRenderer $view, SitePageBlockRepresentation $block)
     {
         $data = $block->data();
-        $args = $data['args'];
+        $args = $data['args'] + ['order' => ['alphabetic' => 'ASC']];
         $options = $data['options'];
 
-        $term = $args['term'];
-        $total = $this->referencePlugin->count(
-            $args['term'],
-            $args['type'],
-            $args['resource_name'],
+        // TODO Update forms and saved params.
+        // Use new format for references.
+        $fields = ['fields' => $args['fields']];
+        $query = $args['query'];
+        unset(
+            $args['fields'],
             $args['query']
         );
+        $options = $options + $args;
 
-        return $view->partial(
-            self::PARTIAL_NAME,
-            [
-                'block' => $block,
-                'term' => $term,
-                'total' => $total,
-                'args' => $args,
-                'options' => $options,
-            ]
-        );
+        $languages = @$options['languages'];
+        unset($options['languages']);
+        if ($languages) {
+            $options['filters']['languages'] = $languages;
+        }
+
+        $byInitial = !empty($options['by_initial']);
+        if ($byInitial) {
+            $options['filters']['begin'] = $view->params()->fromQuery('begin') ?: 'a';
+        }
+
+        $options['sort_order'] = reset($args['order']);
+        $options['sort_by'] = key($args['order']) === 'alphabetic' ? 'alphabetic' : 'total';
+        $options['per_page'] = 0;
+
+        $template = $options['template'] ?? self::PARTIAL_NAME;
+        unset($options['template']);
+
+        $vars = [
+            'fields' => $fields,
+            'query' => $query,
+            'options' => $options,
+        ];
+
+        return $template !== self::PARTIAL_NAME && $view->resolver($template)
+            ? $view->partial($template, $vars)
+            : $view->partial(self::PARTIAL_NAME, $vars);
+    }
+
+    protected function isResourceClass($term)
+    {
+        static $resourceClasses;
+
+        if (is_null($resourceClasses)) {
+            $resourceClasses = [];
+            foreach ($this->api->search('resource_classes')->getContent() as $resourceClass) {
+                $resourceClasses[$resourceClass->term()] = $resourceClass;
+            }
+        }
+
+        return isset($resourceClasses[$term]);
     }
 }

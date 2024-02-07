@@ -1,50 +1,80 @@
-<?php
+<?php declare(strict_types=1);
+
 namespace Log\Controller\Admin;
 
+use Laminas\Mvc\Controller\AbstractActionController;
+use Laminas\View\Model\ViewModel;
 use Log\Form\QuickSearchForm;
 use Log\Stdlib\PsrMessage;
 use Omeka\Form\ConfirmForm;
-use Zend\Mvc\Controller\AbstractActionController;
-use Zend\View\Model\ViewModel;
 
 class LogController extends AbstractActionController
 {
+    /**
+     * @var bool
+     */
+    protected $logDb;
+
+    public function __construct($logDb)
+    {
+        $this->logDb = $logDb;
+    }
+
     public function browseAction()
     {
         $this->setBrowseDefaults('created');
-        $response = $this->api()->search('logs', $this->params()->fromQuery());
-        $this->paginator($response->getTotalResults(), $this->params()->fromQuery('page'));
+
+        $params = $this->params()->fromQuery();
 
         $formSearch = $this->getForm(QuickSearchForm::class);
-        $formSearch->setAttribute('action', $this->url()->fromRoute(null, ['action' => 'browse'], true));
-        $formSearch->setAttribute('id', 'log-search');
-        if ($this->getRequest()->isPost()) {
-            $data = $this->params()->fromPost();
-            $formSearch->setData($data);
-        } elseif ($this->getRequest()->isGet()) {
-            $data = $this->params()->fromQuery();
-            $formSearch->setData($data);
+        $formSearch
+            ->setAttribute('action', $this->url()->fromRoute(null, ['action' => 'browse'], true))
+            ->setAttribute('id', 'log-search');
+        if ($params) {
+            $formSearch->setData($params);
+            // TODO Don't check validity?
         }
 
+        // TODO Manage multiple messages in/nin.
+        $params += ['message' => []];
+        if (!is_array($params['message'])) {
+            $params['message'] = [['text' => $params['message'], 'type' => 'in']];
+        }
+        if (isset($params['message_not']) && strlen($params['message_not'])) {
+            $params['message'][] = ['text' => $params['message_not'], 'type' => 'nin'];
+            unset($params['message_not']);
+        }
+        $response = $this->api()->search('logs', $params);
+        $this->paginator($response->getTotalResults(), $this->params()->fromQuery('page'));
+
         $formDeleteSelected = $this->getForm(ConfirmForm::class);
-        $formDeleteSelected->setAttribute('action', $this->url()->fromRoute('admin/log/default', ['action' => 'batch-delete'], true));
-        $formDeleteSelected->setButtonLabel('Confirm delete'); // @translate
-        $formDeleteSelected->setAttribute('id', 'confirm-delete-selected');
+        $formDeleteSelected
+            ->setAttribute('action', $this->url()->fromRoute('admin/log/default', ['action' => 'batch-delete'], true))
+            ->setAttribute('id', 'confirm-delete-selected');
+        $formDeleteSelected
+            ->setButtonLabel('Confirm delete'); // @translate
 
         $formDeleteAll = $this->getForm(ConfirmForm::class);
-        $formDeleteAll->setAttribute('action', $this->url()->fromRoute('admin/log/default', ['action' => 'batch-delete-all'], true));
-        $formDeleteAll->setButtonLabel('Confirm delete'); // @translate
-        $formDeleteAll->setAttribute('id', 'confirm-delete-all');
-        $formDeleteAll->get('submit')->setAttribute('disabled', true);
+        $formDeleteAll
+            ->setAttribute('action', $this->url()->fromRoute('admin/log/default', ['action' => 'batch-delete-all'], true))
+            ->setAttribute('id', 'confirm-delete-all')
+            ->get('submit')->setAttribute('disabled', true);
+        $formDeleteAll
+            ->setButtonLabel('Confirm delete'); // @translate
 
-        $view = new ViewModel;
         $logs = $response->getContent();
-        $view->setVariable('logs', $logs);
-        $view->setVariable('resources', $logs);
-        $view->setVariable('formSearch', $formSearch);
-        $view->setVariable('formDeleteSelected', $formDeleteSelected);
-        $view->setVariable('formDeleteAll', $formDeleteAll);
-        return $view;
+
+        if (!$this->logDb) {
+            $this->messenger()->addWarning('The logger is currently disabled for database. Check config/local.config.php.'); // @translate
+        }
+
+        return new ViewModel([
+            'logs' => $logs,
+            'resources' => $logs,
+            'formSearch' => $formSearch,
+            'formDeleteSelected' => $formDeleteSelected,
+            'formDeleteAll' => $formDeleteAll,
+        ]);
     }
 
     public function showDetailsAction()
@@ -54,10 +84,11 @@ class LogController extends AbstractActionController
         $log = $response->getContent();
 
         $view = new ViewModel;
-        $view->setTerminal(true);
-        $view->setVariable('linkTitle', $linkTitle);
-        $view->setVariable('resource', $log);
-        $view->setVariable('log', $log);
+        $view
+            ->setTerminal(true)
+            ->setVariable('linkTitle', $linkTitle)
+            ->setVariable('resource', $log)
+            ->setVariable('log', $log);
         return $view;
     }
 
@@ -68,13 +99,14 @@ class LogController extends AbstractActionController
         $log = $response->getContent();
 
         $view = new ViewModel;
-        $view->setTerminal(true);
-        $view->setTemplate('common/delete-confirm-details');
-        $view->setVariable('resource', $log);
-        $view->setVariable('resourceLabel', 'log'); // @translate
-        $view->setVariable('partialPath', 'log/admin/log/show-details');
-        $view->setVariable('linkTitle', $linkTitle);
-        $view->setVariable('log', $log);
+        $view
+            ->setTerminal(true)
+            ->setTemplate('common/delete-confirm-details')
+            ->setVariable('resource', $log)
+            ->setVariable('resourceLabel', 'log') // @translate
+            ->setVariable('partialPath', 'log/admin/log/show-details')
+            ->setVariable('linkTitle', $linkTitle)
+            ->setVariable('log', $log);
         return $view;
     }
 
@@ -142,6 +174,16 @@ class LogController extends AbstractActionController
         $form = $this->getForm(ConfirmForm::class);
         $form->setData($this->getRequest()->getPost());
         if ($form->isValid()) {
+            // TODO Manage multiple messages in/nin.
+            $query += ['message' => []];
+            if (!is_array($query['message'])) {
+                $query['message'] = [['text' => $query['message'], 'type' => 'in']];
+            }
+            if (isset($query['message_not']) && strlen($query['message_not'])) {
+                $query['message'][] = ['text' => $query['message_not'], 'type' => 'nin'];
+                unset($query['message_not']);
+            }
+
             $job = $this->jobDispatcher()->dispatch('Omeka\Job\BatchDelete', [
                 'resource' => 'logs',
                 'query' => $query,

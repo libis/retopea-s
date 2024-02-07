@@ -1,11 +1,11 @@
-<?php
+<?php declare(strict_types=1);
 namespace Log\Job;
 
 use DateTime;
 use Doctrine\ORM\EntityManager;
 use Log\Log\Writer\Job as JobWriter;
-use Omeka\Job\DispatchStrategy\StrategyInterface;
 use Omeka\Entity\Job;
+use Omeka\Job\DispatchStrategy\StrategyInterface;
 
 class Dispatcher extends \Omeka\Job\Dispatcher
 {
@@ -14,7 +14,7 @@ class Dispatcher extends \Omeka\Job\Dispatcher
      */
     protected $useJobWriter;
 
-    public function send(Job $job, StrategyInterface $strategy)
+    public function send(Job $job, StrategyInterface $strategy): void
     {
         // Keep the default writer if wanted.
         if ($this->useJobWriter) {
@@ -32,19 +32,27 @@ class Dispatcher extends \Omeka\Job\Dispatcher
             $strategy->send($job);
         } catch (\Exception $e) {
             $this->logger->err((string) $e);
-            $job->setStatus(Job::STATUS_ERROR);
-            $job->setEnded(new DateTime('now'));
 
             // Account for "inside Doctrine" errors that close the EM
             if ($this->entityManager->isOpen()) {
-                $entityManager = $this->entityManager;
+                $em = $this->entityManager;
             } else {
-                $entityManager = $this->getNewEntityManager($this->entityManager);
+                $em = $this->getNewEntityManager($this->entityManager);
             }
 
-            $entityManager->clear();
-            $entityManager->merge($job);
-            $entityManager->flush();
+            // Reload job that may have been updated during process, but keep
+            // the logs since the job object itself is up-to-date.
+            $em->clear();
+            try {
+                $jobEntity = $em->find(Job::class, $job->getId());
+            } catch (\Exception $e) {
+                return;
+            }
+            $jobEntity->setLog($job->getLog());
+            $jobEntity->setStatus(Job::STATUS_ERROR);
+            $jobEntity->setEnded(new DateTime('now'));
+            $em->persist($jobEntity);
+            $em->flush();
         }
     }
 
@@ -68,7 +76,7 @@ class Dispatcher extends \Omeka\Job\Dispatcher
         );
     }
 
-    public function useJobWriter($useJobWriter)
+    public function useJobWriter($useJobWriter): void
     {
         $this->useJobWriter = $useJobWriter;
     }

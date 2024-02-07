@@ -1,11 +1,11 @@
-<?php
+<?php declare(strict_types=1);
 
 /*
  * @author Daniel Berthereau
  * @license http://www.cecill.info/licences/Licence_CeCILL_V2.1-en.txt
- * @copyright Daniel Berthereau, 2017-2019
+ * @copyright Daniel Berthereau, 2017-2023
  *
- * Copyright 2017-2020 Daniel Berthereau
+ * Copyright 2017-2023 Daniel Berthereau
  *
  * This software is governed by the CeCILL license under French law and abiding
  * by the rules of distribution of free software. You can use, modify and/or
@@ -40,17 +40,17 @@ if (!class_exists(\Generic\AbstractModule::class)) {
 }
 
 use Generic\AbstractModule;
+use Laminas\EventManager\Event;
+use Laminas\EventManager\SharedEventManagerInterface;
 use Omeka\Module\Exception\ModuleCannotInstallException;
-use Zend\EventManager\Event;
-use Zend\EventManager\SharedEventManagerInterface;
 
 class Module extends AbstractModule
 {
     const NAMESPACE = __NAMESPACE__;
 
-    protected function preInstall()
+    protected function preInstall(): void
     {
-        $js = __DIR__ . '/asset/vendor/pdf.js/build/pdf.js';
+        $js = __DIR__ . '/asset/vendor/pdf.js/build/pdf.min.js';
         if (!file_exists($js)) {
             $services = $this->getServiceLocator();
             $t = $services->get('MvcTranslator');
@@ -63,7 +63,7 @@ class Module extends AbstractModule
         }
     }
 
-    public function attachListeners(SharedEventManagerInterface $sharedEventManager)
+    public function attachListeners(SharedEventManagerInterface $sharedEventManager): void
     {
         $sharedEventManager->attach(
             \Omeka\Form\SiteSettingsForm::class,
@@ -77,10 +77,12 @@ class Module extends AbstractModule
         );
     }
 
-    public function handleSiteSettingsFilters(Event $event)
+    public function handleSiteSettingsFilters(Event $event): void
     {
-        $inputFilter = $event->getParam('inputFilter');
-        $inputFilter->get('pdfviewer')
+        $inputFilter = version_compare(\Omeka\Module::VERSION, '4', '<')
+            ? $event->getParam('inputFilter')->get('pdfviewer')
+            : $event->getParam('inputFilter');
+        $inputFilter
             ->add([
                 'name' => 'pdfviewer_template',
                 'required' => false,

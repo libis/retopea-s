@@ -1,9 +1,10 @@
-<?php
+<?php declare(strict_types=1);
+
 namespace Reference\Service\BlockLayout;
 
 use Interop\Container\ContainerInterface;
+use Laminas\ServiceManager\Factory\FactoryInterface;
 use Reference\Site\BlockLayout\ReferenceTree;
-use Zend\ServiceManager\Factory\FactoryInterface;
 
 class ReferenceTreeFactory implements FactoryInterface
 {
@@ -17,7 +18,7 @@ class ReferenceTreeFactory implements FactoryInterface
         $controllerPluginManager = $services->get('ControllerPluginManager');
         return new ReferenceTree(
             $controllerPluginManager->get('api'),
-            $controllerPluginManager->get('reference')
+            $controllerPluginManager->get('referenceTree')
         );
     }
 }

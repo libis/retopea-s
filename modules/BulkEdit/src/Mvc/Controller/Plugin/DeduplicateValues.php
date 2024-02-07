@@ -1,9 +1,10 @@
-<?php
+<?php declare(strict_types=1);
+
 namespace BulkEdit\Mvc\Controller\Plugin;
 
 use Doctrine\ORM\EntityManager;
-use Zend\Log\LoggerInterface;
-use Zend\Mvc\Controller\Plugin\AbstractPlugin;
+use Laminas\Log\LoggerInterface;
+use Laminas\Mvc\Controller\Plugin\AbstractPlugin;
 
 class DeduplicateValues extends AbstractPlugin
 {
@@ -20,13 +21,20 @@ class DeduplicateValues extends AbstractPlugin
     protected $logger;
 
     /**
+     * @param bool
+     */
+    protected $supportAnyValue;
+
+    /**
      * @param EntityManager $entityManager
      * @param LoggerInterface $logger
+     * @param bool $supportAnyValue
      */
-    public function __construct(EntityManager $entityManager, LoggerInterface $logger)
+    public function __construct(EntityManager $entityManager, LoggerInterface $logger, bool $supportAnyValue)
     {
         $this->entityManager = $entityManager;
         $this->logger = $logger;
+        $this->supportAnyValue = $supportAnyValue;
     }
 
     /**
@@ -47,50 +55,73 @@ class DeduplicateValues extends AbstractPlugin
 
         // For large base, a temporary table is prefered to speed process.
         $connection = $this->entityManager->getConnection();
-        $logger = $this->logger;
+
+        // The query modifies the sql mode, so it should be reset.
+        $sqlMode = $connection->fetchOne('SELECT @@SESSION.sql_mode;');
 
         $query = is_null($resourceIds)
             ? $this->prepareQuery()
             : $this->prepareQueryForResourceIds($resourceIds);
 
-        $deduplicated = $connection->exec($query);
-        $logger->info(sprintf('Deduplicated %d values.', $deduplicated));
-        return $deduplicated;
+        $processed = $connection->executeStatement($query);
+
+        $connection->executeStatement("SET sql_mode = '$sqlMode';");
+
+        if ($processed) {
+            $this->logger->info(sprintf('Deduplicated %d values.', $processed));
+        }
+        return $processed;
     }
 
     protected function prepareQuery()
     {
-        return <<<'SQL'
-DROP TABLE IF EXISTS value_temporary;
-CREATE TEMPORARY TABLE value_temporary (id INT, PRIMARY KEY (id))
+        // TODO Remove "Any_value", but it cannot be replaced by "Min".
+        if ($this->supportAnyValue) {
+            $prefix = 'ANY_VALUE(';
+            $suffix = ')';
+        } else {
+            $prefix = $suffix = '';
+        }
+        return <<<SQL
+SET sql_mode=(SELECT REPLACE(@@sql_mode, 'ONLY_FULL_GROUP_BY', ''));
+DROP TABLE IF EXISTS `value_temporary`;
+CREATE TEMPORARY TABLE `value_temporary` (`id` INT, PRIMARY KEY (`id`))
 AS
-    SELECT id
-    FROM value
-    GROUP BY resource_id, property_id, value_resource_id, type, lang, value, uri, is_public;
-DELETE v FROM value v
-LEFT JOIN value_temporary value_temporary
-    ON value_temporary.id = v.id
-WHERE value_temporary.id IS NULL;
-DROP TABLE IF EXISTS value_temporary;
+    SELECT $prefix`id`$suffix
+    FROM `value`
+    GROUP BY `resource_id`, `property_id`, `value_resource_id`, `type`, `lang`, `value`, `uri`, `is_public`;
+DELETE `v` FROM `value` AS `v`
+LEFT JOIN `value_temporary` AS `value_temporary`
+    ON `value_temporary`.`id` = `v`.`id`
+WHERE `value_temporary`.`id` IS NULL;
+DROP TABLE IF EXISTS `value_temporary`;
 SQL;
     }
 
     protected function prepareQueryForResourceIds(array $resourceIds)
     {
+        if ($this->supportAnyValue) {
+            $prefix = 'ANY_VALUE(';
+            $suffix = ')';
+        } else {
+            $prefix = $suffix = '';
+        }
         $idsString = implode(',', $resourceIds);
         return <<<SQL
-CREATE TEMPORARY TABLE value_temporary (id INT, PRIMARY KEY (id))
+SET sql_mode=(SELECT REPLACE(@@sql_mode, 'ONLY_FULL_GROUP_BY', ''));
+DROP TABLE IF EXISTS `value_temporary`;
+CREATE TEMPORARY TABLE `value_temporary` (`id` INT, PRIMARY KEY (`id`))
 AS
-    SELECT id
-    FROM value
-    WHERE resource_id IN ($idsString)
-    GROUP BY resource_id, property_id, value_resource_id, type, lang, value, uri, is_public;
-DELETE v FROM value v
-    LEFT JOIN value_temporary value_temporary
-    ON value_temporary.id = v.id
-WHERE resource_id IN ($idsString)
-    AND value_temporary.id IS NULL;
-DROP TABLE IF EXISTS value_temporary;
+    SELECT $prefix`id`$suffix
+    FROM `value`
+    WHERE `resource_id` IN ($idsString)
+    GROUP BY `resource_id`, `property_id`, `value_resource_id`, `type`, `lang`, `value`, `uri`, `is_public`;
+DELETE `v` FROM `value` AS `v`
+    LEFT JOIN `value_temporary` AS `value_temporary`
+    ON `value_temporary`.`id` = `v`.`id`
+WHERE `resource_id` IN ($idsString)
+    AND `value_temporary`.`id` IS NULL;
+DROP TABLE IF EXISTS `value_temporary`;
 SQL;
     }
 }

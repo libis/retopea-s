@@ -1,7 +1,8 @@
-<?php
+<?php declare(strict_types=1);
+
 namespace Internationalisation\View\Helper;
 
-use Zend\View\Helper\AbstractHelper;
+use Laminas\View\Helper\AbstractHelper;
 
 /**
  * View helper to get country from a locale id.
@@ -41,14 +42,16 @@ class LocaleToCountry extends AbstractHelper
      * Get the country from the locale, if possible.
      *
      * @param string $locale
-     * @return string Uppercase two letters code, or empty.
+     * @return string Uppercase two letters code, or empty string.
      */
-    public function __invoke($locale)
+    public function __invoke($string locale): string
     {
-        if (strlen($locale) == 2) {
-            return isset($this->countriesByLocale[$locale])
-                ? $this->countriesByLocale[$locale]
-                : '';
+        if (isset($this->countriesByLocale[$locale])) {
+            return $this->countriesByLocale[$locale];
+        }
+
+        if (strlen($locale) === 2) {
+            return '';
         }
 
         $matches = [];

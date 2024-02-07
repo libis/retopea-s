@@ -7,11 +7,11 @@ use NumericDataTypes\Form\Element\Interval as IntervalElement;
 use Omeka\Api\Adapter\AbstractEntityAdapter;
 use Omeka\Api\Adapter\AdapterInterface;
 use Omeka\Api\Representation\ValueRepresentation;
+use Omeka\DataType\ValueAnnotatingInterface;
 use Omeka\Entity\Value;
-use Zend\Form\Element;
-use Zend\View\Renderer\PhpRenderer;
+use Laminas\View\Renderer\PhpRenderer;
 
-class Interval extends AbstractDateTimeDataType
+class Interval extends AbstractDateTimeDataType implements ValueAnnotatingInterface
 {
     public function getName()
     {
@@ -20,7 +20,7 @@ class Interval extends AbstractDateTimeDataType
 
     public function getLabel()
     {
-        return 'Interval';
+        return 'Interval'; // @translate
     }
 
     public function getJsonLd(ValueRepresentation $value)
@@ -86,19 +86,16 @@ class Interval extends AbstractDateTimeDataType
         $value->setValueResource(null);
     }
 
-    public function render(PhpRenderer $view, ValueRepresentation $value)
+    public function render(PhpRenderer $view, ValueRepresentation $value, $options = [])
     {
         if (!$this->isValid(['@value' => $value->value()])) {
             return $value->value();
         }
+        $options['lang'] = $options['lang'] ?? $view->lang();
         list($intervalStart, $intervalEnd) = explode('/', $value->value());
-        $dateStart = $this->getDateTimeFromValue($intervalStart);
-        $dateEnd = $this->getDateTimeFromValue($intervalEnd, false);
-        return sprintf(
-            '%s – %s',
-            $dateStart['date']->format($dateStart['format_render']),
-            $dateEnd['date']->format($dateEnd['format_render'])
-        );
+        $dateStart = $this->getFormattedDateTimeFromValue($intervalStart, true, $options);
+        $dateEnd = $this->getFormattedDateTimeFromValue($intervalEnd, false, $options);
+        return sprintf('%s – %s', $dateStart, $dateEnd);
     }
 
     public function getFulltextText(PhpRenderer $view, ValueRepresentation $value)
@@ -151,5 +148,14 @@ class Interval extends AbstractDateTimeDataType
                 $adapter->createNamedParameter($qb, $number)
             ));
         }
+    }
+
+    public function valueAnnotationPrepareForm(PhpRenderer $view)
+    {
+    }
+
+    public function valueAnnotationForm(PhpRenderer $view)
+    {
+        return $this->form($view);
     }
 }

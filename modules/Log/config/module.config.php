@@ -1,4 +1,5 @@
-<?php
+<?php declare(strict_types=1);
+
 namespace Log;
 
 return [
@@ -25,13 +26,16 @@ return [
             'db' => true,
             // This is the default log file of Omeka (logs/application.log).
             'stream' => true,
-            // Log for Omeka jobs (useless with this module, but kept for testing purpose).
+            // Log for Omeka jobs (useless with this module).
             // This is a standard Zend writer, but there is no more parameters.
-            'job' => true,
+            // Note: the default log of job is a big text field (4GB), so it may
+            // prevent to restore a database if they a row is too big (bigger than
+            // the param "max_allowed_packet" in the config of mariadb/mysql).
+            'job' => false,
             // This is the default log for php. On a web server, it may be a log inside /var/log
             // like /var/log/nginx/ssl-vhost1.error.log, /var/log/apache2/error.log, /var/log/lastlog, or
             // /tmp/systemd-private-xxx-apache2.service-xxx/tmp/php_errors.log, etc.
-            'syslog' => true,
+            'syslog' => false,
             // Config for sentry, an error tracking service (https://sentry.io).
             // See readme to enable it.
             'sentry' => false,
@@ -43,10 +47,10 @@ return [
                 'db' => [
                     'name' => 'db',
                     'options' => [
-                        'filters' => \Zend\Log\Logger::INFO,
+                        'filters' => \Laminas\Log\Logger::DEBUG,
                         'formatter' => Formatter\PsrLogDb::class,
                         'db' => null,
-                        // 'db' => new \Zend\Db\Adapter\Adapter([
+                        // 'db' => new \Laminas\Db\Adapter\Adapter([
                         //     'driver' => 'mysqli',
                         //     'database' =>null,
                         //     'username' => null,
@@ -74,7 +78,7 @@ return [
                     'name' => 'stream',
                     'options' => [
                         // This is the default level in the standard config.
-                        'filters' => \Zend\Log\Logger::NOTICE,
+                        'filters' => \Laminas\Log\Logger::NOTICE,
                         'formatter' => Formatter\PsrLogSimple::class,
                         'stream' => OMEKA_PATH . '/logs/application.log',
                     ],
@@ -82,13 +86,13 @@ return [
                 'syslog' => [
                     'name' => 'syslog',
                     'options' => [
-                        'filters' => \Zend\Log\Logger::ERR,
+                        'filters' => \Laminas\Log\Logger::ERR,
                         'formatter' => Formatter\PsrLogSimple::class,
                         'application' => 'omeka-s',
                         'facility' => LOG_USER,
                     ],
                 ],
-                // See https://github.com/facile-it/sentry-module#log-writer
+                // See https://gitlab.com/facile-it/sentry-module#log-writer
                 'sentry' => [
                     'name' => \Facile\SentryModule\Log\Writer\Sentry::class,
                     'options' => [
@@ -96,7 +100,7 @@ return [
                             [
                                 'name' => 'priority',
                                 'options' => [
-                                    'priority' => \Zend\Log\Logger::INFO,
+                                    'priority' => \Laminas\Log\Logger::INFO,
                                 ],
                             ],
                         ],
@@ -108,7 +112,7 @@ return [
                     'name' => Processor\UserId::class,
                 ],
             ],
-            // Special options for exceptions, errors and fatal errors, disabled by Zend by default.
+            // Special options for exceptions, errors and fatal errors, disabled by Laminas by default.
             // Note that it may disable the default error logging of php and debug tools.
             // 'exceptionhandler' => true,
             // 'errorhandler' => true,
@@ -149,8 +153,8 @@ return [
         ],
     ],
     'controllers' => [
-        'invokables' => [
-            Controller\Admin\LogController::class => Controller\Admin\LogController::class,
+        'factories' => [
+            Controller\Admin\LogController::class => Service\Controller\Admin\LogControllerFactory::class,
         ],
     ],
     'controller_plugins' => [
@@ -183,7 +187,7 @@ return [
             'admin' => [
                 'child_routes' => [
                     'log' => [
-                        'type' => \Zend\Router\Http\Literal::class,
+                        'type' => \Laminas\Router\Http\Literal::class,
                         'options' => [
                             'route' => '/log',
                             'defaults' => [
@@ -195,7 +199,7 @@ return [
                         'may_terminate' => true,
                         'child_routes' => [
                             'default' => [
-                                'type' => \Zend\Router\Http\Segment::class,
+                                'type' => \Laminas\Router\Http\Segment::class,
                                 'options' => [
                                     'route' => '/:action',
                                     'constraints' => [
@@ -207,7 +211,7 @@ return [
                                 ],
                             ],
                             'id' => [
-                                'type' => \Zend\Router\Http\Segment::class,
+                                'type' => \Laminas\Router\Http\Segment::class,
                                 'options' => [
                                     'route' => '/:id[/:action]',
                                     'constraints' => [

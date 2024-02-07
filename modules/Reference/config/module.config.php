@@ -1,18 +1,33 @@
-<?php
+<?php declare(strict_types=1);
+
 namespace Reference;
 
 return [
+    'entity_manager' => [
+        'mapping_classes_paths' => [
+            dirname(__DIR__) . '/src/Entity',
+        ],
+        'proxy_paths' => [
+            dirname(__DIR__) . '/data/doctrine-proxies',
+        ],
+        'functions' => [
+            'string' => [
+                'any_value' => \DoctrineExtensions\Query\Mysql\AnyValue::class,
+            ],
+        ],
+    ],
     'view_manager' => [
         'template_path_stack' => [
             dirname(__DIR__) . '/view',
         ],
-        'strategies' => [
-            'ViewJsonStrategy',
-        ],
     ],
     'view_helpers' => [
         'factories' => [
-            'reference' => Service\ViewHelper\ReferenceFactory::class,
+            'references' => Service\ViewHelper\ReferencesFactory::class,
+        ],
+        'aliases' => [
+            /** @deprecated Since release for Omeka 3. */
+            'reference' => 'references',
         ],
     ],
     'block_layouts' => [
@@ -24,22 +39,32 @@ return [
     ],
     'form_elements' => [
         'invokables' => [
+            Form\Element\DoubleArrayTextarea::class => Form\Element\DoubleArrayTextarea::class,
+            Form\Element\OptionalMultiCheckbox::class => Form\Element\OptionalMultiCheckbox::class,
+            Form\SettingsFieldset::class => Form\SettingsFieldset::class,
+            Form\SiteSettingsFieldset::class => Form\SiteSettingsFieldset::class,
             Form\ReferenceFieldset::class => Form\ReferenceFieldset::class,
             Form\ReferenceIndexFieldset::class => Form\ReferenceIndexFieldset::class,
             Form\ReferenceTreeFieldset::class => Form\ReferenceTreeFieldset::class,
         ],
-        'factories' => [
-            Form\ConfigForm::class => Service\Form\ConfigFormFactory::class,
+        'aliases' => [
+            'DoubleArrayTextarea' => Form\Element\DoubleArrayTextarea::class,
+            'OptionalMultiCheckbox' => Form\Element\OptionalMultiCheckbox::class,
         ],
     ],
     'controllers' => [
         'invokables' => [
             Controller\Site\ReferenceController::class => Controller\Site\ReferenceController::class,
         ],
+        'factories' => [
+            Controller\ApiController::class => Service\Controller\ApiControllerFactory::class,
+        ],
     ],
     'controller_plugins' => [
         'factories' => [
-            'reference' => Service\ControllerPlugin\ReferenceFactory::class,
+            'currentReferenceMetadata' => Service\ControllerPlugin\CurrentReferenceMetadataFactory::class,
+            'references' => Service\ControllerPlugin\ReferencesFactory::class,
+            'referenceTree' => Service\ControllerPlugin\ReferenceTreeFactory::class,
         ],
     ],
     'router' => [
@@ -47,7 +72,7 @@ return [
             'site' => [
                 'child_routes' => [
                     'reference' => [
-                        'type' => \Zend\Router\Http\Literal::class,
+                        'type' => \Laminas\Router\Http\Literal::class,
                         'options' => [
                             'route' => '/reference',
                             'defaults' => [
@@ -59,7 +84,7 @@ return [
                         'may_terminate' => true,
                         'child_routes' => [
                             'list' => [
-                                'type' => \Zend\Router\Http\Segment::class,
+                                'type' => \Laminas\Router\Http\Segment::class,
                                 'options' => [
                                     'route' => '/:slug',
                                     'constraints' => [
@@ -72,7 +97,7 @@ return [
                                 'may_terminate' => true,
                                 'child_routes' => [
                                     'output' => [
-                                        'type' => \Zend\Router\Http\Segment::class,
+                                        'type' => \Laminas\Router\Http\Segment::class,
                                         'options' => [
                                             'route' => '.:output',
                                             'constraints' => [
@@ -84,14 +109,19 @@ return [
                             ],
                         ],
                     ],
-                    'reference_tree' => [
-                        'type' => \Zend\Router\Http\Literal::class,
+                ],
+            ],
+            'api' => [
+                'child_routes' => [
+                    'reference' => [
+                        'type' => \Laminas\Router\Http\Segment::class,
                         'options' => [
-                            'route' => '/reference-tree',
+                            'route' => '/references[/:resource]',
+                            'constraints' => [
+                                'resource' => 'items|item_sets|media|annotations',
+                            ],
                             'defaults' => [
-                                '__NAMESPACE__' => 'Reference\Controller\Site',
-                                'controller' => Controller\Site\ReferenceController::class,
-                                'action' => 'tree',
+                                'controller' => Controller\ApiController::class,
                             ],
                         ],
                     ],
@@ -110,79 +140,82 @@ return [
         ],
     ],
     'reference' => [
-        'config' => [
+        'site_settings' => [
+            'reference_page_title' => '',
             'reference_resource_name' => 'items',
-            'reference_link_to_single' => true,
-            'reference_custom_url' => false,
-            'reference_total' => true,
-            'reference_search_list_values' => false,
+            'reference_options' => [
+                'headings',
+                'skiplinks',
+                'total',
+                'link_to_single',
+                // 'custom_url',
+            ],
             // Pages ("properties" or "resource_classes") to provide, by slug.
             'reference_slugs' => [
-                // 3 is the property id of Dublin Core Terms Subject, forced during install.
-                'dcterms:subject' => [
-                    'type' => 'properties',
-                    'term' => 3,
+                'dcterms-subject' => [
+                    'term' => 'dcterms:subject',
                     'label' => 'Subject',
-                    'active' => true,
                 ],
             ],
-            'reference_list_skiplinks' => true,
-            'reference_list_headings' => true,
-            'reference_tree_enabled' => false,
-            'reference_tree_term' => 'dcterms:subject',
-            'reference_tree_hierarchy' => [],
-            'reference_tree_branch' => false,
-            'reference_tree_query_type' => 'eq',
-            'reference_tree_expanded' => true,
         ],
         // Default for blocks.
         'block_settings' => [
             'reference' => [
                 'args' => [
-                    'term' => 'dcterms:subject',
+                    'fields' => [
+                        'dcterms:subject',
+                    ],
                     'type' => 'properties',
                     'resource_name' => 'items',
                     'order' => ['alphabetic' => 'ASC'],
                     'query' => '',
+                    'languages' => [],
                 ],
                 'options' => [
+                    'heading' => 'Subjects', // @translate
+                    'by_initial' => false,
                     'link_to_single' => true,
                     'custom_url' => false,
-                    'heading' => 'Subjects', // @translate
                     'skiplinks' => true,
                     'headings' => true,
                     'total' => true,
+                    'list_by_max' => 0,
+                    'subject_property' => null,
+                    'template' => '',
                 ],
             ],
             'referenceIndex' => [
                 'args' => [
-                    'terms' => ['dcterms:subject'],
+                    'fields' => [
+                        'dcterms:subject',
+                    ],
                     'type' => 'properties',
                     'resource_name' => 'items',
                     'order' => ['alphabetic' => 'ASC'],
                     'query' => '',
+                    'languages' => [],
                 ],
                 'options' => [
                     'heading' => 'Reference index', // @translate
                     'total' => true,
+                    'template' => '',
                 ],
             ],
             'referenceTree' => [
-                'args' => [
-                    'term' => 'dcterms:subject',
-                    'tree' => [],
-                    'resource_name' => 'items',
-                    'query' => '',
+                'heading' => 'Tree of subjects', // @translate
+                'fields' => [
+                    'dcterms:subject',
                 ],
-                'options' => [
-                    'query_type' => 'eq',
-                    'link_to_single' => true,
-                    'custom_url' => false,
-                    'heading' => 'Tree of subjects', // @translate
-                    'total' => true,
-                    'branch' => false,
-                    'expanded' => true,
-                ],
+                'tree' => [],
+                'resource_name' => 'items',
+                'query' => [],
+                'query_type' => 'eq',
+                'link_to_single' => true,
+                'custom_url' => false,
+                'total' => true,
+                'branch' => false,
+                'expanded' => true,
+                'template' => '',
             ],
         ],
     ],

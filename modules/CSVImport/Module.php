@@ -2,9 +2,8 @@
 namespace CSVImport;
 
 use Omeka\Module\AbstractModule;
-use Omeka\Entity\Job;
-use Zend\ModuleManager\ModuleManager;
-use Zend\ServiceManager\ServiceLocatorInterface;
+use Laminas\ModuleManager\ModuleManager;
+use Laminas\ServiceManager\ServiceLocatorInterface;
 
 class Module extends AbstractModule
 {

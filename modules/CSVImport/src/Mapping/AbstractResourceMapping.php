@@ -3,8 +3,8 @@ namespace CSVImport\Mapping;
 
 use CSVImport\Mvc\Controller\Plugin\FindResourcesFromIdentifiers;
 use Omeka\Stdlib\Message;
-use Zend\ServiceManager\ServiceLocatorInterface;
-use Zend\View\Renderer\PhpRenderer;
+use Laminas\ServiceManager\ServiceLocatorInterface;
+use Laminas\View\Renderer\PhpRenderer;
 
 abstract class AbstractResourceMapping extends AbstractMapping
 {
@@ -56,7 +56,9 @@ abstract class AbstractResourceMapping extends AbstractMapping
                 $values = [$values];
             } else {
                 $values = explode($multivalueSeparator, $values);
-                $values = array_map(function ($v) { return trim($v); }, $values);
+                $values = array_map(function ($v) {
+                    return trim($v);
+                }, $values);
             }
             $values = array_filter($values, 'strlen');
             if ($values) {
@@ -94,7 +96,7 @@ abstract class AbstractResourceMapping extends AbstractMapping
             $data['o:resource_template'] = ['o:id' => (int) $this->args['o:resource_template']['o:id']];
         }
         if (!empty($this->args['o:resource_class']['o:id'])) {
-            $data['o:resource_class'] = ['o:id' => (int) $this->args['o:resource_class']['o:id']];;
+            $data['o:resource_class'] = ['o:id' => (int) $this->args['o:resource_class']['o:id']];
         }
         if (!empty($this->args['o:owner']['o:id'])) {
             $data['o:owner'] = ['o:id' => (int) $this->args['o:owner']['o:id']];
@@ -123,6 +125,7 @@ abstract class AbstractResourceMapping extends AbstractMapping
     protected function processGlobalArgsItem()
     {
         $data = &$this->data;
+        $action = $this->args['action'];
 
         // Set columns.
         if (isset($this->args['column-item_set'])) {
@@ -136,6 +139,17 @@ abstract class AbstractResourceMapping extends AbstractMapping
             foreach ($this->args['o:item_set'] as $id) {
                 $data['o:item_set'][] = ['o:id' => (int) $id];
             }
+        }
+
+        // Set site assignments
+        if (!empty($this->args['o:site'])) {
+            $data['o:site'] = [];
+            foreach ($this->args['o:site'] as $id) {
+                $data['o:site'][] = ['o:id' => (int) $id];
+            }
+        } elseif ($action === \CSVImport\Job\Import::ACTION_CREATE) {
+            // Allow assignment of no sites when creating
+            $data['o:site'] = [];
         }
     }
 

@@ -1,22 +1,26 @@
 Pdf Viewer (module for Omeka S)
 ===============================
 
+> __New versions of this module and support for Omeka S version 3.0 and above
+> are available on [GitLab], which seems to respect users and privacy better
+> than the previous repository.__
+
 [Pdf Viewer] is a module for [Omeka S] that allows to display pdf files
 with the browser reader or via the customizable internal reader, the same Mozilla
-library [`pdf.js`], at the choice of the admin and site admins.
+library [pdf.js], at the choice of the admin and site admins.
 
 
 Installation
 ------------
 
-The module uses an external library, [`pdf.js`], so use the release zip to
+The module uses an external library, [pdf.js], so use the release zip to
 install it, or use and init the source.
 
 See general end user documentation for [installing a module].
 
 * From the zip
 
-Download the last release [`PdfViewer.zip`] from the list of releases (the
+Download the last release [PdfViewer.zip] from the list of releases (the
 master does not contain the dependency), and uncompress it in the `modules`
 directory.
 
@@ -25,25 +29,36 @@ directory.
 If the module was installed from the source, rename the name of the folder of
 the module to `PdfViewer`, and go to the root module, and run:
 
-```
-    npm install
-    cd node_modules/pdf.js
-    npm install
-    gulp dist
-    cd ../..
-    gulp
+```sh
+composer install --no-dev
 ```
 
-For update:
+The assets are a slightly modified version of the generic viewer. They can be
+rebuild if needed with the script "build.php", that is automatically run from
+composer during install.
 
+```sh
+npm install
+cd node_modules/pdf.js
+npm install
+gulp dist
+# The package version for composer contains the standard minified version from
+# the directory "build" and the "generic" viewer.
+cd ../..
+rm -rf /tmp/pdf.js
+cp -r node_modules/pdf.js/build/generic/ /tmp/pdf.js/
+rm /tmp/pdf.js/web/compressed.tracemonkey-pldi-09.pdf
+cp node_modules/pdf.js/build/dist/build/pdf.min.js /tmp/pdf.js/build/
+cp node_modules/pdf.js/build/dist/build/pdf.worker.min.js /tmp/pdf.js/build/
+rm -rf asset/vendor/pdf.js
+cp -r /tmp/pdf.js asset/vendor
+php -f data/scripts/build.php
+# For release.
+tar czf /tmp/pdf.js.tar.gz /tmp/pdf.js
 ```
-    npm update
-    cd node_modules/pdf.js
-    npm update
-    gulp dist
-    cd ../..
-    gulp
-```
+
+In some cases, when using an old version of pdf.js, the argument `--legacy-peer-deps`
+should be added to npm.
 
 
 Config
@@ -72,13 +87,13 @@ your archives regularly so you can roll back if needed.
 Troubleshooting
 ---------------
 
-See online issues on the [module issues] page on GitHub.
+See online issues on the [module issues] page on GitLab.
 
 
 License
 -------
 
-This module is published under the [CeCILL v2.1] licence, compatible with
+This module is published under the [CeCILL v2.1] license, compatible with
 [GNU/GPL] and approved by [FSF] and [OSI].
 
 This software is governed by the CeCILL license under French law and abiding by
@@ -104,30 +119,31 @@ conditions as regards security.
 The fact that you are presently reading this means that you have had knowledge
 of the CeCILL license and that you accept its terms.
 
-The [`pdf.js`] library is published under the [Apache] license.
+The [pdf.js] library is published under the [Apache] license.
 
 
 Copyright
 ---------
 
-Javascript library [`pdf.js`]:
+Javascript library [pdf.js]:
 
-* Copyright Mozilla, 2011-2017
+* Copyright Mozilla, 2011-2021
 
 Module Pdf Viewer for Omeka S:
 
-* Copyright Daniel Berthereau, 2017-2020 (see [Daniel-KM] on GitHub)
+* Copyright Daniel Berthereau, 2017-2021 (see [Daniel-KM] on GitLab)
 
 
-[Pdf Viewer]: https://github.com/Daniel-KM/Omeka-S-module-PdfViewer
+[Pdf Viewer]: https://gitlab.com/Daniel-KM/Omeka-S-module-PdfViewer
 [Omeka S]: https://omeka.org/s
-[`pdf.js`]: https://mozilla.github.io/pdf.js
-[installing a module]: http://dev.omeka.org/docs/s/user-manual/modules/#installing-modules
-[`PdfViewer.zip`]: https://github.com/Daniel-KM/Omeka-S-module-PdfViewer/releases
-[module issues]: https://github.com/Daniel-KM/Omeka-S-module-PdfViewer/issues
+[pdf.js]: https://mozilla.github.io/pdf.js
+[Installing a module]: https://omeka.org/s/docs/user-manual/modules/#installing-modules
+[PdfViewer.zip]: https://gitlab.com/Daniel-KM/Omeka-S-module-PdfViewer/-/releases
+[module issues]: https://gitlab.com/Daniel-KM/Omeka-S-module-PdfViewer/-/issues
 [CeCILL v2.1]: https://www.cecill.info/licences/Licence_CeCILL_V2.1-en.html
 [GNU/GPL]: https://www.gnu.org/licenses/gpl-3.0.html
 [FSF]: https://www.fsf.org
 [OSI]: http://opensource.org
 [Apache]: https://github.com/mozilla/pdf.js/blob/master/LICENSE
-[Daniel-KM]: https://github.com/Daniel-KM "Daniel Berthereau"
+[GitLab]: https://gitlab.com/Daniel-KM
+[Daniel-KM]: https://gitlab.com/Daniel-KM "Daniel Berthereau"

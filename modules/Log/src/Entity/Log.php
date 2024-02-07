@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 namespace Log\Entity;
 
 use DateTime;
@@ -77,7 +77,7 @@ class Log extends AbstractEntity
 
     /**
      * @var array
-     * @Column(type="json_array")
+     * @Column(type="json")
      */
     protected $context;
 
@@ -92,81 +92,90 @@ class Log extends AbstractEntity
         return $this->id;
     }
 
-    public function setOwner(User $owner = null)
+    public function setOwner(User $owner = null): AbstractEntity
     {
         $this->owner = $owner;
+        return $this;
     }
 
-    public function getOwner()
+    public function getOwner(): ?User
     {
         return $this->owner;
     }
 
-    public function setJob(Job $job = null)
+    public function setJob(Job $job = null): AbstractEntity
     {
         $this->job = $job;
+        return $this;
     }
 
-    public function getJob()
+    public function getJob(): ?Job
     {
         return $this->job;
     }
 
-    public function setReference($reference)
+    public function setReference($reference): AbstractEntity
     {
         $this->reference = $reference;
+        return $this;
     }
 
-    public function getReference()
+    public function getReference(): string
     {
         return $this->reference;
     }
 
-    public function setSeverity($severity)
+    public function setSeverity($severity): AbstractEntity
     {
-        $this->severity = $severity;
+        $this->severity = (int) $severity;
+        return $this;
     }
 
-    public function getSeverity()
+    public function getSeverity(): int
     {
         return $this->severity;
     }
 
-    public function setMessage($message)
+    public function setMessage($message): AbstractEntity
     {
         $this->message = $message;
+        return $this;
     }
 
-    public function getMessage()
+    public function getMessage(): string
     {
         return $this->message;
     }
 
-    public function setContext(array $context)
+    public function setContext(array $context): AbstractEntity
     {
         $this->context = $context;
+        return $this;
     }
 
-    public function getContext()
+    public function getContext(): array
     {
         return $this->context;
     }
 
-    public function setCreated(DateTime $created)
+    public function setCreated(DateTime $created): AbstractEntity
     {
         $this->created = $created;
+        return $this;
     }
 
-    public function getCreated()
+    public function getCreated(): DateTime
     {
         return $this->created;
     }
 
     /**
      * @PrePersist
+     * @param LifecycleEventArgs $eventContext
      */
-    public function prePersist(LifecycleEventArgs $eventContext)
+    public function prePersist(LifecycleEventArgs $eventContext): AbstractEntity
     {
         $this->created = new DateTime('now');
+        return $this;
     }
 }

@@ -1,9 +1,9 @@
-<?php
+<?php declare(strict_types=1);
 namespace Log\Log\Writer;
 
+use Laminas\Log\Writer\AbstractWriter;
 use Log\Formatter\PsrLogSimple as PsrLogSimpleFormatter;
 use Omeka\Entity\Job as JobEntity;
-use Zend\Log\Writer\AbstractWriter;
 
 class Job extends AbstractWriter
 {
@@ -26,7 +26,7 @@ class Job extends AbstractWriter
      *
      * @param array $event
      */
-    protected function doWrite(array $event)
+    protected function doWrite(array $event): void
     {
         $this->job->addLog($this->formatter->format($event));
     }

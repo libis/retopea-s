@@ -2,7 +2,7 @@ version: '3'
 
 services:
   omeka-s:
-    image: registry.docker.libis.be/omeka_s_v2:latest
+    image: registry.docker.libis.be/omeka_s_v3:latest
     ports:
       - "9002:80"
     volumes:

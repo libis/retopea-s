@@ -6,7 +6,8 @@ use Omeka\Form\Element\ItemSetSelect;
 use Omeka\Form\Element\PropertySelect;
 use Omeka\Form\Element\ResourceSelect;
 use Omeka\Form\Element\ResourceClassSelect;
-use Zend\Form\Form;
+use Omeka\Form\Element\SiteSelect;
+use Laminas\Form\Form;
 
 class MappingForm extends Form
 {
@@ -17,8 +18,8 @@ class MappingForm extends Form
         $resourceType = $this->getOption('resource_type');
         $serviceLocator = $this->getServiceLocator();
         $userSettings = $serviceLocator->get('Omeka\Settings\User');
-        $config = $serviceLocator->get('Config');
-        $default = $config['csv_import']['user_settings'];
+        $config = $serviceLocator->get('CSVImport\Config');
+        $default = $config['user_settings'];
         $acl = $serviceLocator->get('Omeka\Acl');
 
         $this->add([
@@ -53,7 +54,7 @@ class MappingForm extends Form
             'type' => 'hidden',
             'attributes' => [
                 'value' => $this->getOption('comment'),
-            ]
+            ],
         ]);
 
         $this->add([
@@ -71,7 +72,7 @@ class MappingForm extends Form
             'attributes' => [
                 'id' => 'csv-import-basics-fieldset',
                 'class' => 'section',
-            ]
+            ],
         ]);
 
         $basicSettingsFieldset = $this->get('basic-settings');
@@ -197,6 +198,21 @@ class MappingForm extends Form
                             ],
                         ],
                     ]);
+
+                    $basicSettingsFieldset->add([
+                        'name' => 'o:site',
+                        'type' => SiteSelect::class,
+                        'attributes' => [
+                            'id' => 'select-sites',
+                            'class' => 'chosen-select',
+                            'multiple' => true,
+                            'data-placeholder' => 'Select sites', // @translate
+                            'value' => $this->getDefaultSiteIds(),
+                        ],
+                        'options' => [
+                            'label' => 'Sites', // @translate
+                        ],
+                    ]);
                     break;
 
                 case 'resources':
@@ -228,6 +244,21 @@ class MappingForm extends Form
                                 'resource' => 'item_sets',
                                 'query' => [],
                             ],
+                        ],
+                    ]);
+
+                    $basicSettingsFieldset->add([
+                        'name' => 'o:site',
+                        'type' => SiteSelect::class,
+                        'attributes' => [
+                            'id' => 'select-sites',
+                            'class' => 'chosen-select',
+                            'multiple' => true,
+                            'data-placeholder' => 'Select sites', // @translate
+                            'value' => $this->getDefaultSiteIds(),
+                        ],
+                        'options' => [
+                            'label' => 'Sites for items', // @translate
                         ],
                     ]);
                     break;
@@ -271,7 +302,7 @@ class MappingForm extends Form
                 'attributes' => [
                     'id' => 'csv-import-advanced-fieldset',
                     'class' => 'section',
-                ]
+                ],
             ]);
 
             $advancedSettingsFieldset = $this->get('advanced-settings');
@@ -310,12 +341,12 @@ class MappingForm extends Form
                     'attributes' => [
                         'id' => 'identifier_column',
                         'class' => 'action-option',
-                    ]
+                    ],
                 ]);
             } else {
                 $advancedSettingsFieldset->add([
                     'name' => 'identifier_column',
-                    'type' => 'Number'
+                    'type' => 'Number',
                 ]);
             }
 
@@ -326,7 +357,6 @@ class MappingForm extends Form
                     'label' => 'Resource identifier property', // @translate
                     'info' => 'Use this property, generally "dcterms:identifier", to identify the existing resources, so it will be possible to update them. One column of the file must map the selected property. In all cases, it is strongly recommended to add one ore more unique identifiers to all your resources.', // @translate
                     'empty_option' => 'Select below', // @translate
-                    'term_as_value' => false,
                     'prepend_value_options' => [
                         'internal_id' => 'Internal ID', // @translate
                     ],
@@ -370,7 +400,7 @@ class MappingForm extends Form
                     'value' => $userSettings->get(
                         'csv_import_rows_by_batch',
                         $default['csv_import_rows_by_batch']),
-                    'min'  => '1',
+                    'min' => '1',
                     'step' => '1',
                 ],
             ]);
@@ -401,7 +431,11 @@ class MappingForm extends Form
                 'name' => 'o:item_set',
                 'required' => false,
             ]);
-            
+            $basicSettingsInputFilter->add([
+                'name' => 'o:site',
+                'required' => false,
+            ]);
+
             $advancedSettingsInputFilter = $inputFilter->get('advanced-settings');
             $advancedSettingsInputFilter->add([
                 'name' => 'action',
@@ -420,6 +454,21 @@ class MappingForm extends Form
                 'required' => false,
             ]);
         }
+    }
+
+    private function getDefaultSiteIds()
+    {
+        $serviceLocator = $this->getServiceLocator();
+        $api = $serviceLocator->get('Omeka\ApiManager');
+        $userSettings = $serviceLocator->get('Omeka\Settings\User');
+
+        $globalDefaultSites = $api->search('sites', ['assign_new_items' => true])->getContent();
+        $userDefaultSiteIds = $userSettings->get('default_item_sites', []);
+        $globalDefaultSiteIds = [];
+        foreach ($globalDefaultSites as $siteRepresentation) {
+            $globalDefaultSiteIds[] = $siteRepresentation->id();
+        }
+        return array_merge($userDefaultSiteIds, $globalDefaultSiteIds);
     }
 
     public function setServiceLocator($serviceLocator)

@@ -10,7 +10,11 @@ Note: The current standard (2007) uses the native language as a base for the
 codes. For example, three letters code for `French` is `fra`, not `fre`, or, for
 `Chinese`, `zho`, not `chi`. English language is deprecated.
 
-This library is used in the module [Internationalisation] for [Omeka S].
+This library is used in the module [Internationalisation] for [Omeka S] and some
+other places.
+
+The list of codes may be updated by [SIL], so some codes may be removed and some
+other ones may be added regularly.
 
 
 Installation
@@ -18,7 +22,7 @@ Installation
 
 This module is a composer library available on [packagist]:
 
-```
+```sh
 composer require daniel-km/simple-iso-639-3
 ```
 
@@ -40,6 +44,7 @@ $languages = [
     'frAnÇaiS',
     'frm',
     'fro',
+    'fxxx',
 ];
 $result = [];
 foreach ($languages as $language) {
@@ -69,6 +74,7 @@ Result:
 | frAnÇaiS | fra  | fr    | fr, fra, fre | français | French                        | French                         |
 | frm      | frm  | frm   | frm          | françois | Middle French (ca. 1400-1600) | French, Middle (ca. 1400-1600) |
 | fro      | fro  | fro   | fro          | Franceis | Old French (842-ca. 1400)     | French, Old (842-ca. 1400)     |
+| fxxx     |      |       |              |          |                               |                                |
 
 
 Development
@@ -76,7 +82,7 @@ Development
 
 The lists are automatically generated from this command:
 
-```
+```sh
 php -f scripts/generate.php
 ```
 
@@ -93,7 +99,7 @@ your archives regularly so you can roll back if needed.
 Troubleshooting
 ---------------
 
-See online issues on the [module issues] page on GitHub.
+See online issues on the [module issues] page on GitLab.
 
 
 License
@@ -101,7 +107,7 @@ License
 
 ### Module
 
-This module is published under the [CeCILL v2.1] licence, compatible with
+This module is published under the [CeCILL v2.1] license, compatible with
 [GNU/GPL] and approved by [FSF] and [OSI].
 
 This software is governed by the CeCILL license under French law and abiding by
@@ -133,17 +139,18 @@ Copyright
 
 * Copyright The Internet Society (2005) (RFC 4646)
 * Copyright http://www.iso639-3.sil.org (language codes)
-* Copyright Daniel Berthereau, 2019 (see [Daniel-KM] on GitHub)
+* Copyright Daniel Berthereau, 2019-2023 (see [Daniel-KM] on GitLab)
 
 
-[Simple ISO 639-3]: https://github.com/Daniel-KM/Simple-ISO-639-3
-[SIL]: http://www.iso639-3.sil.org/
+[Simple ISO 639-3]: https://gitlab.com/Daniel-KM/Simple-ISO-639-3
+[SIL]: https://iso639-3.sil.org
 [RFC 4646]: https://tools.ietf.org/html/rfc4646
-[Internationalisation]: https://github.com/Daniel-KM/Omeka-S-module-Internationalisation
+[Internationalisation]: https://gitlab.com/Daniel-KM/Omeka-S-module-Internationalisation
 [Omeka S]: https://omeka.org/s
-[issues]: https://github.com/Daniel-KM/Simple-ISO-639-3/issues
+[issues]: https://gitlab.com/Daniel-KM/Simple-ISO-639-3/-/issues
 [CeCILL v2.1]: https://www.cecill.info/licences/Licence_CeCILL_V2.1-en.html
 [GNU/GPL]: https://www.gnu.org/licenses/gpl-3.0.html
 [FSF]: https://www.fsf.org
 [OSI]: http://opensource.org
-[Daniel-KM]: https://github.com/Daniel-KM "Daniel Berthereau"
+[GitLab]: https://gitlab.com/Daniel-KM
+[Daniel-KM]: https://gitlab.com/Daniel-KM "Daniel Berthereau"

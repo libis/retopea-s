@@ -8,10 +8,10 @@ use Omeka\Api\Adapter\AbstractEntityAdapter;
 use Omeka\Api\Adapter\AdapterInterface;
 use Omeka\Api\Representation\ValueRepresentation;
 use Omeka\Entity\Value;
-use Zend\Form\Element;
-use Zend\View\Renderer\PhpRenderer;
+use Omeka\DataType\ValueAnnotatingInterface;
+use Laminas\View\Renderer\PhpRenderer;
 
-class Integer extends AbstractDataType
+class Integer extends AbstractDataType implements ValueAnnotatingInterface
 {
     /**
      * Minimum and maximum integers.
@@ -25,7 +25,7 @@ class Integer extends AbstractDataType
      * @see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number/MIN_SAFE_INTEGER
      */
     const MIN_SAFE_INT = -9007199254740991;
-    const MAX_SAFE_INT =  9007199254740991;
+    const MAX_SAFE_INT = 9007199254740991;
 
     public function getName()
     {
@@ -34,7 +34,7 @@ class Integer extends AbstractDataType
 
     public function getLabel()
     {
-        return 'Integer';
+        return 'Integer'; // @translate
     }
 
     public function getJsonLd(ValueRepresentation $value)
@@ -44,7 +44,7 @@ class Integer extends AbstractDataType
         }
         return [
             '@value' => (int) $value->value(),
-            '@type' => 'o-module-numeric-xsd:integer',
+            '@type' => 'http://www.w3.org/2001/XMLSchema#integer',
         ];
     }
 
@@ -70,7 +70,7 @@ class Integer extends AbstractDataType
             && ((int) $valueObject['@value'] >= self::MIN_SAFE_INT);
     }
 
-    public function render(PhpRenderer $view, ValueRepresentation $value)
+    public function render(PhpRenderer $view, ValueRepresentation $value, $options = [])
     {
         if (!$this->isValid(['@value' => $value->value()])) {
             return $value->value();
@@ -136,5 +136,14 @@ class Integer extends AbstractDataType
             );
             $qb->addOrderBy('numeric_value', $query['sort_order']);
         }
+    }
+
+    public function valueAnnotationPrepareForm(PhpRenderer $view)
+    {
+    }
+
+    public function valueAnnotationForm(PhpRenderer $view)
+    {
+        return $this->form($view);
     }
 }

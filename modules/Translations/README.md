@@ -1,8 +1,12 @@
 Translations (module for Omeka S)
 =================================
 
-[Translations] is a module for [Omeka S] that allows to add specific
-translations of strings, in particular the hard-coded texts in the theme.
+[Translations] is a module for [Omeka S] that allows users to add their own
+translations of strings.
+
+As of Omeka S 4.0, both modules and themes are capable of providing translations
+on their own. However, this module may still be used to fill in missing
+translations or make overrides.
 
 In Omeka, the translations are managed with `.po` files in the directory `application/language/`
 for the core and in  the directory `language/` of each enabled module. This
@@ -124,16 +128,17 @@ of the CeCILL license and that you accept its terms.
 Copyright
 ---------
 
-* Copyright Daniel Berthereau, 2018-2019 (see [Daniel-KM] on GitHub)
+* Copyright Daniel Berthereau, 2018-2023 (see [Daniel-KM] on GitHub)
 
 
 [Translations]: https://github.com/Daniel-KM/Omeka-S-module-Translations
 [Omeka S]: https://omeka.org/s
 [plugin Translations]: https://github.com/Daniel-KM/Omeka-plugin-Translations
 [Omeka Classic]: https://omeka.org/classic
+[installing a module]: https://omeka.org/s/docs/user-manual/modules/#installing-modules
 [poedit]: https://poedit.net
 [lokalize]: https://www.kde.org/applications/development/lokalize
-[plugin issues]: https://github.com/Daniel-KM/Omeka-plugin-Translations/issues
+[module issues]: https://github.com/Daniel-KM/Omeka-plugin-Translations/issues
 [CeCILL v2.1]: https://www.cecill.info/licences/Licence_CeCILL_V2.1-en.html
 [GNU/GPL]: https://www.gnu.org/licenses/gpl-3.0.html
 [FSF]: https://www.fsf.org

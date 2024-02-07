@@ -1,9 +1,9 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Log\Processor;
 
+use Laminas\Log\Processor\ProcessorInterface;
 use Omeka\Entity\User;
-use Zend\Log\Processor\ProcessorInterface;
 
 class UserId implements ProcessorInterface
 {
@@ -15,11 +15,11 @@ class UserId implements ProcessorInterface
     /**
      * @param int|null $userId
      */
-    public function __construct(User $user = null)
+    public function __construct(?User $user = null)
     {
-        if ($user) {
-            $this->userId = $user->getId();
-        }
+        $this->userId = $user
+            ? $user->getId()
+            : null;
     }
 
     /**

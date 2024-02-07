@@ -5,10 +5,10 @@ use Doctrine\ORM\Events;
 use Mapping\Db\Event\Listener\DetachOrphanMappings;
 use Omeka\Module\AbstractModule;
 use Omeka\Permissions\Acl;
-use Zend\EventManager\Event;
-use Zend\EventManager\SharedEventManagerInterface;
-use Zend\Mvc\MvcEvent;
-use Zend\ServiceManager\ServiceLocatorInterface;
+use Laminas\EventManager\Event;
+use Laminas\EventManager\SharedEventManagerInterface;
+use Laminas\Mvc\MvcEvent;
+use Laminas\ServiceManager\ServiceLocatorInterface;
 
 class Module extends AbstractModule
 {
@@ -71,6 +71,12 @@ class Module extends AbstractModule
     public function onBootstrap(MvcEvent $event)
     {
         parent::onBootstrap($event);
+
+        // Set the corresponding visibility rules on Mapping resources.
+        $em = $this->getServiceLocator()->get('Omeka\EntityManager');
+        $filter = $em->getFilters()->getFilter('resource_visibility');
+        $filter->addRelatedEntity('Mapping\Entity\Mapping', 'item_id');
+        $filter->addRelatedEntity('Mapping\Entity\MappingMarker', 'item_id');
 
         $acl = $this->getServiceLocator()->get('Omeka\Acl');
         $acl->allow(
@@ -396,4 +402,3 @@ class Module extends AbstractModule
         }
     }
 }
-

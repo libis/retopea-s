@@ -1,0 +1,162 @@
+<?php
+/**
+ * @var \Laminas\View\Renderer\PhpRenderer $this
+ * @var \BulkExport\Api\Representation\ExportRepresentation[] $exports
+ */
+
+$plugins = $this->getHelperPluginManager();
+$translate = $plugins->get('translate');
+$escape = $plugins->get('escapeHtml');
+$hyperlink = $plugins->get('hyperlink');
+$url = $plugins->get('url');
+
+$urlBase = $url('top') . 'files/bulk_export/';
+?>
+
+<?php $this->trigger('view.browse.before'); ?>
+
+<table class="tablesaw" data-tablesaw-mode="stack">
+    <thead>
+        <tr>
+            <th><?= $escape($translate('Comment')) ?></th>
+            <th><?= $escape($translate('Status')) ?></th>
+            <th><?= $escape($translate('Started')) ?></th>
+            <th><?= $escape($translate('Completed')) ?></th>
+            <th><?= $escape($translate('Owner')) ?></th>
+        </tr>
+    </thead>
+    <tbody>
+        <?php foreach ($exports as $export): ?>
+            <?php
+            $status = $translate($export->statusLabel());
+            $owner = $export->owner();
+            $filename = $export->filename();
+            $fileUrl = $filename && $export->isCompleted() ? $urlBase . $filename : '';
+            $exporter = $export->exporter();
+            $userIsAllowedDelete = $exporter->userIsAllowed('delete');
+            ?>
+            <tr>
+                <td>
+                    <?php $comment = $export->comment() ?>
+                    <?php if ($comment): ?>
+                    <?= $comment ?>
+                    <span class="bulk-label-sub"><?= $exporter ? $exporter->label() : '' ?></span>
+                    <?php else: ?>
+                    <?= $exporter ? $exporter->label() : $translate('[Unknown]') ?>
+                    <?php endif; ?>
+                    <ul class="actions">
+                        <?php if ($fileUrl): ?>
+                        <li><?= $hyperlink('', $fileUrl, [
+                            'class' => 'fas fa-cloud-download-alt o-icon-',
+                            'title' => $translate('Get file'), // @translate
+                            'download' => '',
+                        ]) ?></li>
+                        <?php endif; ?>
+                        <?php if ($export->isInProgress()): ?>
+                        <li><?= $hyperlink('', $url('admin/id', ['controller' => 'job', 'action' => 'stop', 'id' => $export->job()->id()]), [
+                            'class' => 'fas fa-times-circle o-icon-',
+                            'title' => $translate('Stop'), // @translate
+                        ]) ?></li>
+                        <?php endif; ?>
+                        <li><?= $hyperlink('', $this->url('admin/bulk-export/id', ['controller' => 'export', 'action' => 'show', 'id' => $export->id()]), [
+                            'class' => 'fas fa-cogs o-icon-',
+                            'title' => $translate('See params'),
+                        ]) ?></li>
+                        <li><?= $hyperlink('', $this->url('admin/bulk-export/id', ['controller' => 'export', 'action' => 'logs', 'id' => $export->id()]), [
+                            'class' => 'fas fa-list o-icon-',
+                            'title' => $translate('See logs'),
+                        ]) ?></li>
+                    <?php if ($userIsAllowedDelete): ?>
+                    <li><?= $hyperlink('', '#', [
+                            'data-sidebar-selector' => '#sidebar',
+                            'data-sidebar-content-url' => $export->url('delete-confirm'),
+                            'class' => 'o-icon-delete sidebar-content',
+                            'title' => $translate('Delete'),
+                        ]) ?></li>
+                    <?php endif; ?>
+                    </ul>
+                </td>
+                <td><?= $fileUrl ? $hyperlink($status, $fileUrl) : $status ?></td>
+                <td><?= $export->started() ? $export->started()->format('Y-m-d H:i:s') : '' ?></td>
+                <td><?= $export->ended() ? $export->ended()->format('Y-m-d H:i:s') : '' ?></td>
+                <td><?= $owner ? $hyperlink($owner->name(), $owner->adminUrl()) : $translate('[no owner]') ?></td>
+            </tr>
+        <?php endforeach; ?>
+    </tbody>
+</table>
+
+<?php $this->trigger('view.browse.after'); ?>
+
+<?php if (!$exports) return; ?>
+
+<div id="sidebar" class="sidebar">
+    <?= $hyperlink('', '#', [
+        'class' => 'sidebar-close o-icon-close',
+        'title' => $translate('Close'),
+    ]) ?>
+    <div class="sidebar-content"></div>
+</div>
+<?php /*
+<div id="sidebar-delete-selected" class="sidebar">
+    <?= $hyperlink('', '#', [
+        'class' => 'sidebar-close o-icon-close',
+        'title' => $translate('Close'),
+    ]) ?>
+    <div class="sidebar-content">
+        <div id="sidebar-confirm">
+            <h3><?= $translate('Delete exports') ?></h3>
+            <p><?= $translate('Are you sure you would like to delete the selected exports?') ?></p>
+            <p class="error"><?= sprintf(
+                $translate('%1$s: this action will permanently delete %2$s exports and cannot be undone.'),
+                sprintf('<strong>%s</strong>', $translate('Warning')),
+                '<strong><span id="delete-selected-count"></span></strong>'
+            ) ?></p>
+            <?= $this->form($formDeleteSelected) ?>
+        </div>
+    </div>
+</div>
+<div id="sidebar-delete-all" class="sidebar">
+    <?php echo $hyperlink('', '#', [
+        'class' => 'sidebar-close o-icon-close',
+        'title' => $translate('Close'),
+    ]); ?>
+    <div class="sidebar-content">
+        <div id="sidebar-confirm">
+            <h3><?= $translate('Delete exports') ?></h3>
+            <p><?= $translate('Are you sure you would like to delete all exports on all pages of this result?') ?></p>
+            <p class="error"><?= sprintf(
+                $translate('%1$s: this action will permanently delete %2$s exports and cannot be undone.'),
+                sprintf('<strong>%s</strong>', $translate('Warning')),
+                sprintf('<strong>%s</strong>', number_format($this->pagination()->getPaginator()->getTotalCount()))
+            ) ?></p>
+            <label><input type="checkbox" name="confirm-delete-all-check"> <?= $translate('Are you sure?') ?></label>
+            <?= $this->form($this->formDeleteAll) ?>
+        </div>
+    </div>
+</div>
+
+<script>
+// Complete the batch delete form after confirmation.
+$('#confirm-delete-selected, #confirm-delete-all').on('submit', function(e) {
+    var confirmForm = $(this);
+    if ('confirm-delete-all' === this.id) {
+        confirmForm.append($('.batch-query').clone());
+    } else {
+        $('#batch-form').find('input[name="resource_ids[]"]:checked').each(function() {
+            confirmForm.append($(this).clone().prop('disabled', false).attr('type', 'hidden'));
+        });
+    }
+});
+$('.delete-all').on('click', function(e) {
+    Omeka.closeSidebar($('#sidebar-delete-selected'));
+});
+$('.delete-selected').on('click', function(e) {
+    Omeka.closeSidebar($('#sidebar-delete-all'));
+    var inputs = $('input[name="resource_ids[]"]');
+    $('#delete-selected-count').text(inputs.filter(':checked').length);
+});
+$('#sidebar-delete-all').on('click', 'input[name="confirm-delete-all-check"]', function(e) {
+    $('#confirm-delete-all input[type="submit"]').prop('disabled', this.checked ? false : true);
+});
+</script>
+*/ ?>

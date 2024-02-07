@@ -9,7 +9,7 @@ use Omeka\Module\AbstractModule;
  * Allows to add specific translations of strings, in particular the hard-coded
  * texts in the theme.
  *
- * @copyright Daniel Berthereau, 2018-2019
+ * @copyright Daniel Berthereau, 2018-2023
  * @license https://www.cecill.info/licences/Licence_CeCILL_V2.1-en.html
  */
 class Module extends AbstractModule

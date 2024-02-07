@@ -106,8 +106,8 @@ class MappingMarkerAdapter extends AbstractEntityAdapter
             $client = $this->getServiceLocator()->get('Omeka\HttpClient')
                 ->setUri('http://nominatim.openstreetmap.org/search')
                 ->setParameterGet([
-                    'q'  => $query['address'],
-                    'format'  => 'json',
+                    'q' => $query['address'],
+                    'format' => 'json',
                 ]);
             $response = $client->send();
 
@@ -119,7 +119,7 @@ class MappingMarkerAdapter extends AbstractEntityAdapter
 
                     // Set the radius unit constant needed for the distance
                     // calcluation below.
-                    $unit = isset($query['radius_unit']) ? $query['radius_unit'] : 'km';
+                    $unit = $query['radius_unit'] ?? 'km';
                     switch ($unit) {
                         case 'mile':
                             $unitConst = 3959;
@@ -142,16 +142,13 @@ class MappingMarkerAdapter extends AbstractEntityAdapter
                                 sin(radians(%2$s)) *
                                 sin(radians(omeka_root.lat))
                             )
-                        )) AS HIDDEN distance',
+                        )) <= %4$s',
                         $unitConst,
                         $this->createNamedParameter($qb, $results[0]['lat']),
-                        $this->createNamedParameter($qb, $results[0]['lon'])
-                    );
-                    $qb->addSelect($dql);
-                    $qb->having(sprintf(
-                        'distance <= %s',
+                        $this->createNamedParameter($qb, $results[0]['lon']),
                         $this->createNamedParameter($qb, $query['radius'])
-                    ));
+                    );
+                    $qb->andWhere($dql);
                 }
             }
             if (!$addressFound) {

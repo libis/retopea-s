@@ -5,8 +5,8 @@ use Omeka\Api\Adapter\AbstractEntityAdapter;
 use Omeka\Api\Representation\ValueRepresentation;
 use Omeka\DataType\Uri;
 use Omeka\Entity\Value;
-use Zend\Form\Element\Select;
-use Zend\View\Renderer\PhpRenderer;
+use Laminas\Form\Element\Select;
+use Laminas\View\Renderer\PhpRenderer;
 
 class RightsStatement extends Uri
 {
@@ -58,7 +58,6 @@ class RightsStatement extends Uri
             ->setEmptyOption('Select Below')
             ->setValueOptions($this->statements);
         return $view->formSelect($select);
-
     }
 
     public function isValid(array $valueObject)

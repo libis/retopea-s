@@ -1,8 +1,8 @@
 <?php
 namespace Mapping\Controller\Site;
 
-use Zend\Mvc\Controller\AbstractActionController;
-use Zend\View\Model\ViewModel;
+use Laminas\Mvc\Controller\AbstractActionController;
+use Laminas\View\Model\ViewModel;
 
 class IndexController extends AbstractActionController
 {
@@ -36,8 +36,7 @@ class IndexController extends AbstractActionController
             if (isset($query['mapping_address']) && isset($query['mapping_radius'])) {
                 $markersQuery['address'] = $query['mapping_address'];
                 $markersQuery['radius'] = $query['mapping_radius'];
-                $markersQuery['radius_unit'] = isset($query['mapping_radius_unit'])
-                    ? $query['mapping_radius_unit'] : null;
+                $markersQuery['radius_unit'] = $query['mapping_radius_unit'] ?? null;
             }
             $response = $this->api()->search('mapping_markers', $markersQuery);
             $markers = $response->getContent();

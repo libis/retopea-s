@@ -3,29 +3,65 @@ namespace FileSideload\Media\Ingester;
 
 use Omeka\Api\Request;
 use Omeka\Entity\Media;
+use Omeka\File\TempFileFactory;
 use Omeka\File\Validator;
 use Omeka\Media\Ingester\IngesterInterface;
 use Omeka\Stdlib\ErrorStore;
-use Zend\Form\Element\Select;
-use Zend\View\Renderer\PhpRenderer;
+use Laminas\Form\Element\Select;
+use Laminas\View\Renderer\PhpRenderer;
 
 class Sideload implements IngesterInterface
 {
+    /**
+     * @var string
+     */
     protected $directory;
 
+    /**
+     * @var bool
+     */
     protected $deleteFile;
 
+    /**
+     * @var TempFileFactory
+     */
     protected $tempFileFactory;
 
+    /**
+     * @var Validator
+     */
     protected $validator;
 
-    public function __construct($directory, $deleteFile, $tempFileFactory, Validator $validator)
-    {
+    /**
+     * @var int
+     */
+    protected $maxFiles;
+
+    /**
+     * @var bool
+     */
+    protected $hasMoreFiles = false;
+
+    /**
+     * @param string $directory
+     * @param bool $deleteFile
+     * @param TempFileFactory $tempFileFactory
+     * @param Validator $validator
+     * @param int $maxFiles
+     */
+    public function __construct(
+        $directory,
+        $deleteFile,
+        TempFileFactory $tempFileFactory,
+        Validator $validator,
+        $maxFiles
+    ) {
         // Only work on the resolved real directory path.
-        $this->directory = realpath($directory);
+        $this->directory = $directory ? realpath($directory) : '';
         $this->deleteFile = $deleteFile;
         $this->tempFileFactory = $tempFileFactory;
         $this->validator = $validator;
+        $this->maxFiles = $maxFiles;
     }
 
     public function getLabel()
@@ -52,7 +88,7 @@ class Sideload implements IngesterInterface
     {
         $data = $request->getContent();
         if (!isset($data['ingest_filename'])) {
-            $errorStore->addError('ingest_filename', 'No ingest filename specified'); // @translate;
+            $errorStore->addError('ingest_filename', 'No ingest filename specified'); // @translate
             return;
         }
 
@@ -61,8 +97,8 @@ class Sideload implements IngesterInterface
             ? $data['ingest_filename']
             : $this->directory . DIRECTORY_SEPARATOR . $data['ingest_filename'];
         $fileinfo = new \SplFileInfo($filepath);
-        $tempPath = $this->verifyFile($fileinfo);
-        if (false === $tempPath) {
+        $realPath = $this->verifyFile($fileinfo);
+        if (false === $realPath) {
             $errorStore->addError('ingest_filename', sprintf(
                 'Cannot sideload file "%s". File does not exist or does not have sufficient permissions', // @translate
                 $filepath
@@ -71,17 +107,24 @@ class Sideload implements IngesterInterface
         }
 
         $tempFile = $this->tempFileFactory->build();
-        $tempFile->setTempPath($tempPath);
         $tempFile->setSourceName($data['ingest_filename']);
+
+        // Copy the file to a temp path, so it is managed as a real temp file (#14).
+        copy($realPath, $tempFile->getTempPath());
+
         if (!$this->validator->validate($tempFile, $errorStore)) {
             return;
         }
+
         if (!array_key_exists('o:source', $data)) {
             $media->setSource($data['ingest_filename']);
         }
         $storeOriginal = (!isset($data['store_original']) || $data['store_original']);
-        $deleteTempFile = ('yes' === $this->deleteFile);
-        $tempFile->mediaIngestFile($media, $request, $errorStore, $storeOriginal, true, $deleteTempFile, true);
+        $tempFile->mediaIngestFile($media, $request, $errorStore, $storeOriginal, true, true, true);
+
+        if ($this->deleteFile) {
+            unlink($realPath);
+        }
     }
 
     public function form(PhpRenderer $view, array $options = [])
@@ -89,14 +132,19 @@ class Sideload implements IngesterInterface
         $files = $this->getFiles();
         $isEmpty = empty($files);
 
+        if ($isEmpty) {
+            $emptyOption = 'No file: add files in the directory or check its path'; // @translate
+        } elseif ($this->hasMoreFiles) {
+            $emptyOption = 'Select a file to sideload… (only first ones are listed)'; // @translate
+        } else {
+            $emptyOption = 'Select a file to sideload…'; // @translate
+        }
+
         $select = new Select('o:media[__index__][ingest_filename]');
         $select->setOptions([
             'label' => 'File', // @translate
             'value_options' => $files,
-            'empty_option' => $isEmpty
-                ? 'No file: add files in the directory or check its path' // @translate
-                : 'Select a file to sideload...', // @translate
-            'info' => 'The filename.', // @translate
+            'empty_option' => $emptyOption,
         ]);
         $select->setAttributes([
             'id' => 'media-sideload-ingest-filename-__index__',
@@ -113,17 +161,49 @@ class Sideload implements IngesterInterface
     public function getFiles()
     {
         $files = [];
+        $count = 0;
         $dir = new \SplFileInfo($this->directory);
         if ($dir->isDir()) {
-            $iterator = new \DirectoryIterator($dir);
-            foreach ($iterator as $file) {
+            $lengthDir = strlen($this->directory) + 1;
+            $dir = new \RecursiveDirectoryIterator($this->directory);
+            // Prevent UnexpectedValueException "Permission denied" by excluding
+            // directories that are not executable or readable.
+            $dir = new \RecursiveCallbackFilterIterator($dir, function ($current, $key, $iterator) {
+                if ($iterator->isDir() && (!$iterator->isExecutable() || !$iterator->isReadable())) {
+                    return false;
+                }
+                return true;
+            });
+            $iterator = new \RecursiveIteratorIterator($dir);
+            foreach ($iterator as $filepath => $file) {
                 if ($this->verifyFile($file)) {
-                    $files[$file->getFilename()] = $file->getFilename();
+                    // For security, don't display the full path to the user.
+                    $relativePath = substr($filepath, $lengthDir);
+                    // Use keys for quicker process on big directories.
+                    $files[$relativePath] = null;
+                    if ($this->maxFiles && ++$count >= $this->maxFiles) {
+                        $this->hasMoreFiles = true;
+                        break;
+                    }
                 }
             }
         }
-        asort($files);
-        return $files;
+
+        // Don't mix directories and files, but list directories first as usual.
+        $alphabeticAndDirFirst = function ($a, $b) {
+            if ($a === $b) {
+                return 0;
+            }
+            $aInRoot = strpos($a, '/') === false;
+            $bInRoot = strpos($b, '/') === false;
+            if (($aInRoot && $bInRoot) || (!$aInRoot && !$bInRoot)) {
+                return strcasecmp($a, $b);
+            }
+            return $bInRoot ? -1 : 1;
+        };
+        uksort($files, $alphabeticAndDirFirst);
+
+        return array_combine(array_keys($files), array_keys($files));
     }
 
     /**
@@ -150,7 +230,7 @@ class Sideload implements IngesterInterface
         if (0 !== strpos($realPath, $this->directory)) {
             return false;
         }
-        if ('yes' === $this->deleteFile && !$fileinfo->getPathInfo()->isWritable()) {
+        if ($this->deleteFile && !$fileinfo->getPathInfo()->isWritable()) {
             return false;
         }
         if (!$fileinfo->isFile() || !$fileinfo->isReadable()) {

@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Internationalisation\Job;
 
@@ -12,7 +12,7 @@ use Omeka\Stdlib\Message;
 class DuplicateSite extends AbstractJob
 {
     /**
-     * @var \Zend\Log\Logger
+     * @var \Laminas\Log\Logger
      */
     protected $logger;
 
@@ -41,11 +41,11 @@ class DuplicateSite extends AbstractJob
      */
     protected $mapPages = [];
 
-    public function perform()
+    public function perform(): void
     {
         $services = $this->getServiceLocator();
 
-        $referenceIdProcessor = new \Zend\Log\Processor\ReferenceId();
+        $referenceIdProcessor = new \Laminas\Log\Processor\ReferenceId();
         $referenceIdProcessor->setReferenceId('internationalisation/duplicate/job_' . $this->job->getId());
 
         $this->logger = $services->get('Omeka\Logger');
@@ -73,7 +73,7 @@ class DuplicateSite extends AbstractJob
             $this->logger->err(new Message(
                 'The site #%1$s is not available for copy. Check your rights.', // @translate
                 $targetId
-                ));
+            ));
             $this->job->setStatus(\Omeka\Entity\Job::STATUS_ERROR);
             return;
         }
@@ -174,6 +174,16 @@ class DuplicateSite extends AbstractJob
         }
 
         $this->indexPages($target);
+        // Assign resources and reindex pages.
+        $services->get(\Omeka\Job\Dispatcher::class)->dispatch(
+            \Omeka\Job\UpdateSiteItems::class,
+            [
+                'sites' => [$targetId => $target->getItemPool()],
+                'action' => 'add',
+            ],
+            $services->get(\Omeka\Job\DispatchStrategy\Synchronous::class)
+        );
+
 
         if ($this->job->getStatus() === \Omeka\Entity\Job::STATUS_ERROR) {
             $this->logger->warn(
@@ -182,7 +192,7 @@ class DuplicateSite extends AbstractJob
         }
     }
 
-    protected function updateSiteGroups(Site $source, Site $target)
+    protected function updateSiteGroups(Site $source, Site $target): void
     {
         // Add the site to the group first to simplify duplication of pages.
         $settings = $this->getServiceLocator()->get('Omeka\Settings');
@@ -200,13 +210,13 @@ class DuplicateSite extends AbstractJob
         $settings->set('internationalisation_site_groups', $siteGroups);
     }
 
-    protected function removeSettings(Site $site, array $settings = null)
+    protected function removeSettings(Site $site, array $settings = null): void
     {
         $sql = <<<SQL
 DELETE FROM `site_setting`
 WHERE `site_id` = {$site->getId()};
 SQL;
-        $this->connection->exec($sql);
+        $this->connection->executeStatement($sql);
 
         if (!$settings) {
             return;
@@ -225,32 +235,32 @@ SQL;
         ));
     }
 
-    protected function removeSiteItemPool(Site $site)
+    protected function removeSiteItemPool(Site $site): void
     {
         $site->setItemPool([]);
         $this->entityManager->refresh($site);
     }
 
-    protected function removeSiteTheme(Site $site)
+    protected function removeSiteTheme(Site $site): void
     {
         $site->setTheme('default');
         $this->entityManager->refresh($site);
     }
 
-    protected function removeNavigation(Site $site)
+    protected function removeNavigation(Site $site): void
     {
         $site->setHomepage(null);
         $site->setNavigation([]);
         $this->entityManager->refresh($site);
     }
 
-    protected function removeSitePermissions(Site $site)
+    protected function removeSitePermissions(Site $site): void
     {
         $sql = <<<SQL
 DELETE FROM `site_permission`
 WHERE `site_id` = {$site->getId()};
 SQL;
-        $result = $this->connection->exec($sql);
+        $result = $this->connection->executeStatement($sql);
         $this->entityManager->refresh($site);
 
         $this->logger->notice(new Message(
@@ -259,17 +269,17 @@ SQL;
         ));
     }
 
-    protected function removeSiteItemSets(Site $site)
+    protected function removeSiteItemSets(Site $site): void
     {
         $sql = <<<SQL
 DELETE FROM `site_item_set`
 WHERE `site_id` = {$site->getId()};
 SQL;
-        $this->connection->exec($sql);
+        $this->connection->executeStatement($sql);
         $this->entityManager->refresh($site);
     }
 
-    protected function removeSitePages(Site $site)
+    protected function removeSitePages(Site $site): void
     {
         // FIXME There is no "on delete cascade" on db level currently!
         $sql = <<<SQL
@@ -278,18 +288,18 @@ INNER JOIN `site_page_block` ON `site_page_block`.`id` = `site_block_attachment`
 INNER JOIN `site_page` ON `site_page`.`id` = `site_page_block`.`page_id`
 WHERE `site_page`.`site_id` = {$site->getId()};
 SQL;
-        $this->connection->exec($sql);
+        $this->connection->executeStatement($sql);
         $sql = <<<SQL
 DELETE `site_page_block` FROM `site_page_block`
 INNER JOIN `site_page` ON `site_page`.`id` = `site_page_block`.`page_id`
 WHERE `site_page`.`site_id` = {$site->getId()};
 SQL;
-        $this->connection->exec($sql);
+        $this->connection->executeStatement($sql);
         $sql = <<<SQL
 DELETE FROM `site_page`
 WHERE `site_id` = {$site->getId()};
 SQL;
-        $result = $this->connection->exec($sql);
+        $result = $this->connection->executeStatement($sql);
         $this->entityManager->refresh($site);
 
         $this->logger->notice(new Message(
@@ -298,13 +308,13 @@ SQL;
         ));
     }
 
-    protected function removeCollecting(Site $site)
+    protected function removeCollecting(Site $site): void
     {
         $sql = <<<SQL
 DELETE FROM `collecting_form`
 WHERE `site_id` = {$site->getId()};
 SQL;
-        $result = $this->connection->exec($sql);
+        $result = $this->connection->executeStatement($sql);
 
         $this->logger->notice(new Message(
             '%1$d collecting forms removed from "%2$s".', // @translate
@@ -319,7 +329,7 @@ SQL;
      * @param Site $target
      * @param array $settings
      */
-    protected function copySettings(Site $source, Site $target, array $settings = null)
+    protected function copySettings(Site $source, Site $target, array $settings = null): void
     {
         $sql = <<<SQL
 INSERT INTO `site_setting` (`id`, `site_id`, `value`)
@@ -328,7 +338,7 @@ SELECT `t2`.`id`, {$target->getId()} AS 'site_id', `t2`.`value` FROM (
 ) AS `t2`
 ON DUPLICATE KEY UPDATE `id`=`t2`.`id`, `site_id`={$target->getId()}, `value`=`t2`.`value`;
 SQL;
-        $this->connection->exec($sql);
+        $this->connection->executeStatement($sql);
 
         if (!$settings) {
             return;
@@ -354,7 +364,7 @@ SQL;
      * @param Site $target
      * @param string $mode
      */
-    protected function copySitePages(Site $source, Site $target, $mode)
+    protected function copySitePages(Site $source, Site $target, $mode): void
     {
         // Get pages to check rights.
         if (!$source->getPages()->count()) {
@@ -363,7 +373,7 @@ SQL;
 
         // Manage private page slugs.
         $sql = 'SELECT `id`, `slug` FROM `site_page` WHERE `site_id` = ' . (int) $target->getId();
-        $existingSlugs = $this->connection->query($sql)->fetchAll(\PDO::FETCH_KEY_PAIR);
+        $existingSlugs = $this->connection->executeQuery($sql)->fetchAllKeyValue();
 
         /**
          * @var \Omeka\Entity\SitePage $sourcePage
@@ -375,7 +385,7 @@ SQL;
             if ($slugExists) {
                 $slug = mb_substr($slug . '_' . $source->getSlug(), 0, 190);
                 if (in_array($slug, $existingSlugs)) {
-                    $slug = mb_substr($slug, 0, 185) . '_' . substr(str_replace(['+', '/'], '', base64_encode(random_bytes(20))), 0, 4);
+                    $slug = mb_substr($slug, 0, 185) . '_' . substr(str_replace(['+', '/', '='], ['', '', ''], base64_encode(random_bytes(128))), 0, 4);
                 }
             }
             if ($mode === 'mirror') {
@@ -425,7 +435,7 @@ SQL;
         ));
     }
 
-    protected function copySitePermissions(Site $source, Site $target)
+    protected function copySitePermissions(Site $source, Site $target): void
     {
         $sql = <<<SQL
 INSERT INTO `site_permission` (`site_id`, `user_id`, `role`)
@@ -434,17 +444,17 @@ SELECT {$target->getId()} AS 'site_id', `t2`.`user_id`, `t2`.`role` FROM (
 ) AS `t2`
 ON DUPLICATE KEY UPDATE `site_id`={$target->getId()}, `user_id`=`t2`.`user_id`, `role`=`t2`.`role`;
 SQL;
-        $this->connection->exec($sql);
+        $this->connection->executeStatement($sql);
         $this->entityManager->refresh($target);
     }
 
-    protected function copySiteItemPool(Site $source, Site $target)
+    protected function copySiteItemPool(Site $source, Site $target): void
     {
         $target->setItemPool($source->getItemPool());
         $this->entityManager->refresh($target);
     }
 
-    protected function copySiteItemSets(Site $source, Site $target)
+    protected function copySiteItemSets(Site $source, Site $target): void
     {
         $sql = <<<SQL
 INSERT INTO `site_item_set` (`site_id`, `item_set_id`, `position`)
@@ -453,11 +463,11 @@ SELECT {$target->getId()} AS 'site_id', `t2`.`item_set_id`, `t2`.`position` FROM
 ) AS `t2`
 ON DUPLICATE KEY UPDATE `site_id`={$target->getId()}, `item_set_id`=`t2`.`item_set_id`, `position`=`t2`.`position`;
 SQL;
-        $this->connection->exec($sql);
+        $this->connection->executeStatement($sql);
         $this->entityManager->refresh($target);
     }
 
-    protected function copySiteTheme(Site $source, Site $target)
+    protected function copySiteTheme(Site $source, Site $target): void
     {
         // $target->setTitle($source->getTitle());
         // $target->setSummary($source->getSummary());
@@ -470,14 +480,15 @@ SQL;
         // The settings may be already copied with other settings.
         $siteSettings = $this->getServiceLocator()->get('Omeka\Settings\Site');
         $siteSettings->setTargetId($source->getId());
-        $themeSettings = $siteSettings->get('theme_settings_' . $theme) ?: '{}';
+        $themeSettings = $siteSettings->get('theme_settings_' . $theme);
         $siteSettings->setTargetId($target->getId());
-        $siteSettings->set('theme_settings_' . $theme, $themeSettings);
-
+        if ($themeSettings) {
+            $siteSettings->set('theme_settings_' . $theme, $themeSettings);
+        }
         $this->entityManager->flush();
     }
 
-    protected function copySiteNavigation(Site $source, Site $target)
+    protected function copySiteNavigation(Site $source, Site $target): void
     {
         $homepage = $source->getHomepage();
         if ($homepage && isset($this->mapPages[$homepage->getId()])) {
@@ -494,7 +505,8 @@ SQL;
         }
 
         $navigation = $source->getNavigation();
-        $iterate = function (&$navigation) use (&$iterate) {
+        $iterate = null;
+        $iterate = function (&$navigation) use (&$iterate): void {
             foreach ($navigation as &$data) {
                 if ($data['type'] === 'page' && !empty($this->mapPages[$data['data']['id']])) {
                     $data['data']['id'] = $this->mapPages[$data['data']['id']]->getId();
@@ -510,7 +522,7 @@ SQL;
         $this->entityManager->flush();
     }
 
-    protected function copyCollecting(Site $source, Site $target)
+    protected function copyCollecting(Site $source, Site $target): void
     {
         $sql = <<<SQL
 INSERT INTO `collecting_form` (`item_set_id`, `site_id`, `owner_id`, `label`, `anon_type`, `success_text`, `email_text`)
@@ -518,25 +530,48 @@ SELECT  `t2`.`item_set_id`, {$target->getId()} AS 'site_id', `t2`.`owner_id`, `t
     SELECT `t`.`item_set_id`, `t`.`site_id`, `t`.`owner_id`, `t`.`label`, `t`.`anon_type`, `t`.`success_text`, `t`.`email_text` FROM `collecting_form` AS `t` WHERE `site_id` = {$source->getId()}
 ) AS `t2`;
 SQL;
-        $result = $this->connection->exec($sql);
+        try {
+            $result = $this->connection->executeStatement($sql);
+        } catch (\Exception $e) {
+            $this->logger->notice(new Message(
+                'The module Collecting is a new version and is not copiable for now. Copy forms manually if needed.' // @translate
+            ));
+            return;
+        }
 
         $this->logger->notice(new Message(
             '%1$d collecting forms from site "%2$s" were successfully copied into "%3$s".', // @translate
             $result, $source->getSlug(), $target->getSlug()
         ));
 
-$sql = <<<SQL
-INSERT INTO `collecting_prompt` (`form_id`, `property_id`, `position`, `type`, `text`, `input_type`, `select_options`, `resource_query`, `custom_vocab`, `media_type`, `required`, `multiple`)
-SELECT `form_id`, `property_id`, `position`, `type`, `text`, `input_type`, `select_options`, `resource_query`, `custom_vocab`, `media_type`, `required`, `multiple` FROM `collecting_prompt`
+        // Check if the module is the fork one with column multiple or the basic one.
+        $sql = <<<'SQL'
+SHOW COLUMNS FROM `collecting_prompt` LIKE 'multiple';
+SQL;
+        try {
+            $multiple = $this->connection->executeStatement($sql) ? ', `multiple`' : '';
+        } catch (\Exception $e) {
+            $multiple = '';
+        }
+        $sql = <<<SQL
+INSERT INTO `collecting_prompt` (`form_id`, `property_id`, `position`, `type`, `text`, `input_type`, `select_options`, `resource_query`, `custom_vocab`, `media_type`, `required`$multiple)
+SELECT `form_id`, `property_id`, `position`, `type`, `text`, `input_type`, `select_options`, `resource_query`, `custom_vocab`, `media_type`, `required`$multiple FROM `collecting_prompt`
 JOIN `collecting_form` ON `collecting_form`.`id` = `collecting_prompt`.`form_id`
 WHERE `collecting_form`.`site_id` = {$source->getId()};
 SQL;
-        $this->connection->exec($sql);
+        try {
+            $result = $this->connection->executeStatement($sql);
+        } catch (\Exception $e) {
+            $this->logger->notice(new Message(
+                'The module Collecting is a new version and is not copiable for now. Copy forms manually if needed.' // @translate
+            ));
+            return;
+        }
 
         // No need to refresh.
     }
 
-    protected function indexPages(Site $site)
+    protected function indexPages(Site $site): void
     {
         /**
          * @var \Omeka\Stdlib\FulltextSearch $fulltext
@@ -547,7 +582,7 @@ SQL;
         }
     }
 
-    protected function addRelations(SitePage $sourcePage, SitePage $targetPage)
+    protected function addRelations(SitePage $sourcePage, SitePage $targetPage): void
     {
         /** @var \Internationalisation\Entity\SitePageRelation[] $relations */
         $relations = $this->api->search('site_page_relations', ['relation' => $sourcePage->getId()], ['responseContent' => 'resource', 'initialize' => false, 'finalize' => false, 'flushEntityManager' => false])->getContent();

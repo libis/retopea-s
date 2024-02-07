@@ -1,9 +1,11 @@
-<?php
+<?php declare(strict_types=1);
+
 namespace Internationalisation\Form;
 
+use Laminas\Form\Element;
+use Laminas\Form\Fieldset;
+use Omeka\Form\Element\ArrayTextarea;
 use Omeka\View\Helper\Setting;
-use Zend\Form\Element;
-use Zend\Form\Fieldset;
 
 class SiteSettingsFieldset extends Fieldset
 {
@@ -14,7 +16,11 @@ class SiteSettingsFieldset extends Fieldset
 
     protected $label = 'Internationalisation'; // @translate
 
-    public function init()
+    protected $elementGroups = [
+        'internationalisation' => 'Internationalisation', // @translate
+    ];
+
+    public function init(): void
     {
         $siteSetting = $this->getSiteSetting();
         $locale = $siteSetting('locale');
@@ -38,10 +44,13 @@ class SiteSettingsFieldset extends Fieldset
         }
 
         $this
+            ->setAttribute('id', 'internationalisation')
+            ->setOption('element_groups', $this->elementGroups)
             ->add([
                 'name' => 'internationalisation_display_values',
                 'type' => Element\Select::class,
                 'options' => [
+                    'element_group' => 'internationalisation',
                     'label' => 'Language of values', // @translate
                     'info' => $info,
                     'value_options' => $valueOptions,
@@ -54,8 +63,9 @@ class SiteSettingsFieldset extends Fieldset
 
             ->add([
                 'name' => 'internationalisation_fallbacks',
-                'type' => Element\Textarea::class,
+                'type' => ArrayTextarea::class,
                 'options' => [
+                    'element_group' => 'internationalisation',
                     'label' => 'Custom language fallbacks', // @translate
                     'info' => 'Specify values to display when a property has no value with the language of the site. Set one language code by line.', // @translate
                 ],
@@ -70,8 +80,9 @@ fr',
 
             ->add([
                 'name' => 'internationalisation_required_languages',
-                'type' => Element\Textarea::class,
+                'type' => ArrayTextarea::class,
                 'options' => [
+                    'element_group' => 'internationalisation',
                     'label' => 'Required languages', // @translate
                     'info' => 'Specify values to display in all cases. Values without language are displayed in all cases. Set one language code by line.', // @translate
                 ],
@@ -84,19 +95,13 @@ fra',
             ]);
     }
 
-    /**
-     * @param Setting $siteSetting
-     */
-    public function setSiteSetting(Setting $siteSetting)
+    public function setSiteSetting(Setting $siteSetting): self
     {
         $this->siteSetting = $siteSetting;
         return $this;
     }
 
-    /**
-     * @return \Omeka\View\Helper\Setting
-     */
-    public function getSiteSetting()
+    public function getSiteSetting(): Setting
     {
         return $this->siteSetting;
     }

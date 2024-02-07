@@ -6,10 +6,9 @@ use CSVImport\Mvc\Controller\Plugin\FindResourcesFromIdentifiers;
 use CSVImport\Source\SourceInterface;
 use finfo;
 use Omeka\Api\Manager;
-use Omeka\Api\Response;
 use Omeka\Job\AbstractJob;
 use Omeka\Stdlib\Message;
-use Zend\Log\Logger;
+use Laminas\Log\Logger;
 
 class Import extends AbstractJob
 {
@@ -100,13 +99,13 @@ class Import extends AbstractJob
 
     public function perform()
     {
-        ini_set('auto_detect_line_endings', true);
+        ini_set('auto_detect_line_endings', '1');
         $services = $this->getServiceLocator();
         $this->api = $services->get('Omeka\ApiManager');
         $this->logger = $services->get('Omeka\Logger');
         $this->findResourcesFromIdentifiers = $services->get('ControllerPluginManager')
             ->get('findResourcesFromIdentifiers');
-        $config = $services->get('Config');
+        $config = $services->get('CSVImport\Config');
 
         $this->args = $this->job->getArgs();
         $args = &$this->args;
@@ -117,7 +116,7 @@ class Import extends AbstractJob
         $this->importResource = $this->resourceType === 'resources';
 
         $this->mappings = [];
-        $mappingClasses = $config['csv_import']['mappings'][$this->resourceType];
+        $mappingClasses = $config['mappings'][$this->resourceType];
         foreach ($mappingClasses as $mappingClass) {
             $mapping = new $mappingClass();
             $mapping->init($args, $services);
@@ -163,7 +162,7 @@ class Import extends AbstractJob
             $this->identifierPropertyId = (int) $args['identifier_property'];
         } else {
             $result = $this->api
-            ->search('properties', ['term' => $args['identifier_property']])->getContent();
+                ->search('properties', ['term' => $args['identifier_property']])->getContent();
             $this->identifierPropertyId = $result ? $result[0]->id() : null;
         }
 
@@ -171,11 +170,10 @@ class Import extends AbstractJob
             $this->rowsByBatch = (int) $args['rows_by_batch'];
         }
 
-        // The core allows batch processes only for creation and deletion.
-        if (!in_array($args['action'], [self::ACTION_CREATE, self::ACTION_DELETE, self::ACTION_SKIP])
-            // It allows to identify resources too, so to use a new resource
-            // from a previous row.
-            || ($args['action'] === self::ACTION_CREATE && $this->resourceType === 'resources')
+        // Force row-at-a-time processing for mixed-resource imports to allow
+        // rows to freely reference data from prior rows
+        if ($this->resourceType === 'resources'
+            && !in_array($args['action'], [self::ACTION_DELETE, self::ACTION_SKIP])
         ) {
             $this->rowsByBatch = 1;
         }
@@ -195,7 +193,7 @@ class Import extends AbstractJob
             $data = $this->mapRows($rows);
             $this->processBatchData($data);
             $offset += $this->rowsByBatch;
-        };
+        }
 
         if ($this->emptyLines) {
             $this->logger->info(new Message('%d empty lines were skipped.', // @translate
@@ -215,7 +213,9 @@ class Import extends AbstractJob
     {
         $data = [];
         foreach ($rows as $row) {
-            if (!array_filter($row, function ($v) { return strlen($v); })) {
+            if (!array_filter($row, function ($v) {
+                return strlen($v);
+            })) {
                 $this->emptyLines++;
                 continue;
             }
@@ -259,6 +259,8 @@ class Import extends AbstractJob
             case self::ACTION_REVISE:
             case self::ACTION_UPDATE:
             case self::ACTION_REPLACE:
+                $originalIdentityMap = $this->getServiceLocator()->get('Omeka\EntityManager')->getUnitOfWork()->getIdentityMap();
+
                 $findResourcesFromIdentifiers = $this->findResourcesFromIdentifiers;
                 $identifiers = $this->extractIdentifiers($data);
                 $ids = $findResourcesFromIdentifiers($identifiers, $this->identifierPropertyId, $this->resourceType);
@@ -292,6 +294,7 @@ class Import extends AbstractJob
                     $dataToProcess = $this->identifyMedias($dataToProcess, $idsToProcess);
                 }
                 $this->update($dataToProcess, $idsToProcess, $args['action']);
+                $this->detachAllNewEntities($originalIdentityMap);
                 break;
 
             case self::ACTION_DELETE:
@@ -580,8 +583,8 @@ class Import extends AbstractJob
         // WHERE item_id IN (SELECT item_id FROM `media` WHERE id IN (%s) GROUP BY item_id ORDER BY item_id ASC)
         $conn->exec('SET @item_id = 0; SET @rank = 1;');
         $query = <<<'SQL'
-SELECT id, rank FROM (
-    SELECT id, @rank := IF(@item_id = item_id, @rank + 1, 1) AS rank, @item_id := item_id AS item
+SELECT id, `rank` FROM (
+    SELECT id, @rank := IF(@item_id = item_id, @rank + 1, 1) AS `rank`, @item_id := item_id AS item
     FROM media
     WHERE item_id IN (%s)
     ORDER BY item_id ASC, -position DESC, id ASC
@@ -741,7 +744,7 @@ SQL;
      * @param string $resourceType
      * @param int $id
      * @param array $data
-     * @return Response
+     * @return \Omeka\Api\Response
      */
     protected function append($resourceType, $id, $data)
     {
@@ -771,7 +774,7 @@ SQL;
      * @param int $id
      * @param array $data
      * @param string $action
-     * @return Response
+     * @return \Omeka\Api\Response
      */
     protected function updateRevise($resourceType, $id, $data, $action)
     {
@@ -803,11 +806,11 @@ SQL;
      */
     protected function removeEmptyData(array $data)
     {
-        // Data are updated in place.
-        foreach ($data as $name => &$metadata) {
+        foreach ($data as $name => $metadata) {
             switch ($name) {
                 case 'o:resource_template':
                 case 'o:resource_class':
+                case 'o:thumbnail':
                 case 'o:owner':
                 case 'o:item':
                     if (empty($metadata) || empty($metadata['o:id'])) {
@@ -826,6 +829,7 @@ SQL;
                 case 'o:ingester':
                 case 'o:source':
                 case 'ingest_filename':
+                case 'o:size':
                     unset($data[$name]);
                     break;
                 case 'o:is_public':
@@ -834,12 +838,12 @@ SQL;
                         unset($data[$name]);
                     }
                     break;
+                // Properties.
                 default:
-                    if (is_array($metadata)) {
-                        if (empty($metadata)) {
-                            unset($data[$name]);
-                        }
+                    if (is_array($metadata) && empty($metadata)) {
+                        unset($data[$name]);
                     }
+                    break;
             }
         }
         return $data;
@@ -958,18 +962,16 @@ SQL;
     protected function deduplicateIds($data)
     {
         $dataBase = $data;
-        // Base to normalize data in order to deduplicate them in one pass.
-        $base = [];
-        $base['id'] = ['o:id' => 0];
         // Deduplicate data.
-        $data = array_map('unserialize', array_unique(array_map('serialize',
+        $data = array_map('unserialize', array_unique(array_map(
+            'serialize',
             // Normalize data.
-            array_map(function ($v) use ($base) {
+            array_map(function ($v) {
                 return isset($v['o:id']) ? ['o:id' => $v['o:id']] : $v;
-        }, $data))));
-        // Keep first original data.
-        $data = array_intersect_key($dataBase, $data);
-        return $data;
+            }, $data)
+        )));
+        // Keep original data first.
+        return array_intersect_key($dataBase, $data);
     }
 
     /**
@@ -982,17 +984,44 @@ SQL;
     {
         // Base to normalize data in order to deduplicate them in one pass.
         $base = [];
-        $base['literal'] = ['property_id' => 0, 'type' => 'literal', '@language' => '', '@value' => ''];
-        $base['resource'] = ['property_id' => 0, 'type' => 'resource', 'value_resource_id' => 0];
-        $base['url'] = ['property_id' => 0, 'type' => 'url', '@id' => 0, 'o:label' => ''];
+
+        $base['literal'] = ['is_public' => true, 'property_id' => 0, 'type' => 'literal', '@language' => null, '@value' => ''];
+        $base['resource'] = ['is_public' => true, 'property_id' => 0, 'type' => 'resource', 'value_resource_id' => 0];
+        $base['uri'] = ['is_public' => true, 'o:label' => null, 'property_id' => 0, 'type' => 'uri', '@id' => ''];
         foreach ($values as $key => $value) {
             $values[$key] = array_values(
                 // Deduplicate values.
-                array_map('unserialize', array_unique(array_map('serialize',
+                array_map('unserialize', array_unique(array_map(
+                    'serialize',
                     // Normalize values.
                     array_map(function ($v) use ($base) {
-                        return array_replace($base[$v['type']], array_intersect_key($v, $base[$v['type']]));
-            }, $value)))));
+                        // Data types "resource" and "uri" have "@id" (in json).
+                        $mainType = array_key_exists('value_resource_id', $v)
+                            ? 'resource'
+                            : (array_key_exists('@id', $v) ? 'uri' : 'literal');
+                        // Keep order and meaning keys.
+                        $r = array_replace($base[$mainType], array_intersect_key($v, $base[$mainType]));
+                        $r['is_public'] = (bool) $r['is_public'];
+                        switch ($mainType) {
+                            case 'literal':
+                                if (empty($r['@language'])) {
+                                    $r['@language'] = null;
+                                }
+                                break;
+                            case 'uri':
+                                if (empty($r['o:label'])) {
+                                    $r['o:label'] = null;
+                                }
+                                break;
+                        }
+                        // Bring over annotations untouched, if present
+                        if (isset($v['@annotation'])) {
+                            $r['@annotation'] = $v['@annotation'];
+                        }
+                        return $r;
+                    }, $value)
+                )))
+            );
         }
         return $values;
     }
@@ -1024,7 +1053,7 @@ SQL;
             }
         }
 
-        $sources = $this->getServiceLocator()->get('Config')['csv_import']['sources'];
+        $sources = $this->getServiceLocator()->get('CSVImport\Config')['sources'];
         if (!isset($sources[$mediaType])) {
             return;
         }
@@ -1141,7 +1170,7 @@ SQL;
                     }, $result);
                     if ($itemIds) {
                         $entityManager = $this->getServiceLocator()->get('Omeka\EntityManager');
-                        $query = $entityManager ->createQuery(
+                        $query = $entityManager->createQuery(
                             sprintf('SELECT COUNT(media.id) FROM Omeka\Entity\Media media WHERE media.item IN (%s)',
                                 implode(',', $itemIds)));
                         $total = $query->getSingleScalarResult();
@@ -1181,6 +1210,28 @@ SQL;
         $response = $this->api->update('csvimport_imports', $this->importRecord->id(), $csvImportJson);
         if ($this->source) {
             $this->source->clean();
+        }
+    }
+
+    /**
+     * Given an old copy of the Doctrine identity map, reset
+     * the entity manager to that state by detaching all entities that
+     * did not exist in the prior state.
+     *
+     * @internal This is a copy-paste of the functionality from the abstract entity adapter
+     *
+     * @param array $oldIdentityMap
+     */
+    protected function detachAllNewEntities(array $oldIdentityMap)
+    {
+        $entityManager = $this->getServiceLocator()->get('Omeka\EntityManager');
+        $identityMap = $entityManager->getUnitOfWork()->getIdentityMap();
+        foreach ($identityMap as $entityClass => $entities) {
+            foreach ($entities as $idHash => $entity) {
+                if (!isset($oldIdentityMap[$entityClass][$idHash])) {
+                    $entityManager->detach($entity);
+                }
+            }
         }
     }
 }

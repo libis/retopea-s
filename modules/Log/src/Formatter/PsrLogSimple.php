@@ -1,10 +1,10 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Log\Formatter;
 
-use Zend\Log\Formatter\Simple;
-use Log\Stdlib\PsrInterpolateTrait;
+use Laminas\Log\Formatter\Simple;
 use Log\Stdlib\PsrInterpolateInterface;
+use Log\Stdlib\PsrInterpolateTrait;
 
 class PsrLogSimple extends Simple implements PsrInterpolateInterface
 {
@@ -42,7 +42,7 @@ class PsrLogSimple extends Simple implements PsrInterpolateInterface
                 // Don't print an empty array
                 $value = '';
             }
-            $output = str_replace("%$name%", $value, $output);
+            $output = str_replace("%$name%", (string) $value, $output);
         }
 
         if (isset($event['extra']) && empty($event['extra'])
@@ -56,7 +56,7 @@ class PsrLogSimple extends Simple implements PsrInterpolateInterface
     /**
      * Recursively format the context.
      *
-     * @see \Zend\Log\Formatter\Base::format().
+     * @see \Laminas\Log\Formatter\Base::format().
      * @param array $event
      * @return array
      */
