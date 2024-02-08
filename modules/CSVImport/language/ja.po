@@ -5,7 +5,6 @@
 # 
 # Translators:
 # Naosuke Okamoto, 2020
-# Tatsuro YOKOTA <hidaruma@outlook.jp>, 2022
 # 
 #, fuzzy
 msgid ""
@@ -14,7 +13,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-02-17 13:26-0500\n"
 "PO-Revision-Date: 2017-09-14 20:14+0000\n"
-"Last-Translator: Tatsuro YOKOTA <hidaruma@outlook.jp>, 2022\n"
+"Last-Translator: Naosuke Okamoto, 2020\n"
 "Language-Team: Japanese (https://www.transifex.com/omeka/teams/14184/ja/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -67,7 +66,7 @@ msgstr "CSVインポート"
 
 #: view/csv-import/index/map.phtml:13
 msgid "mixed resources"
-msgstr "混在したリソース"
+msgstr ""
 
 #: view/csv-import/index/map.phtml:14
 msgid "users"
@@ -222,11 +221,11 @@ msgstr "一般データ"
 
 #: view/csv-import/mapping-sidebar/resource.phtml:9
 msgid "Resource template (by label)"
-msgstr "リソーステンプレート（ラベルごと）"
+msgstr ""
 
 #: view/csv-import/mapping-sidebar/resource.phtml:10
 msgid "Resource class (by term)"
-msgstr "リソーステンプレート（用語ごと）"
+msgstr ""
 
 #: view/csv-import/mapping-sidebar/resource.phtml:12
 msgid "Owner (by email address)"
@@ -243,11 +242,11 @@ msgstr "ユーザー情報"
 
 #: src/Mapping/ItemSetMapping.php:8
 msgid "Item set data"
-msgstr "アイテムセットデータ"
+msgstr ""
 
 #: src/Mapping/UserMapping.php:8
 msgid "User info"
-msgstr "ユーザー情報"
+msgstr ""
 
 #: src/Mapping/ItemMapping.php:8
 msgid "Item data"
@@ -260,12 +259,12 @@ msgstr "リソースデータ"
 #: src/Mapping/ResourceMapping.php:64
 #, php-format
 msgid "\"%s\" is not a valid resource type."
-msgstr "\"%s\" は有効なリソース型ではありません。"
+msgstr ""
 
 #: src/Mapping/AbstractResourceMapping.php:235
 #, php-format
 msgid "\"%s\" (%s) is not a valid item set."
-msgstr "\"%s\" （%s） は有効なアイテムセットではありません。"
+msgstr ""
 
 #: src/Mapping/AbstractResourceMapping.php:257
 #, php-format
@@ -275,7 +274,7 @@ msgstr ""
 #: src/Mapping/AbstractResourceMapping.php:270
 #, php-format
 msgid "\"%s\" (%s) is not a valid item identifier."
-msgstr "\"%s\" （%s）は有効なアイテムIDではありません。"
+msgstr ""
 
 #: src/Mapping/AbstractResourceMapping.php:284
 #, php-format
@@ -308,7 +307,7 @@ msgstr ""
 
 #: src/Source/CsvFile.php:84
 msgid "File is not UTF-8 encoded."
-msgstr "ファイルはUTF-8エンコーディングではありません。"
+msgstr ""
 
 #: src/Source/AbstractSpreadsheet.php:34
 #, php-format
